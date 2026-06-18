@@ -31,6 +31,7 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
   const { title, description, center = true, noButtonText = 'Cancel', yesButtonText = 'Yes', onConfirm, children } = props;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const confirm = () => {
 
@@ -42,6 +43,7 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
       close() {
         setIsDialogOpen(false);
         setIsLoading(false);
+        setIsSubmitting(false);
       },
       open() {
         setIsDialogOpen(true);
@@ -86,8 +88,10 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
 
               <div>
                 <PrimaryButton
-                  disabled={isLoading}
+                  disabled={isLoading || isSubmitting}
                   onClick={() => {
+                    if (isSubmitting) return;
+                    setIsSubmitting(true);
                     confirm();
                   }}
                 >{!isLoading && yesButtonText}

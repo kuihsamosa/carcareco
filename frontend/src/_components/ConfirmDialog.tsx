@@ -1,43 +1,53 @@
- 
+
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react'
+import clsx from 'clsx';
 import React from 'react';
 import { useState,  useImperativeHandle  } from 'react';
 import { ExclamationCircleIcon } from '@heroicons/react/24/outline'
 
- export interface IOnConfirm 
+ export interface IOnConfirm
  {
-    (confirmObj:any ):void // eslint-disable-line @typescript-eslint/no-explicit-any
+    (confirmObj:any ):void | Promise<void> // eslint-disable-line @typescript-eslint/no-explicit-any
  }
- 
+
 export type ConfirmDialogHandle  = {
     open: ({
         title,
         description,
-        confirmObj, 
+        confirmObj,
+        variant,
     }:{
         title:string,
         description?:string |undefined ,
         confirmObj: any,  // eslint-disable-line @typescript-eslint/no-explicit-any
+        variant?: 'default' | 'danger',
     }) => void;
   };
-  
+
  type Props  = {
-    onConfirm: IOnConfirm 
+    onConfirm: IOnConfirm
  };
 
  const ConfirmDialog = React.forwardRef<ConfirmDialogHandle , Props >((props, ref) =>{
 
-    const { onConfirm} =props;  
+    const { onConfirm} =props;
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [confirmObjTarget, setConfirmObjTarget] = useState();
-     
-    const confirm =()=>{
-        setIsDialogOpen(false);
-        onConfirm(confirmObjTarget);
+    const [isConfirming, setIsConfirming] = useState(false);
+    const [variant, setVariant] = useState<'default' | 'danger'>('default');
+
+    const confirm = async () => {
+        setIsConfirming(true);
+        try {
+            await Promise.resolve(onConfirm(confirmObjTarget));
+        } finally {
+            setIsConfirming(false);
+            setIsDialogOpen(false);
+        }
     }
 
     useImperativeHandle(ref, () => {
@@ -45,13 +55,15 @@ export type ConfirmDialogHandle  = {
           open({
             title,
             description,
-            confirmObj, 
+            confirmObj,
+            variant,
         }) {
             setTitle(title);
             if(description)setDescription(description);
-            setIsDialogOpen(true); 
+            setIsDialogOpen(true);
             setConfirmObjTarget(confirmObj);
-          }, 
+            setVariant(variant ?? 'default');
+          },
         };
       }, []);
 
@@ -69,8 +81,14 @@ export type ConfirmDialogHandle  = {
                 className="relative transform overflow-hidden rounded-lg bg-white px-4 pt-5 pb-4 text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg sm:p-6 data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
                  <div>
-               <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-green-100">
-                <ExclamationCircleIcon aria-hidden="true" className="size-6 text-green-600" />
+               <div className={clsx(
+                    "mx-auto flex size-12 items-center justify-center rounded-full",
+                    variant === 'danger' ? "bg-red-100" : "bg-green-100"
+                )}>
+                <ExclamationCircleIcon aria-hidden="true" className={clsx(
+                    "size-6",
+                    variant === 'danger' ? "text-red-600" : "text-green-600"
+                )} />
                 </div>
                 <div className="mt-3 text-center sm:mt-5">
                     <DialogTitle as="h3" className="text-base font-semibold text-gray-900">
@@ -84,16 +102,21 @@ export type ConfirmDialogHandle  = {
                 </div>
             </div>
                 <div className="mt-6    grid  grid-flow-row-dense  grid-cols-2  gap-3">
-                    
+
                     <SecondaryButton
                       onClick={() => setIsDialogOpen(false)}
                     >Cancel</SecondaryButton>
                      <PrimaryButton
-                     className="inline-flex w-full justify-center" 
-                     onClick={() => { 
+                     disabled={isConfirming}
+                     loading={isConfirming}
+                     className={clsx(
+                         "inline-flex w-full justify-center",
+                         variant === 'danger' && "!bg-red-600 hover:!bg-red-500"
+                     )}
+                     onClick={() => {
                         confirm();
                      }}
-                    >Yes
+                    >{variant === 'danger' ? 'Yes, delete' : 'Yes'}
                     </PrimaryButton>
                 </div>
             </DialogPanel>
@@ -105,4 +128,3 @@ export type ConfirmDialogHandle  = {
 ConfirmDialog.displayName = "Confirm dialog";
 
 export default ConfirmDialog;
- 
