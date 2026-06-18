@@ -1,3 +1,4 @@
+'use client'
 import { ExclamationCircleIcon } from "@heroicons/react/16/solid"
 import clsx from "clsx"
 import { ChangeEvent, useState, KeyboardEventHandler } from "react";
