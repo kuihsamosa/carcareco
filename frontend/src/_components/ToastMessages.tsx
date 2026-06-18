@@ -16,16 +16,18 @@ const ToastMessages = () => {
   const [show, setShow] = useState(false);
   const [message, setMessage] = useState('');
   const [isError, setIsError] = useState(false);
+  const [action, setAction] = useState<{ label: string } | undefined>(undefined);
   const toast = getCookie('toast')?.toString();
 
 
   useEffect(() => {
- 
+
     if (toast) {
       setShow(true);
       const json = JSON.parse(toast);
       setIsError(json.isError);
       setMessage(json.message);
+      setAction(json.action);
       if (!json.isError) {
         setTimeout(() => {
           if (show) {
@@ -33,15 +35,17 @@ const ToastMessages = () => {
             setMessage("");
             setShow(false);
             setIsError(false);
+            setAction(undefined);
           }
-        }, 10 * 1000);
+        }, 4 * 1000);
       }
 
     }
   }, [toast, show, deleteCookie]);
- 
+
   return (
     <>
+      <style>{`@keyframes shrink { from { transform: scaleX(1); } to { transform: scaleX(0); } }`}</style>
       {/* Global notification live region, render this permanently at the end of the document */}
       <div
         aria-live="assertive"
@@ -60,6 +64,14 @@ const ToastMessages = () => {
                   </div>
                   <div className="ml-3 w-0 flex-1 pt-0.5">
                     <p className={clsx(isError ? "text-red-900" : "text-green-900", "text-sm font-medium")}>{message}</p>
+                    {action && (
+                        <button
+                            onClick={() => { deleteCookie('toast'); setShow(false); }}
+                            className="ml-2 text-sm font-medium text-green-700 underline hover:text-green-900"
+                        >
+                            {action.label}
+                        </button>
+                    )}
                   </div>
                   <div className="ml-4 flex shrink-0">
                     <button
@@ -69,6 +81,7 @@ const ToastMessages = () => {
                         setMessage("");
                         setShow(false);
                         setIsError(false);
+                        setAction(undefined);
                       }}
                       className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
                     >
@@ -78,6 +91,14 @@ const ToastMessages = () => {
                   </div>
                 </div>
               </div>
+              {!isError && (
+                  <div className="h-0.5 bg-green-200 rounded-b-lg overflow-hidden">
+                      <div
+                          className="h-full bg-green-500 origin-left"
+                          style={{ animation: 'shrink 4s linear forwards' }}
+                      />
+                  </div>
+              )}
             </div>
           </Transition>
         </div>

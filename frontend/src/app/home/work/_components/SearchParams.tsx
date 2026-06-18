@@ -12,19 +12,19 @@ export default function SearchParams({
         
             {options.issued === 'on' && <>
                 <div className="col-span-1  ">
-                        <FormInput name="invoiceFrom" label="Invoice from" defaultValue={options.invoiceFrom} type="date" ></FormInput>
+                        <FormInput name="invoiceFrom" label="Invoice from" defaultValue={options.invoiceFrom} type="date" onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') e.preventDefault(); }}></FormInput>
                       </div>
 
                       <div className="col-span-1 ">
-                        <FormInput name="invoiceTo" label="Invoice to" defaultValue={options.invoiceTo} type="date" ></FormInput>
+                        <FormInput name="invoiceTo" label="Invoice to" defaultValue={options.invoiceTo} type="date" onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') e.preventDefault(); }}></FormInput>
                       </div>
                   </>  }
                   <div className="col-span-1  ">
-                    <FormInput name="workFrom" label="Work from" defaultValue={options.workFrom} type="date" ></FormInput>
+                    <FormInput name="workFrom" label="Work from" defaultValue={options.workFrom} type="date" onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') e.preventDefault(); }}></FormInput>
                   </div>
 
                   <div className="col-span-1  ">
-                    <FormInput name="workTo" label="Work to" defaultValue={options.workTo} type="date" ></FormInput>
+                    <FormInput name="workTo" label="Work to" defaultValue={options.workTo} type="date" onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => { if (e.key === 'Enter') e.preventDefault(); }}></FormInput>
                   </div>
 
                   <div className="col-span-1  ">

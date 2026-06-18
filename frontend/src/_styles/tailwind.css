@@ -14,6 +14,11 @@
   [role='button']:disabled {
     cursor: default;
   }
+  button,
+  a,
+  [role='button'] {
+    touch-action: manipulation;
+  }
 }
 .menu-button {
   overflow: auto !important;

@@ -1,6 +1,6 @@
 import { ExclamationCircleIcon } from "@heroicons/react/16/solid"
 import clsx from "clsx"
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState, KeyboardEventHandler } from "react";
 import FormLabel from "./FormLabel";
 
 
@@ -19,6 +19,8 @@ export default function FormInput({
     onInputChange,
     step,
     className,
+    validate,
+    onKeyDown,
 }: {
     name: string,
     label?: string | undefined,
@@ -29,13 +31,14 @@ export default function FormInput({
     placeholder?: string | undefined,
     onInputChange?: IInputOnChange,
     step?: string | undefined,
-    className?: string | undefined
+    className?: string | undefined,
+    validate?: (value: string) => string | undefined,
+    onKeyDown?: KeyboardEventHandler<HTMLInputElement>
 }) {
 
-    let hasError = false;
-    if (inputError) {
-        hasError = true;
-    }
+    const [blurError, setBlurError] = useState<string | undefined>(undefined)
+    const activeError = inputError ?? blurError
+    let hasError = !!activeError
     return (
         <>
             {label&&<FormLabel name={name} label={label}></FormLabel>}
@@ -46,6 +49,12 @@ export default function FormInput({
                     type={type}
                     step={step}
                     onChange={onInputChange}
+                    onKeyDown={onKeyDown}
+                    onBlur={(e) => {
+                        if (validate) {
+                            setBlurError(validate(e.target.value))
+                        }
+                    }}
                     defaultValue={defaultValue}
                     value={value}
 
@@ -64,7 +73,7 @@ export default function FormInput({
                 />}
             </div>
             {hasError && <p id={name + '-error'} role="alert" className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                {inputError}
+                {activeError}
             </p>}
 
         </>

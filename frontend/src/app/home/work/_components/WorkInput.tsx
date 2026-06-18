@@ -11,6 +11,7 @@ import { useState } from 'react';
 import FormSwitch from '@/_components/FormSwitch';
 import { Field, Label } from '@headlessui/react';
 import { query } from '@/_lib/client/query-api';
+import { useUnsavedChanges } from '@/_lib/useUnsavedChanges';
 import { IVehicleData } from '../../vehicles/model';
 import FormInput from '@/_components/FormInput';
 import Select from '@/_components/Select';
@@ -29,7 +30,10 @@ export default function WorkInput({
 
 
     const router = useRouter()
-   
+
+    const [isDirty, setIsDirty] = useState(false)
+    useUnsavedChanges(isDirty)
+
     const [isOffer, setIsOffer] = useState(false);
 
     const [onlyClientVehicles, setOnlyClientVehicles] = useState(!work ? true : false);
@@ -72,6 +76,7 @@ export default function WorkInput({
                                     checked={isOffer}
                                     onChange={(value) => {
                                         setIsOffer(value);
+                                        setIsDirty(true);
                                     }}></FormSwitch>
 
                                 <Label as="span" className="ml-3 text-sm">
@@ -91,6 +96,7 @@ export default function WorkInput({
                                         onChange={(value) => {
                                             setClientUndisclosed(value);
                                             setOnlyClientVehicles(!value);
+                                            setIsDirty(true);
                                         }}></FormSwitch>
                                 </span>
                             </FormLabel>
@@ -132,6 +138,7 @@ export default function WorkInput({
                                                 value={selectedClientVehicleId}
                                                 onChange={(e) => {
                                                     setSelectedClientVehicleId(e.currentTarget.value);
+                                                    setIsDirty(true);
                                                 }} >
                                                 {clientVehicles?.map((item, index) => {
                                                     return (<option key={index} value={item.id}>{[item?.producer, item?.model].filter(x => x).join(' ') + (!item?.regNr ? '' : ` (${item.regNr})`)}</option>)
