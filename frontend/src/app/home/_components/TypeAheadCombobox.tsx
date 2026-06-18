@@ -1,8 +1,9 @@
+'use client'
+
 import { Combobox, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
 import { CheckIcon, MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import { ChangeEvent, useState } from "react";
 import clsx from "clsx";
-
 
 export interface IObjectToString<T> {
   (item: T): string
@@ -49,30 +50,34 @@ export default function TypeAheadCombobox<T>({
   clearable?: boolean | undefined
 }) {
   const [datasource, setDatasource] = useState<T[]>([]);
-  const applyDatasource =(items:T[])=>{
+  const [hasSearched, setHasSearched] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const applyDatasource = (items: T[]) => {
     setDatasource(items);
+    setHasSearched(true);
+    setIsOpen(true);
   }
 
   if(!className){
     className = " block w-full rounded-md bg-white py-1.5 pr-12 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-800 text-sm/6";
   }
 
-
+  const showDropdown = isOpen && hasSearched;
 
   return (
     <Combobox
         as="div"
         id={id}
         name={name}
-
         value={defaultValue}
         onChange={(item) => {
-
           setDatasource([]);
+          setHasSearched(false);
+          setIsOpen(false);
           onItemChange(item);
         }}
       >
-
         <div className={(comboboxOptionsAbsolute?'':'mt-2 relative')}>
           <div className="grid grid-cols-1">
 
@@ -81,13 +86,20 @@ export default function TypeAheadCombobox<T>({
             placeholder={placeholder}
             className={clsx(showLookingGlass&&"col-start-1 row-start-1 pl-11",className)}
             onChange={(event) => {
-               onSearch(event,applyDatasource);
+              if (!event.currentTarget.value) {
+                setHasSearched(false);
+                setIsOpen(false);
+                setDatasource([]);
+                return;
+              }
+              onSearch(event, applyDatasource);
             }}
-            onBlur={() =>   {
-
-              setDatasource([])
-            }
-            }
+            onBlur={() => {
+              setTimeout(() => {
+                setDatasource([]);
+                setIsOpen(false);
+              }, 150);
+            }}
             displayValue={(item) => {
               if (!item) return '';
               return displayFormatter(item);
@@ -105,8 +117,8 @@ export default function TypeAheadCombobox<T>({
           />}
           </div>
 
-          {datasource && datasource.length > 0 && (
-            <ComboboxOptions modal={false}  className={clsx(comboboxOptionsAbsolute?("w-80  sm:w-"+comboboxOptionsWidth):"w-full" ,"absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base ring-1 shadow-lg ring-black/5 focus:outline-hidden  text-sm")} >
+          {showDropdown && datasource.length > 0 && (
+            <ComboboxOptions modal={false} className={clsx(comboboxOptionsAbsolute?("w-80  sm:w-"+comboboxOptionsWidth):"w-full" ,"absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base ring-1 shadow-lg ring-black/5 focus:outline-hidden  text-sm")} >
               {datasource.map((item, index) => (
                 <ComboboxOption
                   key={index}
@@ -122,6 +134,13 @@ export default function TypeAheadCombobox<T>({
                 </ComboboxOption>
               ))}
             </ComboboxOptions>
+          )}
+
+          {showDropdown && datasource.length === 0 && (
+            <div className="absolute z-10 mt-1 w-full rounded-md bg-white py-3 px-4 text-sm text-gray-500 ring-1 shadow-lg ring-black/5">
+              <p className="font-medium text-gray-700 mb-0.5">No results found</p>
+              <p className="text-xs text-gray-400">Try a different search term or check the spelling.</p>
+            </div>
           )}
         </div>
       </Combobox>
