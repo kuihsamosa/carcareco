@@ -119,6 +119,37 @@ const dataPage =({
     });
   };
    
+  async function queryApi<T>(
+    path: string,
+    options?: { params?: Record<string, number | string> }
+  ): Promise<T> {
+    const jwt = getJwtToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (jwt) headers['Authorization'] = 'Bearer ' + jwt;
+    if (!basePath) throw new Error('NEXT_PUBLIC_API_URL env not set');
+    const url = new URL(`${basePath}/api/${path}`);
+    if (options?.params) {
+      Object.entries(options.params).forEach(([k, v]) => url.searchParams.set(k, String(v)));
+    }
+    const res = await fetch(url.toString(), { method: 'GET', headers });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json() as Promise<T>;
+  }
+
+  async function patchApi<T>(path: string, body?: unknown): Promise<T> {
+    const jwt = getJwtToken();
+    const headers: HeadersInit = { 'Content-Type': 'application/json' };
+    if (jwt) headers['Authorization'] = 'Bearer ' + jwt;
+    if (!basePath) throw new Error('NEXT_PUBLIC_API_URL env not set');
+    const res = await fetch(`${basePath}/api/${path}`, {
+      method: 'PATCH',
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json() as Promise<T>;
+  }
+
   export {
-      query,dataPage 
+      query, dataPage, queryApi, patchApi
   }

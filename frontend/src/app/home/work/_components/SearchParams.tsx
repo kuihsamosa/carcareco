@@ -1,3 +1,4 @@
+'use client'
 import FormInput from "@/_components/FormInput";
 import FormLabel from "@/_components/FormLabel"; 
 import { ClientsCombobox, VehiclesCombobox } from "../../_components/SearchCombobox";

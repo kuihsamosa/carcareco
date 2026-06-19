@@ -1,11 +1,12 @@
 'use client'
 import Image from "next/image"
 import ProfileMenu from "./ProfileMenu"
-import { 
-    Cog6ToothIcon, 
+import {
+    Cog6ToothIcon,
     QueueListIcon,
     TruckIcon,
-    UsersIcon, 
+    UsersIcon,
+    ChartBarIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx"; 
 import { usePathname } from 'next/navigation'
@@ -16,6 +17,7 @@ const navigation = [
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
     { name: 'Inventory', href: '/home/inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },
+    { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass}></ChartBarIcon>  },
     // { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass}></WrenchScrewdriverIcon>  },
 ]
  

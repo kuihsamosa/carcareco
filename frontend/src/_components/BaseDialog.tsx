@@ -47,6 +47,7 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
       },
       open() {
         setIsDialogOpen(true);
+        setIsSubmitting(false);
       },
 
       loading(value: boolean) {

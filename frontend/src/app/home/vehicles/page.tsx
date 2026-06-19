@@ -25,11 +25,11 @@ export default async function Page(
             return "pl-4 font-medium gray-900 whitespace-nowrap";
           },
           dataFormatter: ({ producer }) => {
-            const producerName = producer.trim().replace(" ", "-").toLowerCase();
+            const producerName = (producer ?? '').trim().replace(" ", "-").toLowerCase();
             return (
               <div className="flex items-center " >
-                <i className={clsx("pr-2 text-2xl", "car-" + producerName)}>  </i>
-                <span className="text-sm">{producer}</span>
+                {producerName && <i className={clsx("pr-2 text-2xl", "car-" + producerName)}>  </i>}
+                <span className="text-sm">{producer ?? '—'}</span>
               </div>
             );
           }

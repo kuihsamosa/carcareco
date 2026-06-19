@@ -39,7 +39,7 @@ export default function FormInput({
 
     const [blurError, setBlurError] = useState<string | undefined>(undefined)
     const activeError = inputError ?? blurError
-    let hasError = !!activeError
+    const hasError = !!activeError
     return (
         <>
             {label&&<FormLabel name={name} label={label}></FormLabel>}
