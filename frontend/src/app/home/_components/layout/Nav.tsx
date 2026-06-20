@@ -7,18 +7,21 @@ import {
     TruckIcon,
     UsersIcon,
     ChartBarIcon,
+    DocumentTextIcon,
+    WrenchScrewdriverIcon,
   } from '@heroicons/react/24/outline'
-import clsx from "clsx"; 
-import { usePathname } from 'next/navigation'
+import clsx from "clsx";
+import { usePathname, useSearchParams } from 'next/navigation'
  const navigationIconClass = "size-6 shrink-0";
 const navigation = [
     // { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass}></HomeIcon>},
-    { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon> },
+    { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon>, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && !search.includes('issued=on') },
+    { name: 'Invoices', href: '/home/work?issued=on', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass}></DocumentTextIcon>, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && search.includes('issued=on') },
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
     { name: 'Inventory', href: '/home/inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },
     { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass}></ChartBarIcon>  },
-    // { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass}></WrenchScrewdriverIcon>  },
+    { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass}></WrenchScrewdriverIcon>  },
 ]
  
 
@@ -31,7 +34,15 @@ export default   function Nav({
     fullName:string,
     imageUrl:string
 }) {
-    const currentPath = usePathname() ; 
+    const currentPath = usePathname();
+    const searchParams = useSearchParams();
+    const currentSearch = searchParams.toString();
+
+    function isActive(item: typeof navigation[0]) {
+        if ('activeMatch' in item && item.activeMatch) return item.activeMatch(currentPath ?? '', currentSearch);
+        return item.href !== '/home' ? currentPath?.startsWith(item.href) : currentPath === '/home';
+    }
+
     return (
         <>
             <div className="flex h-16 shrink-0 items-center">
@@ -46,7 +57,7 @@ export default   function Nav({
                                     <a
                                         href={item.href}
                                         className={clsx(
-                                               (item.href !=='/home'  &&currentPath?.startsWith(item.href) || item.href =='/home'&& currentPath === '/home') //home is ambigous
+                                               isActive(item)
                                                 ? 'bg-gray-800 text-white'
                                                 : 'text-gray-400 hover:bg-gray-800 hover:text-white',
                                             'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
