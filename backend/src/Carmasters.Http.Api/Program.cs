@@ -36,7 +36,7 @@ builder.
     UseStaticWebAssets();
  
 
-builder.Configuration.AddJsonFile("appsettings.Secrets.json", false);
+builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true);
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 // Add services to the container.
