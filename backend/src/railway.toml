@@ -1,2 +1,3 @@
-[deploy]
-startCommand = "dotnet Carmasters.Http.Api.dll"
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
