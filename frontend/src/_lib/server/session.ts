@@ -39,10 +39,11 @@ export async function createSession(rootJwt: string,publicJwt: string) {
   const expiresAt = new Date(Date.now());   
   expiresAt.setSeconds(expiresAt.getSeconds() + parseInt(sessionTimeoutInSecondsString)); 
   const session = await encrypt({ apiRootJwt:rootJwt, expiresAt })
-  const cookieStore = await cookies() 
+  const isSecure = process.env.NODE_ENV === 'production';
+  const cookieStore = await cookies()
   cookieStore.set('session', session, {
-    httpOnly: true, //jwt not accessible by browser
-    secure: false,
+    httpOnly: true,
+    secure: isSecure,
     expires: expiresAt,
     sameSite: 'lax',
     path: '/',
@@ -50,15 +51,15 @@ export async function createSession(rootJwt: string,publicJwt: string) {
   //jwt for public side resources
   cookieStore.set('jwt',  publicJwt, {
     httpOnly: false,
-    secure: false,
+    secure: isSecure,
     expires: expiresAt,
     sameSite: 'lax',
     path: '/',
   })
-   //browser app has to know when session started so it can call extend session before api jwt times out
+  //browser app has to know when session started so it can call extend session before api jwt times out
   cookieStore.set('session_timestamp',  Date.now().toString(), {
     httpOnly: false,
-    secure: false,
+    secure: isSecure,
     expires: expiresAt,
     sameSite: 'lax',
     path: '/',
