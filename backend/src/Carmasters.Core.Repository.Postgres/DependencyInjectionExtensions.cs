@@ -23,8 +23,12 @@ namespace Carmasters.Core.Repository.Postgres
         {
             var connectionBuilder = new Npgsql.NpgsqlConnectionStringBuilder();
             var options = new DbOptions(); configuration.GetSection("DbOptions").Bind(options);
-            Console.WriteLine($"[DB CONFIG] Host='{options.Host}' (len={options.Host?.Length}) Port={options.Port} User={options.UserId} DB={options.Name}");
-            connectionBuilder.Host = options.Host;
+            // Railway Raw Editor bug: all vars got concatenated into DbOptions__Host value.
+            // Extract just the hostname (everything before the first quote or newline).
+            var rawHost = options.Host ?? string.Empty;
+            var cleanHost = rawHost.Split(new[] { '"', '\n', '\r' }, 2)[0].Trim();
+            Console.WriteLine($"[DB CONFIG] RawHost len={rawHost.Length} CleanHost='{cleanHost}' Port={options.Port} User={options.UserId} DB={options.Name}");
+            connectionBuilder.Host = cleanHost;
             connectionBuilder.Port = options.Port;
             connectionBuilder.Username = options.UserId;
             connectionBuilder.Password = options.Password;

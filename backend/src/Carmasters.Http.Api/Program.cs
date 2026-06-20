@@ -37,7 +37,6 @@ builder.
  
 
 builder.Configuration.AddJsonFile("appsettings.Secrets.json", optional: true);
-builder.Configuration.AddEnvironmentVariables(); // env vars must win over Secrets.json
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 // Add services to the container.
