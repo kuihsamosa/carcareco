@@ -22,6 +22,7 @@ namespace Carmasters.Core.Repository.Postgres
         {
             var connectionBuilder = new Npgsql.NpgsqlConnectionStringBuilder();
             var options = new DbOptions(); configuration.GetSection("DbOptions").Bind(options);
+            Console.WriteLine($"[DB CONFIG] Host='{options.Host}' (len={options.Host?.Length}) Port={options.Port} User={options.UserId} DB={options.Name}");
             connectionBuilder.Host = options.Host;
             connectionBuilder.Port = options.Port;
             connectionBuilder.Username = options.UserId;
