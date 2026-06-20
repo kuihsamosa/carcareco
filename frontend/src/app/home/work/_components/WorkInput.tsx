@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
-import FormTextArea from '@/_components/FormTextArea';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
 import { IWorkData, IMechanic } from '../model';
@@ -17,6 +16,7 @@ import FormInput from '@/_components/FormInput';
 import Select from '@/_components/Select';
 import clsx from 'clsx';
 import WorkInputMechanics from './WorkInputMechanics';
+import WorkAboutItems from './WorkAboutItems';
 
 
 export default function WorkInput({
@@ -103,9 +103,11 @@ export default function WorkInput({
                             {!clientUndisclosed &&
                                 <ClientsCombobox name='clientId'
                                     onItemChange={(item) => {
-                                        if (onlyClientVehicles && item) {
+                                        if (item) {
                                             populateClientVehicles(item.value);
+                                            setOnlyClientVehicles(true);
                                         }
+                                        setSelectedClientVehicleId('');
                                     }}
                                     defaultValue={{
                                         text: work?.clientName ?? '',
@@ -140,6 +142,9 @@ export default function WorkInput({
                                                     setSelectedClientVehicleId(e.currentTarget.value);
                                                     setIsDirty(true);
                                                 }} >
+                                                <option value=''>
+                                                    {clientVehicles.length === 0 ? '— select a customer first —' : '— select a vehicle —'}
+                                                </option>
                                                 {clientVehicles?.map((item, index) => {
                                                     return (<option key={index} value={item.id}>{[item?.producer, item?.model].filter(x => x).join(' ') + (!item?.regNr ? '' : ` (${item.regNr})`)}</option>)
                                                 })}
@@ -161,8 +166,7 @@ export default function WorkInput({
                         </div>
                        <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
                         <div className=" ">
-                            <FormTextArea name='about' rows={8} label='About' defaultValue={work?.notes}>
-                            </FormTextArea>
+                            <WorkAboutItems defaultValue={work?.notes} />
                         </div>
                     </div>
                 </div>

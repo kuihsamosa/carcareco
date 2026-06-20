@@ -1,2 +1,3 @@
 backend/src/Carmasters.Http.Api/dist/
 backend/src/DbUp/dist/
+backend/src/Carmasters.Http.Api/appsettings.Secrets.json
