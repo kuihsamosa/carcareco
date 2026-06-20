@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NHibernate;
 using NHibernate.Mapping;
+using System;
 using System.Data.Common;
 using System.Reflection;
 
