@@ -27,6 +27,8 @@ namespace Carmasters.Core.Repository.Postgres
             connectionBuilder.Username = options.UserId;
             connectionBuilder.Password = options.Password;
             connectionBuilder.Database = options.Name;
+            connectionBuilder.SslMode = Npgsql.SslMode.Require;
+            connectionBuilder.TrustServerCertificate = true;
             var multitenancyEnabled = options.MultiTenancy?.Enabled == true;
             var defaultFactory = default(ISessionFactory);
             var mappingAssemblies = new System.Collections.Generic.List<Assembly>() { typeof(UserDbMapping).Assembly };
