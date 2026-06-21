@@ -1,5 +1,18 @@
-import { QueueListIcon, UsersIcon, TruckIcon, CubeIcon, ClockIcon, CheckCircleIcon, ExclamationTriangleIcon, CurrencyEuroIcon } from "@heroicons/react/24/outline"
+import {
+    QueueListIcon, UsersIcon, TruckIcon, CubeIcon, ClockIcon,
+    CheckCircleIcon, ExclamationTriangleIcon, CurrencyEuroIcon,
+    WrenchScrewdriverIcon, DocumentTextIcon, ChartBarIcon, Cog6ToothIcon,
+} from "@heroicons/react/24/outline"
 import Link from "next/link"
+
+function StatusChip({ label, value, color, href }: { label: string; value: number | string; color: string; href: string }) {
+    return (
+        <Link href={href} className={`flex-1 rounded-xl px-3 py-2.5 text-center ${color} active:opacity-80 transition-opacity`}>
+            <p className="text-xl font-bold leading-none">{value}</p>
+            <p className="text-[10px] font-medium mt-0.5 opacity-80">{label}</p>
+        </Link>
+    )
+}
 
 function StatCard({ label, value, sub, colorClass, icon }: {
     label: string
@@ -22,11 +35,14 @@ function StatCard({ label, value, sub, colorClass, icon }: {
     )
 }
 
-function QuickLink({ href, icon, label }: { href: string, icon: React.ReactNode, label: string }) {
+function QuickLink({ href, icon, label, accent }: { href: string; icon: React.ReactNode; label: string; accent?: string }) {
     return (
-        <Link href={href} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-center">
-            <span className="text-slate-600">{icon}</span>
-            <span className="text-xs font-medium text-gray-600">{label}</span>
+        <Link
+            href={href}
+            className={`flex flex-col items-center gap-1.5 p-3 rounded-2xl transition-colors text-center ${accent ?? 'bg-gray-50 hover:bg-gray-100'}`}
+        >
+            <span className="text-slate-700">{icon}</span>
+            <span className="text-[11px] font-semibold text-gray-700 leading-tight">{label}</span>
         </Link>
     )
 }
@@ -34,33 +50,20 @@ function QuickLink({ href, icon, label }: { href: string, icon: React.ReactNode,
 export default function Page() {
     return (
         <main className="lg:pl-62 p-4 sm:p-8">
-            <div className="mb-6">
-                <h1 className="text-lg font-medium text-gray-900">Dashboard</h1>
+            <div className="mb-5">
+                <h1 className="text-lg font-semibold text-gray-900">Dashboard</h1>
                 <p className="text-sm text-gray-400 mt-0.5">Today&apos;s overview</p>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[120px]">
+            {/* Live Status Strip — tappable chips that filter the work list */}
+            <div className="flex gap-2 mb-5 bg-slate-900 rounded-2xl p-3">
+                <StatusChip label="🔧 Active" value={12} color="bg-white/10 text-white" href="/home/work?status=inprogress" />
+                <StatusChip label="⏳ Waiting" value={3} color="bg-amber-400/20 text-amber-200" href="/home/work?status=waiting" />
+                <StatusChip label="✅ Done" value={4} color="bg-green-400/20 text-green-200" href="/home/work?status=closed" />
+                <StatusChip label="📬 Collect" value={2} color="bg-blue-400/20 text-blue-200" href="/home/work?status=completed" />
+            </div>
 
-                {/* Hero card — active jobs, spans 2 cols */}
-                <div className="col-span-2 row-span-1 rounded-2xl bg-slate-800 p-5 flex flex-col justify-between">
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Active jobs</span>
-                        <QueueListIcon className="w-5 h-5 text-slate-500" aria-hidden="true" />
-                    </div>
-                    <div>
-                        <p className="text-4xl font-medium text-white leading-none">12</p>
-                        <p className="text-xs text-slate-400 mt-1">3 awaiting parts · 2 ready to collect</p>
-                    </div>
-                </div>
-
-                {/* Completed today */}
-                <div className="col-span-1 row-span-1 rounded-2xl p-4 flex flex-col justify-between" style={{ background: '#EAF3DE' }}>
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium" style={{ color: '#3B6D11' }}>Completed today</span>
-                        <CheckCircleIcon className="w-4 h-4" style={{ color: '#3B6D11', opacity: 0.5 }} aria-hidden="true" />
-                    </div>
-                    <p className="text-3xl font-medium text-gray-900">4</p>
-                </div>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[110px]">
 
                 {/* Revenue due */}
                 <div className="col-span-1 row-span-1">
@@ -70,6 +73,15 @@ export default function Page() {
                         sub="3 outstanding"
                         icon={<CurrencyEuroIcon className="w-5 h-5" />}
                     />
+                </div>
+
+                {/* Completed today */}
+                <div className="col-span-1 row-span-1 rounded-2xl p-4 flex flex-col justify-between" style={{ background: '#EAF3DE' }}>
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-medium" style={{ color: '#3B6D11' }}>Completed today</span>
+                        <CheckCircleIcon className="w-4 h-4" style={{ color: '#3B6D11', opacity: 0.5 }} aria-hidden="true" />
+                    </div>
+                    <p className="text-3xl font-medium text-gray-900">4</p>
                 </div>
 
                 {/* Avg job time */}
@@ -91,13 +103,18 @@ export default function Page() {
                     <p className="text-3xl font-medium text-gray-900">3</p>
                 </div>
 
-                {/* Quick links — spans full width */}
-                <div className="col-span-2 lg:col-span-3 row-span-1 rounded-2xl bg-white border border-gray-100 p-4 flex items-center">
-                    <div className="grid grid-cols-4 gap-2 w-full">
-                        <QuickLink href="/home/work/new" icon={<QueueListIcon className="w-5 h-5" />} label="New job" />
-                        <QuickLink href="/home/clients" icon={<UsersIcon className="w-5 h-5" />} label="Clients" />
-                        <QuickLink href="/home/vehicles" icon={<TruckIcon className="w-5 h-5" />} label="Vehicles" />
-                        <QuickLink href="/home/inventory" icon={<CubeIcon className="w-5 h-5" />} label="Inventory" />
+                {/* Quick links — 8-icon grid, spans full width */}
+                <div className="col-span-2 lg:col-span-3 row-span-2 rounded-2xl bg-white border border-gray-100 p-4">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Quick actions</p>
+                    <div className="grid grid-cols-4 gap-2">
+                        <QuickLink href="/home/work/new"       icon={<WrenchScrewdriverIcon className="w-6 h-6" />} label="New Job"  accent="bg-slate-900 [&_span]:text-white [&_.text-gray-700]:text-white hover:bg-slate-800" />
+                        <QuickLink href="/home/clients"        icon={<UsersIcon className="w-6 h-6" />}             label="Clients" />
+                        <QuickLink href="/home/vehicles"       icon={<TruckIcon className="w-6 h-6" />}             label="Vehicles" />
+                        <QuickLink href="/home/inventory"      icon={<CubeIcon className="w-6 h-6" />}              label="Stock" />
+                        <QuickLink href="/home/work"           icon={<QueueListIcon className="w-6 h-6" />}         label="Work list" />
+                        <QuickLink href="/home/work?issued=on" icon={<DocumentTextIcon className="w-6 h-6" />}      label="Invoices" />
+                        <QuickLink href="/home/sales"          icon={<ChartBarIcon className="w-6 h-6" />}          label="Sales" />
+                        <QuickLink href="/home/settings"       icon={<Cog6ToothIcon className="w-6 h-6" />}         label="Settings" />
                     </div>
                 </div>
 

@@ -4,7 +4,8 @@
 import { cookies } from 'next/headers';
 import Nav from './_components/layout/Nav'
 import NavDialog from './_components/layout/NavDialog'
-import ToastMessages from '@/_components/ToastMessages'  
+import OfflineIndicator from './_components/layout/OfflineIndicator'
+import ToastMessages from '@/_components/ToastMessages'
 import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 
@@ -33,18 +34,20 @@ export default async function Layout({ children }: { children: React.ReactNode }
         <>
             {/* <Timeout></Timeout> */}
             <ToastMessages></ToastMessages>
+            <OfflineIndicator />
             <div>
                 {/* Static sidebar for desktop */}
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-62 lg:flex-col">
-                    {/* Sidebar component, swap this element with another sidebar if you like */}
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
-                      <Nav  imageUrl={imageUrl} fullName={fullName}  onSmallScreen={false}></Nav>   
+                        <Nav imageUrl={imageUrl} fullName={fullName} onSmallScreen={false} />
                     </div>
                 </div>
-                 <NavDialog imageUrl={imageUrl} fullName={fullName} ></NavDialog>   
-                {children}
-              
-              </div>
+                <NavDialog imageUrl={imageUrl} fullName={fullName} />
+                {/* pb-20 reserves space for the mobile bottom tab bar */}
+                <div className="pb-20 lg:pb-0">
+                    {children}
+                </div>
+            </div>
         </>
     )
 }

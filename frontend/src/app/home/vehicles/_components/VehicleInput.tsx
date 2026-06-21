@@ -6,11 +6,12 @@ import FormTextArea from '@/_components/FormTextArea';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton'; 
 import { IVehicleData } from '../model'; 
-import FormLabel from '@/_components/FormLabel';
 import TypeAheadCombobox from '../../_components/TypeAheadCombobox';
 import  { ClientsCombobox } from '../../_components/SearchCombobox';
 import data from './car_brands.json'; 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { CameraIcon } from '@heroicons/react/24/outline';
+import FormLabel from '@/_components/FormLabel';
 
 interface ICarProducer
 {
@@ -26,8 +27,9 @@ export default function VehicleInput({
 
 
     const router = useRouter()
-     
-    const [producer,setProducer] = useState<ICarProducer |null>(!vehicle?null:{name:vehicle.producer})
+    const cameraInputRef = useRef<HTMLInputElement>(null)
+    const [regNr, setRegNr] = useState(vehicle?.regNr ?? '')
+    const [producer, setProducer] = useState<ICarProducer | null>(!vehicle ? null : { name: vehicle.producer })
     return (
         <>
             <div className="space-y-12">
@@ -61,7 +63,42 @@ export default function VehicleInput({
                        </div> 
                         <div className="sm:col-span-2">  <FormInput name='model' defaultValue={vehicle?.model} label='Vehicle model'></FormInput></div>
                         <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='VIN Code'></FormInput></div>
-                        <div className="sm:col-span-2">  <FormInput name='regNr' defaultValue={vehicle?.regNr} label='Registration nr'></FormInput></div>
+                        <div className="sm:col-span-2">
+                            <FormLabel name='regNr' label='Registration nr' />
+                            <div className="mt-2 flex gap-2 items-center">
+                                <input
+                                    id="regNr"
+                                    name="regNr"
+                                    type="text"
+                                    value={regNr}
+                                    onChange={e => setRegNr(e.target.value.toUpperCase())}
+                                    placeholder="AB 123 CD"
+                                    autoCapitalize="characters"
+                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-sm font-mono font-bold tracking-widest text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-800"
+                                />
+                                {/* Hidden file input: camera capture on mobile */}
+                                <input
+                                    ref={cameraInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    capture="environment"
+                                    className="sr-only"
+                                    aria-label="Scan plate with camera"
+                                    onChange={() => {
+                                        // OCR integration point — camera photo captured
+                                        // For now, the photo is available in cameraInputRef.current?.files?.[0]
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    title="Scan plate with camera"
+                                    onClick={() => cameraInputRef.current?.click()}
+                                    className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 transition-colors flex-shrink-0"
+                                >
+                                    <CameraIcon className="size-5" />
+                                </button>
+                            </div>
+                        </div>
                         <div className="sm:col-span-2">  <FormInput name='odo' defaultValue={vehicle?.odo} label='Odometer'></FormInput> </div>
                         <div className="col-span-full">
                             <FormLabel name='ownerId' label='Owner'></FormLabel>
