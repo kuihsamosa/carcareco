@@ -32,8 +32,8 @@ function fmt(n: number) {
   return n.toLocaleString('et-EE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export default async function Page({ params }: { params: Promise<{ slug: string[] }> }) {
-  const [id] = (await params).slug;
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const res = await httpGet(`pricings/invoice/${id}/preview`);
 
   if (!res.ok) {

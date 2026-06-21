@@ -18,17 +18,14 @@ async function apiCall({
   method,
   body =null
 }:IAPICall) { 
-  console.log(`[APICALL] start url=${url} authorize=${authorize}`);
   const  requestHeaders:HeadersInit =   {
    "Content-Type": "application/json",
   };
   if(authorize) {
     const jwt = await getJwt();
-    console.log(`[APICALL] got jwt (len=${jwt ? String(jwt).length : 'null'})`);
     requestHeaders["Authorization"] =  'Bearer ' + jwt;
   }
   const fullUrl = process.env.API_URL +`/api/${url}`;
-  console.log(`[APICALL] about to fetch ${fullUrl}`);
   const request = {
     method,
     headers: requestHeaders,
@@ -51,7 +48,6 @@ async function apiCall({
     ]);
     if (result === TIMEOUT) throw new Error('backend timeout after 15s');
     response = result;
-    console.log(`[APICALL] fetch returned status=${response.status} for ${fullUrl}`);
   } catch (err) {
     console.log(`API fetch failed for ${method} ${fullUrl}:`, err);
     redirect(`/error?code=504&statusText=Gateway%20Timeout&text=${encodeURIComponent('The server took too long to respond. It may be waking up — please try again in a moment.')}`);
