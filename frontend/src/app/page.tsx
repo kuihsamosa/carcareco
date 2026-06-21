@@ -173,7 +173,7 @@ export default function Home() {
                   Star on GitHub
                 </Link>
                 <span className="text-slate-400">•</span>
-                <Link href="/docs" className="text-slate-700 hover:text-slate-900">Documentation</Link>
+                <Link href="#" className="text-slate-700 hover:text-slate-900">Documentation</Link>
                 <span className="text-slate-400">•</span>
                 <Link href="/auth/login" className="text-slate-700 hover:text-slate-900">Login</Link>
               </div>
