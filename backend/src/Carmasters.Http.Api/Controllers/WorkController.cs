@@ -126,10 +126,28 @@ namespace Carmasters.Http.Api.Controllers
             var current  = currentId.GetValueOrDefault()!=Guid.Empty ? activities.Single(x=>x.Id == currentId) : activities.First() ;
 
             var isRepairJob = current.Name == "repairjob";
-            IEnumerable<Product> products =  isRepairJob ?
-                    session.QueryOver<ProductInstalled>().Where(x => x.Job.Id == current.Id).List().Cast<Product>() :
-                     session.QueryOver<ProductOffered>().Where(x => x.Offer.Id == current.Id).List().Cast<Product>();
-             
+
+            var linesSql = isRepairJob
+                ? @"SELECT id, name, quantity, unit, price, discount, code, jnr
+                    FROM domain.productinstalled WHERE repairjobid = @id
+                    UNION ALL
+                    SELECT id, name, quantity, unit, price, discount, ''::text as code, 32767 as jnr
+                    FROM domain.serviceperformed WHERE repairjobid = @id
+                    ORDER BY jnr"
+                : @"SELECT id, name, quantity, unit, price, discount, code, jnr
+                    FROM domain.productoffered WHERE offerid = @id
+                    UNION ALL
+                    SELECT id, name, quantity, unit, price, discount, ''::text as code, 32767 as jnr
+                    FROM domain.serviceoffered WHERE offerid = @id
+                    ORDER BY jnr";
+
+            var lines = session.Connection.Query(linesSql, new { id = current.Id }).ToList();
+
+            var vatRate = await GetVatRateaAsync();
+            var taxMultiplier = 1m + vatRate / 100m;
+            var totalWithVat = lines.Sum(x => (decimal)x.quantity * (decimal)x.price * ((100m + (decimal)(x.discount ?? 0)) / 100m));
+            var totalWithoutVat = lines.Sum(x => (decimal)x.quantity * ((decimal)x.price / taxMultiplier) * ((100m + (decimal)(x.discount ?? 0)) / 100m));
+
             return new
             {
                 Items = activities,
@@ -138,8 +156,16 @@ namespace Carmasters.Http.Api.Controllers
                     Id = current.Id,
                     Notes = current.Notes,
                     IsVehicleLinesOnPricing = current.IsVehicleLinesOnPricing,
-                    Products = products.OrderBy(x => x.Jnr).Select(ToDto).ToArray(),
-                    PriceSummary = PriceSummary.CalculatePriceSummary(await GetVatRateaAsync(), products)
+                    Products = lines.Select(x => new {
+                        Id = (Guid)x.id,
+                        Name = (string)x.name,
+                        Quantity = (decimal?)x.quantity,
+                        Unit = (string)x.unit,
+                        Price = (decimal)x.price,
+                        Discount = (short?)x.discount,
+                        Code = (string)x.code
+                    }).ToArray(),
+                    PriceSummary = new { TotalWithVat = totalWithVat, TotalWithoutVat = totalWithoutVat }
                 }
             };
 
@@ -697,8 +723,8 @@ from (
             return Ok(offer.Id);
         }
          
-        private dynamic ToDto(Product saleable) 
-        { 
+        private dynamic ToDto(Product saleable)
+        {
             return new
             {
                 saleable.Id,

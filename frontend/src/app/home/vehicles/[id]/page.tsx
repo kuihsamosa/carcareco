@@ -2,10 +2,11 @@
 
 import { DescriptionItem } from '@/_components/DescriptionItem';
 import { httpGet } from '@/_lib/server/query-api'
-import Main from '../../_components/Main'; 
+import Main from '../../_components/Main';
 import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import { IVehicleData } from '../model';
 import { CardHeader } from '@/_components/Card';
+import EntityTabs from '@/_components/EntityTabs';
 
 
 
@@ -20,11 +21,12 @@ export default async function Page({
   
     return (
 
-        <Main header={
+        <Main narrow={false} header={
             <CardHeader  >
                  <h3 className="px-1 text-base font-semibold text-gray-900">Vehicle Information</h3>
                 <DisplayOptionsMenu id={id} pageName='vehicles'></DisplayOptionsMenu>
             </CardHeader>}>
+            <EntityTabs basePath={`/home/vehicles/${id}`} />
             <dl className="divide-y divide-gray-100"> 
                 <DescriptionItem label='Car make and model' value={[vehicle.producer, vehicle.model].join(' ')}></DescriptionItem>
                 <DescriptionItem label='VIN' value={vehicle.vin}></DescriptionItem>

@@ -55,6 +55,47 @@ namespace Carmasters.Http.Api.Controllers
         }
 
 
+        [HttpGet("invoice/{workId}/preview")]
+        public IActionResult GetInvoicePreview(Guid workId)
+        {
+            var invoiceId = repository.QueryOver<Work>()
+                .Where(x => x.Id == workId)
+                .Select(x => x.Invoice.Id)
+                .SingleOrDefault<Guid>();
+
+            if (invoiceId == Guid.Empty) return NotFound();
+
+            var invoice = repository.Get<Invoice>(invoiceId);
+            var work = repository.QueryOver<Work>().Where(x => x.Id == workId).SingleOrDefault();
+
+            return Ok(new
+            {
+                InvoiceNumber = invoice.Number,
+                IssuedOn = invoice.IssuedOn,
+                DueDays = invoice.DueDays,
+                IsPaid = invoice.IsPaid,
+                PaymentStatus = invoice.PaymentStatus,
+                PaymentType = invoice.PaymentType.ToString(),
+                ClientName = work.Client?.Name,
+                ClientPhone = work.Client?.Phone,
+                VehicleRegNr = work.Vehicle?.RegNr,
+                VehicleInfo = string.Join(" ", new[] { work.Vehicle?.Producer, work.Vehicle?.Model }.Where(x => x != null)),
+                Lines = invoice.Lines.OrderBy(l => l.Nr).Select(l => new
+                {
+                    l.Nr,
+                    l.Description,
+                    l.Quantity,
+                    l.Unit,
+                    l.UnitPrice,
+                    l.Discount,
+                    l.Total,
+                    l.TotalWithVat
+                }).ToArray(),
+                TotalWithoutVat = invoice.Lines.Sum(l => l.Total),
+                TotalWithVat = invoice.Lines.Sum(l => l.TotalWithVat)
+            });
+        }
+
         [HttpGet("invoice/{workId}/{type}")]
         public async Task<IActionResult> PrintInvoice(Guid workId,string type)
         {

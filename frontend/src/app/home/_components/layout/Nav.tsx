@@ -9,19 +9,38 @@ import {
     ChartBarIcon,
     DocumentTextIcon,
     WrenchScrewdriverIcon,
+    CubeIcon,
+    HomeIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx";
 import { usePathname, useSearchParams } from 'next/navigation'
- const navigationIconClass = "size-6 shrink-0";
+
+const navigationIconClass = "size-6 shrink-0";
+
+// lowStockCount would come from a real API — placeholder for wiring up later
+const lowStockCount = 0;
+
 const navigation = [
-    // { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass}></HomeIcon>},
-    { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon>, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && !search.includes('issued=on') },
-    { name: 'Invoices', href: '/home/work?issued=on', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass}></DocumentTextIcon>, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && search.includes('issued=on') },
-    { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
-    { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
-    { name: 'Inventory', href: '/home/inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },
-    { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass}></ChartBarIcon>  },
-    { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass}></WrenchScrewdriverIcon>  },
+    { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home' },
+    { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && !search.includes('issued=on') },
+    { name: 'Invoices', href: '/home/work?issued=on', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (_path: string, search: string) => search.includes('issued=on') },
+    { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} /> },
+    { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} /> },
+    {
+        name: 'Inventory', href: '/home/inventory',
+        icon: (
+            <span className="relative">
+                <CubeIcon aria-hidden="true" className={navigationIconClass} />
+                {lowStockCount > 0 && (
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold">
+                        {lowStockCount}
+                    </span>
+                )}
+            </span>
+        ),
+    },
+    { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} /> },
+    { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass} /> },
 ]
  
 
@@ -39,8 +58,8 @@ export default   function Nav({
     const currentSearch = searchParams.toString();
 
     function isActive(item: typeof navigation[0]) {
-        if ('activeMatch' in item && item.activeMatch) return item.activeMatch(currentPath ?? '', currentSearch);
-        return item.href !== '/home' ? currentPath?.startsWith(item.href) : currentPath === '/home';
+        if (item.activeMatch) return (item.activeMatch as (p: string, s: string) => boolean)(currentPath ?? '', currentSearch);
+        return currentPath?.startsWith(item.href);
     }
 
     return (
@@ -70,7 +89,7 @@ export default   function Nav({
                             ))}
                         </ul>
                     </li>
-                    {!onSmallScreen && <li className="mt-auto flex flex-col mb-5   ">
+                    <li className="mt-auto flex flex-col mb-5   ">
                         <a
                             href="/home/settings"
                             className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
@@ -78,8 +97,8 @@ export default   function Nav({
                             <Cog6ToothIcon aria-hidden="true" className="size-6 shrink-0" />
                             Settings
                         </a>
-                        <ProfileMenu  fullName={fullName} imageUrl={imageUrl} onSmallScreen={false}></ProfileMenu>
-                    </li>}
+                        <ProfileMenu  fullName={fullName} imageUrl={imageUrl} onSmallScreen={onSmallScreen}></ProfileMenu>
+                    </li>
                 </ul>
             </nav>
 

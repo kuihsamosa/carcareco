@@ -39,7 +39,7 @@ export default function Activities({
         </li>
       </ul>
       
-      <ul role="list" className="hidden 2xl:block border-b border-gray-900/5 inset-y-0  2xl:w-108">
+      <ul role="list" className="border-b border-gray-900/5 inset-y-0  2xl:w-108">
 
         {items.length>1 &&items.map((item) => { //do not list if only single activity
           const id = item.id;

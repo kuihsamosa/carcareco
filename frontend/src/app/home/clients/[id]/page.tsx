@@ -2,14 +2,15 @@
 
 import { DescriptionItem } from '@/_components/DescriptionItem';
 import { httpGet } from '@/_lib/server/query-api'
-import Main from '../../_components/Main'; 
+import Main from '../../_components/Main';
 import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import FormList from '@/_components/FormList';
 import FormListEmailItem from '../_components/FormListEmailItem';
 import { IClientData } from '../model';
 import BlueBadge from '@/_components/BlueBadge';
-import YellowBadge from '@/_components/YellowBadge'; 
+import YellowBadge from '@/_components/YellowBadge';
 import { CardHeader } from '@/_components/Card';
+import EntityTabs from '@/_components/EntityTabs';
 
 
 export default async function Page({
@@ -22,14 +23,15 @@ export default async function Page({
     const client = await data.json() as IClientData;
     return (
 
-        <Main header={
-        <CardHeader  > 
+        <Main narrow={false} header={
+        <CardHeader  >
               <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">Client Information{' '}
                         <BlueBadge text={!client.isPrivate ? ' Company' : ' Private person'}  ></BlueBadge>{' '}
                         {client.isAsshole && <YellowBadge text='complicated' ></YellowBadge>}</h3> 
           
                 <DisplayOptionsMenu id={id} pageName='clients'></DisplayOptionsMenu>
-        </CardHeader>}> 
+        </CardHeader>}>
+                    <EntityTabs basePath={`/home/clients/${id}`} />
                     <div className="  border-gray-100">
                         <dl className="divide-y divide-gray-100">
 

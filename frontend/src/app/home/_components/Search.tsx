@@ -25,6 +25,7 @@ export default async function Search(
     rowClass,
     idField = 'id',
     children,
+    mobileCardFormatter,
   }: {
     searchParams: Promise<Record<string, string>>
     resourceName: string,
@@ -33,6 +34,7 @@ export default async function Search(
     columns?: DataRowModel[],
     rowClass? (item:any):string // eslint-disable-line @typescript-eslint/no-explicit-any
     children?: React.ReactNode
+    mobileCardFormatter?: (item: Record<string, any>) => React.ReactNode // eslint-disable-line @typescript-eslint/no-explicit-any
   }) {
 
   if (!pageName) pageName = resourceName;
@@ -114,11 +116,24 @@ export default async function Search(
     </div>
    
       <div className="-mx-4 sm:mx-0 mt-4 flow-root">
-        {data.items.length===0? 
-         <div className="text-center"> 
-           <h3 className="mt-2 pb-6 text-sm font-semibold text-gray-900">Nothing found</h3> 
+        {data.items.length===0?
+         <div className="text-center">
+           <h3 className="mt-2 pb-6 text-sm font-semibold text-gray-900">Nothing found</h3>
         </div>:
-          <div className="overflow-hidden">
+        <>
+          {/* Mobile card view — shown when mobileCardFormatter is provided */}
+          {mobileCardFormatter && (
+            <div className="md:hidden space-y-3 px-1 mb-4">
+              {data.items.map((item) => (
+                <div key={'card-' + item[idField]}>
+                  {mobileCardFormatter(item)}
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Desktop table view */}
+          <div className={mobileCardFormatter ? 'hidden md:block' : ''}>
+          <div className="overflow-x-auto">
           <div className=" overflow-x-auto  ">
             <div className="inline-block min-w-full   align-middle  ">
 
@@ -164,7 +179,6 @@ export default async function Search(
             <div className="hidden sm:block">
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{offset + 1}</span> to <span className="font-medium">{offset + limit}</span>
-                {/* of{' '} <span className="font-medium">{limit}</span> results */}
               </p>
             </div>
             <div className="flex flex-1 justify-between sm:justify-end">
@@ -177,8 +191,10 @@ export default async function Search(
             </div>
           </nav>
         </div>
+        </div>
+        </>
         }
-      
+
       </div>
       
        </>

@@ -62,7 +62,7 @@ export default async function Page(
       dataField: 'notes',
       headerText: 'Description',
       dataFormatter: ({ notes }: { notes: string }) => (
-        <p title={notes} className="truncate" style={{ maxWidth: '300px', marginBottom: '-5px' }}>
+        <p title={notes} className="truncate max-w-[140px] sm:max-w-xs" style={{ marginBottom: '-5px' }}>
           {notes}
         </p>
       ),

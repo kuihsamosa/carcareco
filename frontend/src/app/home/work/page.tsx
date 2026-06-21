@@ -10,10 +10,24 @@ import { EmailSentBadge, OverdueBadge } from "./_components/activity/badges/Issu
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import { Card } from "@/_components/Card";
 import SearchStatusFilter from "./_components/SearchStatusFilter";
-import SearchParams from "./_components/SearchParams"; 
+import SearchParams from "./_components/SearchParams";
 import PrimaryButton from "@/_components/PrimaryButton";
 import SearchInput from "../_components/SearchInput";
 import FormInput from "@/_components/FormInput";
+import { UserCircleIcon, TruckIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+
+function MechanicChip({ name }: { name: string }) {
+  const colors = ['bg-blue-500','bg-emerald-500','bg-violet-500','bg-rose-500','bg-amber-500','bg-teal-500'];
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  const color = colors[Math.abs(hash) % colors.length];
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  return (
+    <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-[9px] font-bold ${color}`} title={name}>
+      {initials}
+    </span>
+  );
+}
 
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
@@ -137,7 +151,7 @@ export default async function Page(
       headerText: 'Description',
       dataFormatter: ({ notes }: { notes: string }) => {
         return (
-          <p title={notes} className="truncate" style={{ maxWidth: '300px', marginBottom: "-5px" }} >
+          <p title={notes} className="truncate max-w-[140px] sm:max-w-xs" style={{ marginBottom: "-5px" }} >
             {notes}
           </p>
         );
@@ -165,26 +179,85 @@ export default async function Page(
               rowClass={(item) => {
                 return (item['status'] === 'closed' ? 'line-through' : '')
               }}
-              columns={columns}> 
+              columns={columns}
+              mobileCardFormatter={(item) => (
+                <a
+                  href={`/home/work/${item.id}`}
+                  className={`block bg-white border rounded-2xl p-4 shadow-sm active:bg-gray-50 transition-colors ${item.status === 'closed' ? 'opacity-60' : 'border-gray-100'}`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <div className="font-semibold text-sm text-gray-900">Work #{item.workNr ?? item.number}</div>
+                      <div className="text-[11px] text-gray-400 mt-0.5">{moment(item.startedOn).format('ll')}</div>
+                    </div>
+                    <WorkStatusBadge status={item.status} />
+                  </div>
+
+                  {item.vehicleRegNr && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <TruckIcon className="size-3.5 text-gray-400 shrink-0" />
+                      <span className="bg-slate-100 text-slate-700 font-mono font-bold text-[11px] px-2 py-0.5 rounded uppercase tracking-wider">
+                        {item.vehicleRegNr}
+                      </span>
+                      {(item.vehicleProducer || item.vehicleModel) && (
+                        <span className="text-[11px] text-gray-500 truncate">{item.vehicleProducer} {item.vehicleModel}</span>
+                      )}
+                    </div>
+                  )}
+
+                  {item.clientName && (
+                    <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-1">
+                      <UserCircleIcon className="size-3.5 shrink-0" />
+                      {item.clientName}
+                    </div>
+                  )}
+
+                  {item.notes && (
+                    <p className="text-[11px] text-gray-400 truncate mt-1">{item.notes}</p>
+                  )}
+
+                  {item.mechanicNames && (
+                    <div className="flex items-center gap-1.5 mt-2">
+                      {String(item.mechanicNames).split(',').filter(Boolean).map((name: string, i: number) => (
+                        <MechanicChip key={i} name={name.trim()} />
+                      ))}
+                    </div>
+                  )}
+
+                  {item.issuance && (
+                    <div className="mt-2 flex items-center gap-1">
+                      <DocumentTextIcon className="size-3.5 text-gray-400" />
+                      <span className="text-[10px] text-gray-500">Invoice #{(item.issuance as IWorkIssuance).invoiceNumber}</span>
+                    </div>
+                  )}
+                </a>
+              )}
+            >
+              {/* Plate-number search shortcut — mobile prominent */}
+              <div className="mb-3 md:hidden">
+                <label className="text-xs font-semibold text-gray-500 mb-1 block uppercase tracking-wide">🔍 Search by plate or client</label>
+                <SearchInput searchParams={searchParams} placeholder="AB 123 CD · client name · VIN…" />
+              </div>
+
               <div className=" 3xl:flex">
-                 <div className="  grid grid-cols-1  md:grid-cols-12 md:grid-flow-row md:gap-x-2 3xl:grid-flow-col  3xl:grid-cols-24   p-0 3xl:gap-x-2  gap-y-2  "> 
-                      <div className="3xl:col-span-6 md:col-span-7 "   >
+                 <div className="  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 md:grid-flow-row md:gap-x-2 3xl:grid-flow-col  3xl:grid-cols-24   p-0 3xl:gap-x-2  gap-y-2  ">
+                      <div className="sm:col-span-2 3xl:col-span-6 md:col-span-7 "   >
                         <SearchStatusFilter issued={options.issued === 'on'} status={options.status}></SearchStatusFilter>
-                        <SearchInput searchParams={searchParams} placeholder="number, client, vehicle vin or reg nr." ></SearchInput> 
-                      </div> 
+                        <SearchInput searchParams={searchParams} placeholder="number, client, vehicle vin or reg nr." ></SearchInput>
+                      </div>
                       <div className="3xl:col-span-4  md:col-span-5 ">
                          <FormInput name="saleable" label="Product or service" placeholder="code or name ..." defaultValue={options.saleable}  ></FormInput>
                       </div>
                       <div  className="3xl:col-span-14  md:col-span-12  " >
                       <SearchParams options={options}></SearchParams>
                       </div>
-                      
-                  </div> 
+
+                  </div>
                   <div className="mx-2 text-right mt-8">
                         <PrimaryButton   id="btnSubmit">Search</PrimaryButton>
                    </div>
               </div>
-                
+
             </Search>
           </Card>
 

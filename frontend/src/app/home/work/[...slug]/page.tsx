@@ -69,9 +69,16 @@ export default async function Page({
                                         </div> 
                                     </div>  
                                 
-                                   <div className='hidden xl:flex gap-x-2 mb-4  xl:ml-4' > 
-                                        <ActivityCreatedBy activity={activity}></ActivityCreatedBy> 
-                                    </div>  
+                                   <div className='hidden xl:flex gap-x-2 mb-4  xl:ml-4' >
+                                        <ActivityCreatedBy activity={activity}></ActivityCreatedBy>
+                                    </div>
+                                   {work.issuance && (
+                                        <div className='mb-4 xl:ml-4'>
+                                            <a href={`/home/work/${id}/invoice`} className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
+                                                View Invoice
+                                            </a>
+                                        </div>
+                                    )}
                                   
                                 </CardHeader>}> 
                                 {current.products.length == 0 && !current?.notes && !isEditing ? <NoProducts work={work} activityId={current.id}></NoProducts>
