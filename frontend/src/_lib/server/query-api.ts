@@ -26,13 +26,26 @@ async function apiCall({
     requestHeaders["Authorization"] =  'Bearer ' + jwt;
   } 
   const fullUrl = process.env.API_URL +`/api/${url}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
   const request = {
     method,
     headers: requestHeaders,
-    body : body? JSON.stringify(body):null
+    body : body? JSON.stringify(body):null,
+    signal: controller.signal,
   };
-   
-  const response = await fetch(fullUrl,request);
+
+  let response: Response;
+  try {
+    response = await fetch(fullUrl,request);
+  } catch (err) {
+    // Network failure or 15s timeout (e.g. backend cold start that never woke).
+    // Surface a real error page instead of hanging the request forever.
+    console.log(`API fetch failed for ${method} ${fullUrl}:`, err);
+    redirect(`/error?code=504&statusText=Gateway%20Timeout&text=${encodeURIComponent('The server took too long to respond. It may be waking up — please try again in a moment.')}`);
+  } finally {
+    clearTimeout(timer);
+  }
   if (!response.ok) {
     debugger;
     const responseText = await response.text();
