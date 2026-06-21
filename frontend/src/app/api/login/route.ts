@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createSession } from '@/_lib/server/session';
+import { buildSession } from '@/_lib/server/session';
 
 export async function POST(request: NextRequest) {
   const { username, password } = await request.json();
@@ -28,7 +28,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unexpected server response.' }, { status: 500 });
   }
 
-  await createSession(data.jwt, data.publicJwt);
+  const s = await buildSession(data.jwt, data.publicJwt);
 
-  return NextResponse.json({ ok: true });
+  const response = NextResponse.json({ ok: true });
+  response.cookies.set('session', s.sessionToken, s.sessionOpts);
+  response.cookies.set('jwt', s.publicJwt, s.publicOpts);
+  response.cookies.set('session_timestamp', s.timestamp, s.publicOpts);
+  return response;
 }

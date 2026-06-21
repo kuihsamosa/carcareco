@@ -32,38 +32,28 @@ interface SessionPayload extends JWTPayload{
     console.log(error)
   }
 }
-export async function createSession(rootJwt: string,publicJwt: string) {
-    
-  if(!sessionTimeoutInSecondsString) throw new Error('NEXT_PUBLIC_SESSION_TIMEOUT env not set');
- 
-  const expiresAt = new Date(Date.now());   
-  expiresAt.setSeconds(expiresAt.getSeconds() + parseInt(sessionTimeoutInSecondsString)); 
-  const session = await encrypt({ apiRootJwt:rootJwt, expiresAt })
+export async function buildSession(rootJwt: string, publicJwt: string) {
+  if (!sessionTimeoutInSecondsString) throw new Error('NEXT_PUBLIC_SESSION_TIMEOUT env not set');
+  const expiresAt = new Date(Date.now());
+  expiresAt.setSeconds(expiresAt.getSeconds() + parseInt(sessionTimeoutInSecondsString));
+  const sessionToken = await encrypt({ apiRootJwt: rootJwt, expiresAt });
   const isSecure = process.env.NODE_ENV === 'production';
-  const cookieStore = await cookies()
-  cookieStore.set('session', session, {
-    httpOnly: true,
-    secure: isSecure,
-    expires: expiresAt,
-    sameSite: 'lax',
-    path: '/',
-  })
-  //jwt for public side resources
-  cookieStore.set('jwt',  publicJwt, {
-    httpOnly: false,
-    secure: isSecure,
-    expires: expiresAt,
-    sameSite: 'lax',
-    path: '/',
-  })
-  //browser app has to know when session started so it can call extend session before api jwt times out
-  cookieStore.set('session_timestamp',  Date.now().toString(), {
-    httpOnly: false,
-    secure: isSecure,
-    expires: expiresAt,
-    sameSite: 'lax',
-    path: '/',
-  })
+  const opts = { expires: expiresAt, sameSite: 'lax' as const, path: '/', secure: isSecure };
+  return {
+    sessionToken,
+    publicJwt,
+    timestamp: Date.now().toString(),
+    sessionOpts: { ...opts, httpOnly: true },
+    publicOpts: { ...opts, httpOnly: false },
+  };
+}
+
+export async function createSession(rootJwt: string, publicJwt: string) {
+  const s = await buildSession(rootJwt, publicJwt);
+  const cookieStore = await cookies();
+  cookieStore.set('session', s.sessionToken, s.sessionOpts);
+  cookieStore.set('jwt', s.publicJwt, s.publicOpts);
+  cookieStore.set('session_timestamp', s.timestamp, s.publicOpts);
 }
 export async function deleteSession() {
   const cookieStore = await cookies()
