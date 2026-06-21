@@ -35,13 +35,15 @@ export default async function Layout({ children }: { children: React.ReactNode }
     let lowStockCount = 0;
     try {
         const apiJwt = await getJwt();
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 3000);
         const res = await fetch(
             `${process.env.API_URL}/api/spareparts/lowstock/count`,
             {
                 headers: { Authorization: `Bearer ${apiJwt}` },
-                signal: AbortSignal.timeout(4000),
+                signal: controller.signal,
             }
-        );
+        ).finally(() => clearTimeout(timer));
         if (res.ok) lowStockCount = await res.json();
     } catch { /* non-fatal — show 0 */ }
 
