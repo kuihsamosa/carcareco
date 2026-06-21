@@ -1,32 +1,39 @@
- 
 import { NextResponse, NextRequest } from 'next/server'
-import { deleteSession,getJwt } from '@/_lib/server/session'
-export default async function authorizationMiddleware(request: NextRequest,response: NextResponse) {
-  
-   // 2. Check if the current route is protected or public
-   const path = request.nextUrl.pathname
-   const isProtectedRoute = path.startsWith('/home');
-    // 3. Decrypt the session from the cookie
-   
-   // logout if /home/logout is called and redirect to login page
-  if (path.includes("/home/logout")) { 
-    await deleteSession();
-    return NextResponse.redirect(new URL('/auth/login', request.url))
-  }
+import { jwtVerify } from 'jose'
 
-  const jwt =await getJwt();
-  // 4. Redirect to /login if the user is not authenticated
-  if (isProtectedRoute && !jwt) {
-    return NextResponse.redirect(new URL('/auth/login', request.nextUrl))
+async function getSessionJwt(request: NextRequest): Promise<string | null> {
+  const session = request.cookies.get('session')?.value;
+  if (!session) return null;
+  try {
+    const key = new TextEncoder().encode(process.env.SESSION_SECRET);
+    const { payload } = await jwtVerify(session, key, { algorithms: ['HS256'] });
+    return (payload.apiRootJwt as string) ?? null;
+  } catch {
+    return null;
   }
- 
-  // 5. Redirect to /home if the user is authenticated
-  if (
-    !isProtectedRoute && jwt
-  ) {
-    return NextResponse.redirect(new URL('/home/work', request.nextUrl))
-  }
-
-  return response
 }
- 
+
+export default async function authorizationMiddleware(request: NextRequest, response: NextResponse) {
+  const path = request.nextUrl.pathname;
+  const isProtectedRoute = path.startsWith('/home');
+
+  if (path.includes('/home/logout')) {
+    const redirect = NextResponse.redirect(new URL('/auth/login', request.url));
+    redirect.cookies.delete('session');
+    redirect.cookies.delete('jwt');
+    redirect.cookies.delete('session_timestamp');
+    return redirect;
+  }
+
+  const jwt = await getSessionJwt(request);
+
+  if (isProtectedRoute && !jwt) {
+    return NextResponse.redirect(new URL('/auth/login', request.nextUrl));
+  }
+
+  if (!isProtectedRoute && jwt) {
+    return NextResponse.redirect(new URL('/home/work', request.nextUrl));
+  }
+
+  return response;
+}
