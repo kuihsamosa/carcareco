@@ -90,7 +90,9 @@ async function apiCall({
         }
       }
 
-     redirect(`/error?code=${response.status}&statusText=${response.statusText}&text=${message}`)
+     // Encode params — a raw backend error message can contain newlines/non-ASCII,
+     // which would make the redirect Location header invalid and crash with 500.
+     redirect(`/error?code=${response.status}&statusText=${encodeURIComponent(response.statusText)}&text=${encodeURIComponent(message.slice(0, 300))}`)
   }
   return response;
 }

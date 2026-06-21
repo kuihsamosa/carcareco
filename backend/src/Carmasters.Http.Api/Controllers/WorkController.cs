@@ -127,18 +127,24 @@ namespace Carmasters.Http.Api.Controllers
 
             var isRepairJob = current.Name == "repairjob";
 
+            // name/quantity/unit/price/discount live on the parent domain.saleable
+            // table (table-per-subclass inheritance); code/jnr live on the subclass.
             var linesSql = isRepairJob
-                ? @"SELECT id, name, quantity, unit, price, discount, code, jnr
-                    FROM domain.productinstalled WHERE repairjobid = @id
+                ? @"SELECT pi.id, s.name, s.quantity, s.unit, s.price, s.discount, pi.code, pi.jnr
+                    FROM domain.productinstalled pi JOIN domain.saleable s ON s.id = pi.id
+                    WHERE pi.repairjobid = @id
                     UNION ALL
-                    SELECT id, name, quantity, unit, price, discount, ''::text as code, 32767 as jnr
-                    FROM domain.serviceperformed WHERE repairjobid = @id
+                    SELECT sp.id, s.name, s.quantity, s.unit, s.price, s.discount, ''::text as code, 32767 as jnr
+                    FROM domain.serviceperformed sp JOIN domain.saleable s ON s.id = sp.id
+                    WHERE sp.repairjobid = @id
                     ORDER BY jnr"
-                : @"SELECT id, name, quantity, unit, price, discount, code, jnr
-                    FROM domain.productoffered WHERE offerid = @id
+                : @"SELECT po.id, s.name, s.quantity, s.unit, s.price, s.discount, po.code, po.jnr
+                    FROM domain.productoffered po JOIN domain.saleable s ON s.id = po.id
+                    WHERE po.offerid = @id
                     UNION ALL
-                    SELECT id, name, quantity, unit, price, discount, ''::text as code, 32767 as jnr
-                    FROM domain.serviceoffered WHERE offerid = @id
+                    SELECT so.id, s.name, s.quantity, s.unit, s.price, s.discount, ''::text as code, 32767 as jnr
+                    FROM domain.serviceoffered so JOIN domain.saleable s ON s.id = so.id
+                    WHERE so.offerid = @id
                     ORDER BY jnr";
 
             var lines = session.Connection.Query(linesSql, new { id = current.Id }).ToList();
