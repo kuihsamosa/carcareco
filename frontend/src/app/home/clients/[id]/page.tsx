@@ -39,12 +39,12 @@ export default async function Page({
                                 <DescriptionItem label='Company name' value={client.name}></DescriptionItem>
                                 : <DescriptionItem label='Full name' value={client.firstName + ' ' + client.lastName}></DescriptionItem>}
                             <DescriptionItem label='Phone' value={client.phone}></DescriptionItem>
-                            {client.emailAddresses.length < 2 ?
+                            {(client.emailAddresses?.length ?? 0) < 2 ?
                                 <DescriptionItem label='Email address' value={client.currentEmail}></DescriptionItem>
                                 : <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                     <dt className="text-sm/6 font-medium text-gray-900">Email addresses</dt>
                                     <FormList
-                                        items={client.emailAddresses}
+                                        items={client.emailAddresses ?? []}
                                         renderItem={(item) => {
                                             return <FormListEmailItem mail={item} isPrimary={item === client.currentEmail}></FormListEmailItem>
                                         }}>
@@ -55,7 +55,7 @@ export default async function Page({
                                 <DescriptionItem label='Registry code' value={client.regNr}></DescriptionItem>
                                 : <DescriptionItem label='Personal code' value={client.personalCode}></DescriptionItem>}
 
-                            <DescriptionItem label='Address' value={[client.address.country, client.address.region, client.address.city, client.address.street, client.address.postalCode].filter(item => item).join(', ')}></DescriptionItem>
+                            <DescriptionItem label='Address' value={[client.address?.country, client.address?.region, client.address?.city, client.address?.street, client.address?.postalCode].filter(item => item).join(', ')}></DescriptionItem>
                             <DescriptionItem label='About' value={client.description}></DescriptionItem>
                             <DescriptionItem label='Added' value={client.introducedAt}></DescriptionItem>
                         </dl>
