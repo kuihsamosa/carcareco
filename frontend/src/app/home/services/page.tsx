@@ -10,6 +10,8 @@ export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   const options = await searchParams;
+  // service history = all works (incl. invoiced), not just open ones
+  const mergedParams = Promise.resolve({ ...options, history: 'on' });
 
   const columns = [
     {
@@ -72,6 +74,7 @@ export default async function Page(
   return (
     <main className="lg:pl-62">
       <form method="GET">
+        <input type="hidden" name="history" value="on" />
         <div className="sm:py-6 px-4 sm:px-8 sm:gap-4">
           <Card
             header={
@@ -80,7 +83,7 @@ export default async function Page(
             }
           >
             <Search
-              searchParams={searchParams}
+              searchParams={mergedParams}
               resourceName="work"
               pageName="services"
               idField="id"
@@ -89,7 +92,7 @@ export default async function Page(
               <div className="flex gap-x-2 mb-4 items-end">
                 <div className="flex-1">
                   <SearchInput
-                    searchParams={searchParams}
+                    searchParams={mergedParams}
                     placeholder="work number, client, vehicle reg nr. or VIN"
                   />
                 </div>

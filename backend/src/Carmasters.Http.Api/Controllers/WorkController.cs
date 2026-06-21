@@ -308,6 +308,9 @@ namespace Carmasters.Http.Api.Controllers
             DateTime? invoiceTo )
         {
             var onlyIssued = issued == "on" ;
+            // Service History shows the full history (invoiced + open works), so it
+            // must NOT apply the "invoiceid is null" filter the default work list uses.
+            var includeInvoiced = Request.Query["history"].FirstOrDefault() == "on";
             var clientId  = Request.Query["clientiId[value]"].FirstOrDefault();
             var vehicleId = Request.Query["vehicleId[value]"].FirstOrDefault();
             orderby = onlyIssued? "i.number": "w.changedon";
@@ -320,10 +323,10 @@ namespace Carmasters.Http.Api.Controllers
                  .PageQuery<WorkPage>(orderby, limit, offset, desc);
 
            
-            if (!onlyIssued)
+            if (!onlyIssued && !includeInvoiced)
             {
                 query.Where("w.invoiceid is null");
-            } 
+            }
 
             if (!string.IsNullOrWhiteSpace(status))
             {

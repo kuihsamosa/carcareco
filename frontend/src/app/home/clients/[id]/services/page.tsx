@@ -24,6 +24,7 @@ export default async function Page({
   const rawParams = await searchParams;
   const mergedParams = Promise.resolve({
     ...rawParams,
+    history: 'on', // service history = all works (incl. invoiced), not just open ones
     'clientiId[value]': id,
     'clientiId[text]': client.isPrivate ? `${client.firstName} ${client.lastName}` : client.name,
   });
@@ -82,6 +83,7 @@ export default async function Page({
     >
       <EntityTabs basePath={`/home/clients/${id}`} />
       <form method="GET">
+        <input type="hidden" name="history" value="on" />
         <input type="hidden" name="clientiId[value]" value={id} />
         <input type="hidden" name="clientiId[text]" value={displayName} />
         <div className="mt-4">
