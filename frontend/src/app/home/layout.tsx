@@ -8,7 +8,7 @@ import OfflineIndicator from './_components/layout/OfflineIndicator'
 import ToastMessages from '@/_components/ToastMessages'
 import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
-import { httpGet } from '@/_lib/server/query-api';
+import { getJwt } from '@/_lib/server/session';
 
 interface CustomJwtPayload {
     FullName?: string; 
@@ -34,16 +34,16 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
     let lowStockCount = 0;
     try {
-        const res = await httpGet('spareparts/lowstock/count');
+        const apiJwt = await getJwt();
+        const res = await fetch(
+            `${process.env.API_URL}/api/spareparts/lowstock/count`,
+            {
+                headers: { Authorization: `Bearer ${apiJwt}` },
+                signal: AbortSignal.timeout(4000),
+            }
+        );
         if (res.ok) lowStockCount = await res.json();
-    } catch (e: unknown) {
-        // Re-throw Next.js internal redirects; swallow real network errors
-        if (typeof e === 'object' && e !== null && 'digest' in e &&
-            typeof (e as { digest: unknown }).digest === 'string' &&
-            (e as { digest: string }).digest.startsWith('NEXT_REDIRECT')) {
-            throw e;
-        }
-    }
+    } catch { /* non-fatal — show 0 */ }
 
     return (
         <>
