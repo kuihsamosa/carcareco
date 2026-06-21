@@ -8,7 +8,6 @@ import OfflineIndicator from './_components/layout/OfflineIndicator'
 import ToastMessages from '@/_components/ToastMessages'
 import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
-import { getJwt } from '@/_lib/server/session';
 
 interface CustomJwtPayload {
     FullName?: string; 
@@ -32,21 +31,9 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
     const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/users/profilepicture/${jwt}`
 
-    // The lowstock badge must NEVER block the shared layout. Next.js's patched
-    // fetch ignores AbortController, so race the request against a hard timer:
-    // if the backend endpoint hangs, we stop awaiting it and render with 0.
-    let lowStockCount = 0;
-    try {
-        const apiJwt = await getJwt();
-        const fetchCount = fetch(`${process.env.API_URL}/api/spareparts/lowstock/count`, {
-            headers: { Authorization: `Bearer ${apiJwt}` },
-            cache: 'no-store',
-        })
-            .then((r) => (r.ok ? r.json() : 0))
-            .catch(() => 0);
-        const timeout = new Promise<number>((resolve) => setTimeout(() => resolve(0), 2500));
-        lowStockCount = (await Promise.race([fetchCount, timeout])) || 0;
-    } catch { /* non-fatal — show 0 */ }
+    // NOTE: the lowstock badge count is fetched client-side inside <Nav> so a
+    // slow/hung backend endpoint can never block server-side rendering of the
+    // shared layout (which would take down every /home/* page). See Nav.tsx.
 
     return (
         <>
@@ -57,10 +44,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 {/* Static sidebar for desktop */}
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-62 lg:flex-col">
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
-                        <Nav imageUrl={imageUrl} fullName={fullName} onSmallScreen={false} lowStockCount={lowStockCount} />
+                        <Nav imageUrl={imageUrl} fullName={fullName} onSmallScreen={false} />
                     </div>
                 </div>
-                <NavDialog imageUrl={imageUrl} fullName={fullName} lowStockCount={lowStockCount} />
+                <NavDialog imageUrl={imageUrl} fullName={fullName} />
                 {/* pb-20 reserves space for the mobile bottom tab bar */}
                 <div className="pb-20 lg:pb-0">
                     {children}

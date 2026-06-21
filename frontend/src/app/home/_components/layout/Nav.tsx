@@ -1,4 +1,5 @@
 'use client'
+import { useEffect, useState } from "react"
 import Image from "next/image"
 import ProfileMenu from "./ProfileMenu"
 import {
@@ -31,16 +32,33 @@ export default function Nav({
     onSmallScreen,
     fullName,
     imageUrl,
-    lowStockCount = 0,
 }: {
     onSmallScreen: boolean;
     fullName: string;
     imageUrl: string;
-    lowStockCount?: number;
 }) {
     const currentPath = usePathname();
     const searchParams = useSearchParams();
     const currentSearch = searchParams.toString();
+
+    // Fetched in the browser (not during SSR) so a slow/hung backend can never
+    // block rendering. Failure is silent — the badge simply stays hidden.
+    const [lowStockCount, setLowStockCount] = useState(0);
+    useEffect(() => {
+        const jwt = document.cookie.split('; ').find((c) => c.startsWith('jwt='))?.split('=')[1];
+        if (!jwt) return;
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 8000);
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/spareparts/lowstock/count`, {
+            headers: { Authorization: `Bearer ${jwt}` },
+            signal: controller.signal,
+        })
+            .then((r) => (r.ok ? r.json() : 0))
+            .then((n) => setLowStockCount(Number(n) || 0))
+            .catch(() => { /* non-fatal — badge stays hidden */ })
+            .finally(() => clearTimeout(timer));
+        return () => clearTimeout(timer);
+    }, []);
 
     const navigation = [
         ...baseNavigation.slice(0, 5),
