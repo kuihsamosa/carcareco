@@ -35,6 +35,15 @@ namespace Carmasters.Core.Repository.Postgres
             connectionBuilder.Database = options.Name;
             connectionBuilder.SslMode = Npgsql.SslMode.Require;
             connectionBuilder.TrustServerCertificate = true;
+            // Fail fast instead of hanging forever when the DB/pooler is unreachable,
+            // and keep the pool small to respect Supabase's pooler connection limits.
+            connectionBuilder.Timeout = 15;            // connection open timeout (s)
+            connectionBuilder.CommandTimeout = 30;     // query timeout (s)
+            connectionBuilder.MaxPoolSize = 5;
+            connectionBuilder.MinPoolSize = 0;
+            connectionBuilder.KeepAlive = 30;
+            connectionBuilder.IncludeErrorDetail = true;
+            Console.WriteLine($"[DB CONFIG] NHibernate connection string ready: Host={connectionBuilder.Host} Port={connectionBuilder.Port} DB={connectionBuilder.Database} Ssl={connectionBuilder.SslMode} Timeout={connectionBuilder.Timeout} MaxPool={connectionBuilder.MaxPoolSize}");
             var multitenancyEnabled = options.MultiTenancy?.Enabled == true;
             var defaultFactory = default(ISessionFactory);
             var mappingAssemblies = new System.Collections.Generic.List<Assembly>() { typeof(UserDbMapping).Assembly };
