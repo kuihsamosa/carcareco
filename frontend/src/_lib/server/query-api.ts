@@ -30,6 +30,10 @@ async function apiCall({
     method,
     headers: requestHeaders,
     body : body? JSON.stringify(body):null,
+    // Authenticated, per-request data must never go through Next.js's Data
+    // Cache layer (which patches fetch in Server Components and can stall the
+    // request). Force a plain, uncached fetch like a normal API call.
+    cache: 'no-store' as RequestCache,
   };
 
   // Next.js's patched fetch ignores AbortController, so a hung backend would
