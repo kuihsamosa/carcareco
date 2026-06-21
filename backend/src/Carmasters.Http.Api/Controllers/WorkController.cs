@@ -269,6 +269,24 @@ namespace Carmasters.Http.Api.Controllers
             }
             return Ok();
         }
+        [HttpGet("stats")]
+        public IActionResult GetStats()
+        {
+            var sql = @"SELECT
+                count(*) filter (where userstatus = 'InProgress' and invoiceid is null) as inprogress,
+                count(*) filter (where userstatus = 'Default'    and invoiceid is null) as waiting,
+                count(*) filter (where userstatus = 'Closed'     and invoiceid is null) as done,
+                count(*) filter (where invoiceid is not null) as invoiced
+            FROM domain.work";
+            var row = session.Connection.QuerySingle(sql);
+            return Ok(new {
+                InProgress = (int)(long)row.inprogress,
+                Waiting    = (int)(long)row.waiting,
+                Done       = (int)(long)row.done,
+                Invoiced   = (int)(long)row.invoiced,
+            });
+        }
+
         //todo move queries out refract
         [HttpGet("page")]
         public PagedResult<WorkPage> GetPage(

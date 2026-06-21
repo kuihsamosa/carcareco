@@ -8,6 +8,7 @@ import OfflineIndicator from './_components/layout/OfflineIndicator'
 import ToastMessages from '@/_components/ToastMessages'
 import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
+import { httpGet } from '@/_lib/server/query-api';
 
 interface CustomJwtPayload {
     FullName?: string; 
@@ -30,6 +31,13 @@ export default async function Layout({ children }: { children: React.ReactNode }
     }
 
     const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/users/profilepicture/${jwt}`
+
+    let lowStockCount = 0;
+    try {
+        const res = await httpGet('spareparts/lowstock/count');
+        if (res.ok) lowStockCount = await res.json();
+    } catch { /* non-fatal */ }
+
     return (
         <>
             {/* <Timeout></Timeout> */}
@@ -39,10 +47,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
                 {/* Static sidebar for desktop */}
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-62 lg:flex-col">
                     <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6">
-                        <Nav imageUrl={imageUrl} fullName={fullName} onSmallScreen={false} />
+                        <Nav imageUrl={imageUrl} fullName={fullName} onSmallScreen={false} lowStockCount={lowStockCount} />
                     </div>
                 </div>
-                <NavDialog imageUrl={imageUrl} fullName={fullName} />
+                <NavDialog imageUrl={imageUrl} fullName={fullName} lowStockCount={lowStockCount} />
                 {/* pb-20 reserves space for the mobile bottom tab bar */}
                 <div className="pb-20 lg:pb-0">
                     {children}

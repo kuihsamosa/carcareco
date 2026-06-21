@@ -32,9 +32,11 @@ const bottomTabs = [
 export default function NavDialog({
     fullName,
     imageUrl,
+    lowStockCount = 0,
 }: {
     fullName: string;
     imageUrl: string;
+    lowStockCount?: number;
 }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const pathname = usePathname();
@@ -68,7 +70,7 @@ export default function NavDialog({
                             </div>
                         </TransitionChild>
                         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-2 ring-1 ring-white/10">
-                            <Nav fullName={fullName} imageUrl={imageUrl} onSmallScreen={true} />
+                            <Nav fullName={fullName} imageUrl={imageUrl} onSmallScreen={true} lowStockCount={lowStockCount} />
                         </div>
                     </DialogPanel>
                 </div>

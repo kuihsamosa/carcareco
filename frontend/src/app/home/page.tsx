@@ -4,6 +4,7 @@ import {
     WrenchScrewdriverIcon, DocumentTextIcon, ChartBarIcon, Cog6ToothIcon,
 } from "@heroicons/react/24/outline"
 import Link from "next/link"
+import { httpGet } from '@/_lib/server/query-api'
 
 function StatusChip({ label, value, color, href }: { label: string; value: number | string; color: string; href: string }) {
     return (
@@ -47,7 +48,20 @@ function QuickLink({ href, icon, label, accent }: { href: string; icon: React.Re
     )
 }
 
-export default function Page() {
+interface WorkStats {
+    inProgress: number;
+    waiting: number;
+    done: number;
+    invoiced: number;
+}
+
+export default async function Page() {
+    let stats: WorkStats = { inProgress: 0, waiting: 0, done: 0, invoiced: 0 };
+    try {
+        const res = await httpGet('work/stats');
+        if (res.ok) stats = await res.json();
+    } catch { /* non-fatal — show zeros */ }
+
     return (
         <main className="lg:pl-62 p-4 sm:p-8">
             <div className="mb-5">
@@ -57,10 +71,10 @@ export default function Page() {
 
             {/* Live Status Strip — tappable chips that filter the work list */}
             <div className="flex gap-2 mb-5 bg-slate-900 rounded-2xl p-3">
-                <StatusChip label="🔧 Active" value={12} color="bg-white/10 text-white" href="/home/work?status=inprogress" />
-                <StatusChip label="⏳ Waiting" value={3} color="bg-amber-400/20 text-amber-200" href="/home/work?status=waiting" />
-                <StatusChip label="✅ Done" value={4} color="bg-green-400/20 text-green-200" href="/home/work?status=closed" />
-                <StatusChip label="📬 Collect" value={2} color="bg-blue-400/20 text-blue-200" href="/home/work?status=completed" />
+                <StatusChip label="🔧 Active" value={stats.inProgress} color="bg-white/10 text-white" href="/home/work?status=inprogress" />
+                <StatusChip label="⏳ Open" value={stats.waiting} color="bg-amber-400/20 text-amber-200" href="/home/work" />
+                <StatusChip label="✅ Done" value={stats.done} color="bg-green-400/20 text-green-200" href="/home/work?status=closed" />
+                <StatusChip label="📬 Invoiced" value={stats.invoiced} color="bg-blue-400/20 text-blue-200" href="/home/work?issued=on" />
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[110px]">

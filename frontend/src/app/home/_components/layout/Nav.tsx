@@ -17,45 +17,48 @@ import { usePathname, useSearchParams } from 'next/navigation'
 
 const navigationIconClass = "size-6 shrink-0";
 
-// lowStockCount would come from a real API — placeholder for wiring up later
-const lowStockCount = 0;
-
-const navigation = [
+const baseNavigation = [
     { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home' },
     { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && !search.includes('issued=on') },
     { name: 'Invoices', href: '/home/work?issued=on', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (_path: string, search: string) => search.includes('issued=on') },
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} /> },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} /> },
-    {
-        name: 'Inventory', href: '/home/inventory',
-        icon: (
-            <span className="relative">
-                <CubeIcon aria-hidden="true" className={navigationIconClass} />
-                {lowStockCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold">
-                        {lowStockCount}
-                    </span>
-                )}
-            </span>
-        ),
-    },
     { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} /> },
     { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass} /> },
-]
- 
+];
 
-export default   function Nav({
-    onSmallScreen, 
+export default function Nav({
+    onSmallScreen,
     fullName,
     imageUrl,
-}:{
-    onSmallScreen:boolean, 
-    fullName:string,
-    imageUrl:string
+    lowStockCount = 0,
+}: {
+    onSmallScreen: boolean;
+    fullName: string;
+    imageUrl: string;
+    lowStockCount?: number;
 }) {
     const currentPath = usePathname();
     const searchParams = useSearchParams();
     const currentSearch = searchParams.toString();
+
+    const navigation = [
+        ...baseNavigation.slice(0, 5),
+        {
+            name: 'Inventory', href: '/home/inventory',
+            icon: (
+                <span className="relative">
+                    <CubeIcon aria-hidden="true" className={navigationIconClass} />
+                    {lowStockCount > 0 && (
+                        <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[9px] font-bold">
+                            {lowStockCount}
+                        </span>
+                    )}
+                </span>
+            ),
+        },
+        ...baseNavigation.slice(5),
+    ];
 
     function isActive(item: typeof navigation[0]) {
         if (item.activeMatch) return (item.activeMatch as (p: string, s: string) => boolean)(currentPath ?? '', currentSearch);

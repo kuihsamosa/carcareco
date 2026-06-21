@@ -6,8 +6,10 @@ using Carmasters.Core.Application.Services;
 using Carmasters.Core.Domain;
 using Carmasters.Core.Repository.Postgres;
 using Carmasters.Http.Api.Models;
+using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using NHibernate;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -19,9 +21,19 @@ namespace Carmasters.Http.Api.Controllers
     public class SparePartsController : BaseController<SparePartDto, SparePart>
     {
 
-        public SparePartsController(IRepository repository, IMapper mapper) : base(repository, mapper)
-        {
+        private readonly ISession session;
 
+        public SparePartsController(IRepository repository, IMapper mapper, ISession session) : base(repository, mapper)
+        {
+            this.session = session;
+        }
+
+        [HttpGet("lowstock/count")]
+        public IActionResult GetLowStockCount()
+        {
+            var count = session.Connection.ExecuteScalar<int>(
+                "SELECT count(*) FROM domain.sparepart WHERE quantity <= 3");
+            return Ok(count);
         }
 
 
