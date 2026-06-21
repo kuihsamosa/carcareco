@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import Nav from './Nav';
 import ProfileMenu from './ProfileMenu';
+import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import clsx from 'clsx';
 
@@ -108,7 +109,7 @@ export default function NavDialog({
                     })}
 
                     {/* Center FAB — New Job */}
-                    <a
+                    <Link
                         href="/home/work/new"
                         className="flex flex-col items-center justify-end pb-1 px-3 flex-shrink-0"
                     >
@@ -116,7 +117,7 @@ export default function NavDialog({
                             <PlusIcon className="size-6 text-white" aria-hidden="true" />
                         </span>
                         <span className="text-[10px] font-medium text-slate-600 -mt-1.5">New Job</span>
-                    </a>
+                    </Link>
 
                     {/* Right two tabs */}
                     {bottomTabs.slice(2).map((tab) => {
