@@ -32,19 +32,20 @@ export default async function Layout({ children }: { children: React.ReactNode }
 
     const imageUrl = `${process.env.NEXT_PUBLIC_API_URL}/api/users/profilepicture/${jwt}`
 
+    // The lowstock badge must NEVER block the shared layout. Next.js's patched
+    // fetch ignores AbortController, so race the request against a hard timer:
+    // if the backend endpoint hangs, we stop awaiting it and render with 0.
     let lowStockCount = 0;
     try {
         const apiJwt = await getJwt();
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 3000);
-        const res = await fetch(
-            `${process.env.API_URL}/api/spareparts/lowstock/count`,
-            {
-                headers: { Authorization: `Bearer ${apiJwt}` },
-                signal: controller.signal,
-            }
-        ).finally(() => clearTimeout(timer));
-        if (res.ok) lowStockCount = await res.json();
+        const fetchCount = fetch(`${process.env.API_URL}/api/spareparts/lowstock/count`, {
+            headers: { Authorization: `Bearer ${apiJwt}` },
+            cache: 'no-store',
+        })
+            .then((r) => (r.ok ? r.json() : 0))
+            .catch(() => 0);
+        const timeout = new Promise<number>((resolve) => setTimeout(() => resolve(0), 2500));
+        lowStockCount = (await Promise.race([fetchCount, timeout])) || 0;
     } catch { /* non-fatal — show 0 */ }
 
     return (
