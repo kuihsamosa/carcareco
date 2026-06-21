@@ -36,7 +36,14 @@ export default async function Layout({ children }: { children: React.ReactNode }
     try {
         const res = await httpGet('spareparts/lowstock/count');
         if (res.ok) lowStockCount = await res.json();
-    } catch { /* non-fatal */ }
+    } catch (e: unknown) {
+        // Re-throw Next.js internal redirects; swallow real network errors
+        if (typeof e === 'object' && e !== null && 'digest' in e &&
+            typeof (e as { digest: unknown }).digest === 'string' &&
+            (e as { digest: string }).digest.startsWith('NEXT_REDIRECT')) {
+            throw e;
+        }
+    }
 
     return (
         <>

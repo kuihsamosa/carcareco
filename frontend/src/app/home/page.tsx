@@ -60,7 +60,13 @@ export default async function Page() {
     try {
         const res = await httpGet('work/stats');
         if (res.ok) stats = await res.json();
-    } catch { /* non-fatal — show zeros */ }
+    } catch (e: unknown) {
+        if (typeof e === 'object' && e !== null && 'digest' in e &&
+            typeof (e as { digest: unknown }).digest === 'string' &&
+            (e as { digest: string }).digest.startsWith('NEXT_REDIRECT')) {
+            throw e;
+        }
+    }
 
     return (
         <main className="lg:pl-62 p-4 sm:p-8">
