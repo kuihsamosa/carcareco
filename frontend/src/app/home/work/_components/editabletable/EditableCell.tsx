@@ -3,14 +3,16 @@ import {   useImperativeHandle, useState } from "react";
 
  
 export function Input<Type extends string | number | readonly string[] | null>(required: boolean | undefined, id: string | undefined, name: string ,type: string, step: string| undefined,  placeholder: string, internalValue: Type, handleOnChange:   ChangeEventHandler<HTMLInputElement>,className:string
-    |undefined
+    |undefined,
+    inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | undefined
 ): React.ReactNode {
     return <input
         required={required}
         id={id?.toString()}
         name={name}
-        type={type} 
+        type={type}
         step={step}
+        inputMode={inputMode}
         className={className}
         placeholder={placeholder}
         value={internalValue??''}

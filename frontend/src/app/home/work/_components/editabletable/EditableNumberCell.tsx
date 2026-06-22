@@ -28,7 +28,7 @@ const EditableNumberCell = React.forwardRef<EditableCellHandle<number|null>, IEd
     };
     if (!isEditing) return getFormattedValue();
 
-    return Input(required, id, name, "number", step, placeholder, internalValue, (e) => setInternalValue(+e.currentTarget.value), className);
+    return Input(required, id, name, "number", step, placeholder, internalValue, (e) => setInternalValue(+e.currentTarget.value), className, "decimal");
 
 });
 EditableNumberCell.displayName = "EditableNumberCell";

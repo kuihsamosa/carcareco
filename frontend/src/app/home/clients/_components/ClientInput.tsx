@@ -13,6 +13,7 @@ import FormCheckBox from '@/_components/FormCheckbox';
 import FormSwitch from '@/_components/FormSwitch';  
 import { IClientData } from '../model';
 import BlueBadge from '@/_components/BlueBadge';
+import PreventEnterSubmit from '@/_components/PreventEnterSubmit';
 
 
 export default function ClientInput({
@@ -48,6 +49,7 @@ export default function ClientInput({
 
     return (
         <>
+            <PreventEnterSubmit />
             <div className="space-y-12">
                 <div className="border-b border-gray-900/10 pb-12">
                    <Field className="flex items-center mb-4 ">
@@ -90,7 +92,7 @@ export default function ClientInput({
 
                         </div>
                         <div className="sm:col-span-3">
-                            <FormInput name='phone' defaultValue={client?.phone} label='Phone'></FormInput>
+                            <FormInput name='phone' type='tel' inputMode='tel' defaultValue={client?.phone} label='Phone'></FormInput>
                         </div> 
                         <ClientEmailsInput client={client}></ClientEmailsInput>
                         <ClientAddress address={client?.address} name='street-address'></ClientAddress>

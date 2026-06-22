@@ -12,6 +12,7 @@ import data from './car_brands.json';
 import { useRef, useState } from 'react';
 import { CameraIcon } from '@heroicons/react/24/outline';
 import FormLabel from '@/_components/FormLabel';
+import PreventEnterSubmit from '@/_components/PreventEnterSubmit';
 
 interface ICarProducer
 {
@@ -32,9 +33,10 @@ export default function VehicleInput({
     const [producer, setProducer] = useState<ICarProducer | null>(!vehicle ? null : { name: vehicle.producer })
     return (
         <>
+            <PreventEnterSubmit />
             <div className="space-y-12">
                 <div className="border-b border-gray-900/10 pb-12">
-                    
+
                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <div className="sm:col-span-2">
                         <FormLabel name='producer' label='Car make'></FormLabel>

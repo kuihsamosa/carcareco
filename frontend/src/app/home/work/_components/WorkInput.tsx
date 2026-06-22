@@ -17,6 +17,7 @@ import Select from '@/_components/Select';
 import clsx from 'clsx';
 import WorkInputMechanics from './WorkInputMechanics';
 import WorkAboutItems from './WorkAboutItems';
+import PreventEnterSubmit from '@/_components/PreventEnterSubmit';
 
 
 export default function WorkInput({
@@ -65,6 +66,7 @@ export default function WorkInput({
 
     return (
         <>
+            <PreventEnterSubmit />
             <div className="space-y-12 ">
                 <div className="border-b  border-gray-900/10 pb-12">
 
@@ -133,7 +135,7 @@ export default function WorkInput({
                                         <FormInput placeholder="First name" name="newClientFirstName" className="flex-1" />
                                         <FormInput placeholder="Last name" name="newClientLastName" className="flex-1" />
                                     </div>
-                                    <FormInput placeholder="Phone" name="newClientPhone" />
+                                    <FormInput type="tel" inputMode="tel" placeholder="Phone" name="newClientPhone" />
                                     <button type="button" onClick={() => setNewClientMode(false)}
                                         className="text-xs text-gray-400 hover:text-gray-600">
                                         Cancel — use existing client
@@ -184,7 +186,7 @@ export default function WorkInput({
                                     </div>
                                 </div>
                                 <div className='ml-2  '>
-                                    <FormInput type='number' placeholder='Odometer value' name='odo' defaultValue={work?.odo ?? 0}></FormInput>
+                                    <FormInput type='number' inputMode='numeric' placeholder='Odometer value' name='odo' defaultValue={work?.odo ?? 0}></FormInput>
                                 </div>
                             </div>
 

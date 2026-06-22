@@ -9,8 +9,9 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { BaseDialogHandle } from "@/_components/BaseDialog"
 import { DataItemRowHandle } from "./editabletable/DataIItemRow"
 import { IActivities, IOfferIssuance, IProduct, IWorkData } from "../model"
-import OfferAcceptedDialog from "./activity/OfferAcceptedDialog" 
+import OfferAcceptedDialog from "./activity/OfferAcceptedDialog"
 import SendPricingDialog from "./activity/SendPricingDialog"
+import PreventEnterSubmit from "@/_components/PreventEnterSubmit"
 
 export default function Activity({
     edit,
@@ -128,6 +129,7 @@ export default function Activity({
     }, [addEmptyRow, data.length,startfresh])
     return (
         <div className="">
+            <PreventEnterSubmit />
             {activityIsOffer&&<OfferAcceptedDialog  dialogRef={offerAcceptedRef} work={work}  activities={activities}></OfferAcceptedDialog>}
             <ApplyDiscountsDialog dialogRef={applyDiscountsRef} tableRef={tableRef} ></ApplyDiscountsDialog>
             {activityIsOffer&& <IssueOfferDialog dialogRef={issueOfferRef} work={work}   activities={activities} ></IssueOfferDialog>}

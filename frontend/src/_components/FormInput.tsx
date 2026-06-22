@@ -22,6 +22,7 @@ export default function FormInput({
     className,
     validate,
     onKeyDown,
+    inputMode,
 }: {
     name: string,
     label?: string | undefined,
@@ -34,7 +35,8 @@ export default function FormInput({
     step?: string | undefined,
     className?: string | undefined,
     validate?: (value: string) => string | undefined,
-    onKeyDown?: KeyboardEventHandler<HTMLInputElement>
+    onKeyDown?: KeyboardEventHandler<HTMLInputElement>,
+    inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'email' | 'url' | 'search' | undefined
 }) {
 
     const [blurError, setBlurError] = useState<string | undefined>(undefined)
@@ -49,6 +51,7 @@ export default function FormInput({
                     name={name}
                     type={type}
                     step={step}
+                    inputMode={inputMode}
                     onChange={onInputChange}
                     onKeyDown={onKeyDown}
                     onBlur={(e) => {
