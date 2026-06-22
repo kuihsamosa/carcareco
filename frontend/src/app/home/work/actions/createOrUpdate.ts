@@ -7,14 +7,27 @@ import { redirect } from "next/navigation";
 export async function createOrUpdate(
     formData: FormData
     ) {
-      
-     
+
+
     const id = formData.get('id');
     let vehicleId = formData.get('vehicleId');
     if(formData.get('onlyClientVehicles')=='on'){
         vehicleId = formData.get('vehicleId[value]');
     }
-    const clientId = formData.get('clientId[value]');
+
+    let clientId = formData.get('clientId[value]');
+
+    if (formData.get('newClientMode') === 'on') {
+        const newClientBody = {
+            firstName: formData.get('newClientFirstName'),
+            lastName: formData.get('newClientLastName'),
+            phone: formData.get('newClientPhone'),
+            emailAddresses: [],
+            introducedAt: new Date(),
+        };
+        const clientRes = await httpPost({ url: 'privateclients', body: newClientBody });
+        clientId = await clientRes.json();
+    }
  //Guid? ClientId, string Description, Guid? VehicleId, Guid[] AssignedTo, int? Odo, bool StartWithOffer
     const body = {
        clientId:clientId ==''?null:clientId,

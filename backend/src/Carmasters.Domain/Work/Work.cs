@@ -115,6 +115,11 @@ namespace Carmasters.Core.Domain
         {
             this.Notes = description;
         }
+
+        public virtual void RescheduleTo(DateTime startedOn)
+        {
+            this.StartedOn = startedOn;
+        }
          
         public virtual void WithoutVehicle()
         {

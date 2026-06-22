@@ -41,6 +41,7 @@ export default function WorkInput({
     const [clientVehicles, setClientVehicles] = useState<IVehicleData[]>([]);
     const [selectedClientVehicleId, setSelectedClientVehicleId] = useState(work?.vehicleId ?? '');
     const [clientUndisclosed, setClientUndisclosed] = useState(!work ? false : !work.clientId);
+    const [newClientMode, setNewClientMode] = useState(false);
     const populateClientVehicles = (clientId: string) => {
         query({
             url: 'vehicles/client/' + clientId,
@@ -96,25 +97,49 @@ export default function WorkInput({
                                         onChange={(value) => {
                                             setClientUndisclosed(value);
                                             setOnlyClientVehicles(!value);
+                                            setNewClientMode(false);
                                             setIsDirty(true);
                                         }}></FormSwitch>
                                 </span>
                             </FormLabel>
-                            {!clientUndisclosed &&
-                                <ClientsCombobox name='clientId'
-                                    onItemChange={(item) => {
-                                        if (item) {
-                                            populateClientVehicles(item.value);
-                                            setOnlyClientVehicles(true);
-                                        }
-                                        setSelectedClientVehicleId('');
-                                    }}
-                                    defaultValue={{
-                                        text: work?.clientName ?? '',
-                                        value: work?.clientId ?? '',
-                                    }}>
-                                </ClientsCombobox>}
-
+                            {!clientUndisclosed && !newClientMode &&
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1">
+                                        <ClientsCombobox name='clientId'
+                                            onItemChange={(item) => {
+                                                if (item) {
+                                                    populateClientVehicles(item.value);
+                                                    setOnlyClientVehicles(true);
+                                                }
+                                                setSelectedClientVehicleId('');
+                                            }}
+                                            defaultValue={{
+                                                text: work?.clientName ?? '',
+                                                value: work?.clientId ?? '',
+                                            }}>
+                                        </ClientsCombobox>
+                                    </div>
+                                    {!work && (
+                                        <button type="button" onClick={() => { setNewClientMode(true); setIsDirty(true); }}
+                                            className="mt-0 text-sm text-indigo-600 hover:text-indigo-500 whitespace-nowrap">
+                                            + New
+                                        </button>
+                                    )}
+                                </div>}
+                            {!clientUndisclosed && newClientMode && (
+                                <div className="mt-2 space-y-2 rounded-xl border border-gray-200 p-3 bg-gray-50">
+                                    <input type="hidden" name="newClientMode" value="on" />
+                                    <div className="flex gap-2">
+                                        <FormInput placeholder="First name" name="newClientFirstName" className="flex-1" />
+                                        <FormInput placeholder="Last name" name="newClientLastName" className="flex-1" />
+                                    </div>
+                                    <FormInput placeholder="Phone" name="newClientPhone" />
+                                    <button type="button" onClick={() => setNewClientMode(false)}
+                                        className="text-xs text-gray-400 hover:text-gray-600">
+                                        Cancel — use existing client
+                                    </button>
+                                </div>
+                            )}
                         </div>
                         <div className='  ' >
                             <FormLabel name='vehicleId' label='Vehicle'>

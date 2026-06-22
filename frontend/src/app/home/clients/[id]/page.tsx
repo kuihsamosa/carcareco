@@ -13,14 +13,26 @@ import { CardHeader } from '@/_components/Card';
 import EntityTabs from '@/_components/EntityTabs';
 
 
+interface IClientVehicle {
+    id: string;
+    producer: string;
+    model: string;
+    regNr: string;
+    vin: string;
+}
+
 export default async function Page({
     params,
 }: {
     params: Promise<{ id: string }>
 }) {
     const id = (await params).id;
-    const data = await httpGet('clients/' + id);
+    const [data, vehiclesData] = await Promise.all([
+        httpGet('clients/' + id),
+        httpGet('vehicles/client/' + id),
+    ]);
     const client = await data.json() as IClientData;
+    const vehicles = await vehiclesData.json() as IClientVehicle[];
     return (
 
         <Main narrow={false} header={
@@ -60,6 +72,25 @@ export default async function Page({
                             <DescriptionItem label='Added' value={client.introducedAt}></DescriptionItem>
                         </dl>
                     </div>
+
+                    {vehicles.length > 0 && (
+                        <div className="mt-6">
+                            <h4 className="px-4 sm:px-0 text-sm font-semibold text-gray-900 mb-2">Vehicles</h4>
+                            <ul className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
+                                {vehicles.map(v => (
+                                    <li key={v.id}>
+                                        <a href={`/home/vehicles/${v.id}/services`} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                                            <span className="text-sm font-medium text-gray-900">
+                                                {[v.producer, v.model].filter(Boolean).join(' ')}
+                                                {v.regNr && <span className="ml-2 text-gray-500">({v.regNr})</span>}
+                                            </span>
+                                            <span className="text-xs text-gray-400">{v.vin}</span>
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
         </Main>
     )

@@ -1,6 +1,5 @@
 import {
-    QueueListIcon, UsersIcon, TruckIcon, CubeIcon, ClockIcon,
-    CheckCircleIcon, ExclamationTriangleIcon, CurrencyDollarIcon,
+    QueueListIcon, UsersIcon, TruckIcon, CubeIcon,
     WrenchScrewdriverIcon, DocumentTextIcon, ChartBarIcon, Cog6ToothIcon,
 } from "@heroicons/react/24/outline"
 import Link from "next/link"
@@ -15,26 +14,6 @@ function StatusChip({ label, value, color, href }: { label: string; value: numbe
     )
 }
 
-function StatCard({ label, value, sub, colorClass, icon }: {
-    label: string
-    value: string | number
-    sub?: string
-    colorClass?: string
-    icon?: React.ReactNode
-}) {
-    return (
-        <div className={`rounded-2xl p-4 flex flex-col justify-between h-full ${colorClass ?? 'bg-white border border-gray-100'}`}>
-            <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wide">{label}</span>
-                {icon && <span className="text-gray-300">{icon}</span>}
-            </div>
-            <div>
-                <p className="text-3xl font-medium text-gray-900 leading-none">{value}</p>
-                {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
-            </div>
-        </div>
-    )
-}
 
 function QuickLink({ href, icon, label, accent }: { href: string; icon: React.ReactNode; label: string; accent?: string }) {
     return (
@@ -83,48 +62,10 @@ export default async function Page() {
                 <StatusChip label="📬 Invoiced" value={stats.invoiced} color="bg-blue-400/20 text-blue-200" href="/home/work?issued=on" />
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 auto-rows-[110px]">
-
-                {/* Revenue due */}
-                <div className="col-span-1 row-span-1">
-                    <StatCard
-                        label="Invoices due"
-                        value="RM 1,840"
-                        sub="3 outstanding"
-                        icon={<CurrencyDollarIcon className="w-5 h-5" />}
-                    />
-                </div>
-
-                {/* Completed today */}
-                <div className="col-span-1 row-span-1 rounded-2xl p-4 flex flex-col justify-between" style={{ background: '#EAF3DE' }}>
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium" style={{ color: '#3B6D11' }}>Completed today</span>
-                        <CheckCircleIcon className="w-4 h-4" style={{ color: '#3B6D11', opacity: 0.5 }} aria-hidden="true" />
-                    </div>
-                    <p className="text-3xl font-medium text-gray-900">4</p>
-                </div>
-
-                {/* Avg job time */}
-                <div className="col-span-1 row-span-1">
-                    <StatCard
-                        label="Avg. job time"
-                        value="2.4 h"
-                        sub="This week"
-                        icon={<ClockIcon className="w-5 h-5" />}
-                    />
-                </div>
-
-                {/* Awaiting parts */}
-                <div className="col-span-1 row-span-1 rounded-2xl p-4 flex flex-col justify-between" style={{ background: '#FAEEDA' }}>
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-medium" style={{ color: '#854F0B' }}>Awaiting parts</span>
-                        <ExclamationTriangleIcon className="w-4 h-4" style={{ color: '#854F0B', opacity: 0.5 }} aria-hidden="true" />
-                    </div>
-                    <p className="text-3xl font-medium text-gray-900">3</p>
-                </div>
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
 
                 {/* Quick links — 8-icon grid, spans full width */}
-                <div className="col-span-2 lg:col-span-3 row-span-2 rounded-2xl bg-white border border-gray-100 p-4">
+                <div className="col-span-2 lg:col-span-3 rounded-2xl bg-white border border-gray-100 p-4">
                     <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Quick actions</p>
                     <div className="grid grid-cols-4 gap-2">
                         <QuickLink href="/home/work/new"       icon={<WrenchScrewdriverIcon className="w-6 h-6" />} label="New Job"  accent="bg-slate-900 [&_span]:text-white [&_.text-gray-700]:text-white hover:bg-slate-800" />

@@ -536,6 +536,16 @@ from (
 
         }
 
+        [HttpPut("{id}/startedon")]
+        public OkResult PutStartedOn(Guid id, [FromBody] DateTime startedOn)
+        {
+            var work = session.Get<Work>(id);
+            work.RescheduleTo(startedOn);
+            work.Changed();
+            session.Update(work);
+            return Ok();
+        }
+
         [HttpPut("{id}/status/{status}")]
         public OkResult PutStatus(Guid id, string status)
         {

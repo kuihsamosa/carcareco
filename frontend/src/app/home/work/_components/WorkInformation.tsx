@@ -4,7 +4,8 @@
 import { IWorkData } from '../model';
 import { DocumentTextIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { query } from '@/_lib/client/query-api';
 import { startAnActivity } from '../actions/startAnActivity';
 import ButtonGroup, { IButtonOption } from '@/_components/ButtonGroup';
 import HamburgerMenu from '@/_components/HamburgerMenu';
@@ -55,9 +56,26 @@ export function WorkInformation({
 }) {
 
     const editPath = '/home/work/edit/' + work.id;
- 
+
     const vehicleSummary = [work.vehicleProducer, work.vehicleModel, work.vehicleVin, work.vehicleRegNr].filter(x => x).join(', ');
     const clientSummary = [work.clientName, work.clientPhone, work.clientEmail].filter(x => x).join(', ');
+
+    const [startedOn, setStartedOn] = useState<Date | string>(work.startedOn);
+    const [editingDate, setEditingDate] = useState(false);
+    const dateInputRef = useRef<HTMLInputElement>(null);
+
+    const handleDateBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        const newDate = e.currentTarget.value;
+        if (!newDate) { setEditingDate(false); return; }
+        query({
+            url: `work/${work.id}/startedon`,
+            method: 'PUT',
+            body: newDate,
+            onSuccess: () => { setStartedOn(new Date(newDate).toISOString()); },
+            onFailure: () => {},
+        });
+        setEditingDate(false);
+    };
 
     const [statusSheetOpen, setStatusSheetOpen] = useState(false);
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -195,7 +213,22 @@ export function WorkInformation({
                             )}
                         </dt>
                         <dd className="text-sm/6 text-gray-500">
-                            <time dateTime="2023-01-31">{moment(work.startedOn).format('LLL')}</time>
+                            {editingDate ? (
+                                <input
+                                    ref={dateInputRef}
+                                    type="date"
+                                    autoFocus
+                                    defaultValue={moment(startedOn).format('YYYY-MM-DD')}
+                                    onBlur={handleDateBlur}
+                                    onKeyDown={(e) => { if (e.key === 'Escape') setEditingDate(false); if (e.key === 'Enter') e.currentTarget.blur(); }}
+                                    className="text-sm border border-gray-300 rounded px-1 py-0.5"
+                                />
+                            ) : (
+                                <time dateTime={startedOn?.toString()} onClick={() => !work.issuance && setEditingDate(true)}
+                                    className={!work.issuance ? 'cursor-pointer hover:text-gray-700 hover:underline decoration-dashed underline-offset-2' : ''}>
+                                    {moment(startedOn).format('LLL')}
+                                </time>
+                            )}
                         </dd>
                     </div>
 

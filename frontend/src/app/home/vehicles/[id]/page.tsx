@@ -7,6 +7,7 @@ import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import { IVehicleData } from '../model';
 import { CardHeader } from '@/_components/Card';
 import EntityTabs from '@/_components/EntityTabs';
+import { redirect } from 'next/navigation';
 
 
 
@@ -16,6 +17,7 @@ export default async function Page({
     params: Promise<{ id: string }>
 }) {
     const id = (await params).id;
+    redirect(`/home/vehicles/${id}/services`);
     const data = await httpGet('vehicles/' + id);
     const vehicle = await data.json() as IVehicleData;
   
