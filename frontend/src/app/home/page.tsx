@@ -1,6 +1,6 @@
 import {
     QueueListIcon, UsersIcon, TruckIcon, CubeIcon, ClockIcon,
-    CheckCircleIcon, ExclamationTriangleIcon, CurrencyEuroIcon,
+    CheckCircleIcon, ExclamationTriangleIcon, CurrencyDollarIcon,
     WrenchScrewdriverIcon, DocumentTextIcon, ChartBarIcon, Cog6ToothIcon,
 } from "@heroicons/react/24/outline"
 import Link from "next/link"
@@ -89,9 +89,9 @@ export default async function Page() {
                 <div className="col-span-1 row-span-1">
                     <StatCard
                         label="Invoices due"
-                        value="€ 1,840"
+                        value="RM 1,840"
                         sub="3 outstanding"
-                        icon={<CurrencyEuroIcon className="w-5 h-5" />}
+                        icon={<CurrencyDollarIcon className="w-5 h-5" />}
                     />
                 </div>
 

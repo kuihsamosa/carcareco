@@ -153,18 +153,7 @@ const DataItemRow = React.forwardRef<DataItemRowHandle<IProduct>, IDataItemRowPr
                         className={clsx("w-15",pricePropsClass)}
                         defaultValue={item.unit} isEditing={isEditing}></EditableTextCell>
             </td>
-            <td className={clsx("w-15  text-end",tdStyle)}  >
-                 <EditableNumberCell 
-                    id={item.id}
-                    name='discount'
-                        defaultValue={item.discount}
-                        step="5"
-                        className={clsx("w-15",pricePropsClass)}
-                        ref={discountRef}
-                         placeholder="" isPercentage={true} isEditing={isEditing}>
-                    </EditableNumberCell>
-            </td>
-      
+
         {isEditing && <td className="w-10 text-right text-end">
             <Link color="link" href="#" 
                 onClick={(e) =>

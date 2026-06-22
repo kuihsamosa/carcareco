@@ -9,7 +9,6 @@ import {
     UsersIcon,
     ChartBarIcon,
     DocumentTextIcon,
-    WrenchScrewdriverIcon,
     CubeIcon,
     HomeIcon,
   } from '@heroicons/react/24/outline'
@@ -25,7 +24,6 @@ const baseNavigation = [
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} /> },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} /> },
     { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} /> },
-    { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass} /> },
 ];
 
 export default function Nav({

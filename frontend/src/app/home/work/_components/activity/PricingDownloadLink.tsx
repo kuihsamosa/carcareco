@@ -56,7 +56,7 @@ export default function PricingDownloadLink({
         <div className="flex  ">
        {!hidePaperClip&&   <PaperClipIcon aria-hidden="true" className="h-6 w-5 text-gray-400 mr-4" />}
         <div className=" flex min-w-0 flex-1 gap-2">
-          {!hideLabel&& <span className="truncate text-sm/6 font-bold">{  `${name} nr. ${number}`}</span> }
+          {!hideLabel&& <span className="truncate text-sm/6 font-bold">{number}</span> }
             <div className=" text-sm/6 text-gray-500">
                 <Link href="#"  onClick={async (e)=>{
                    e.preventDefault();

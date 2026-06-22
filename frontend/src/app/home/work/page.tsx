@@ -101,7 +101,7 @@ export default async function Page(
 
         return (
           <a href={'/home/work/' + id}>
-            <h5 >Work nr. {workNr}
+            <h5 >{workNr}
               {' '} {!isInvoiceView && <WorkStatusBadge status={status} ></WorkStatusBadge>}
             </h5>
           </a>
@@ -145,17 +145,6 @@ export default async function Page(
     {
       dataField: 'mechanicNames',
       headerText: 'Mechanics',
-    },
-    {
-      dataField: 'notes',
-      headerText: 'Description',
-      dataFormatter: ({ notes }: { notes: string }) => {
-        return (
-          <p title={notes} className="truncate max-w-[140px] sm:max-w-xs" style={{ marginBottom: "-5px" }} >
-            {notes}
-          </p>
-        );
-      }
     }
   ]
 

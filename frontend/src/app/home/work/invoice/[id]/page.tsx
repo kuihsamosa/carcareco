@@ -29,7 +29,7 @@ interface IInvoicePreview {
 }
 
 function fmt(n: number) {
-  return n.toLocaleString('et-EE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString('en-MY', { style: 'currency', currency: 'MYR' });
 }
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
@@ -101,8 +101,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
           <div className="col-span-5">Item</div>
           <div className="col-span-2 text-right">Qty</div>
           <div className="col-span-2 text-right">Unit price</div>
-          <div className="col-span-1 text-right">Disc.</div>
-          <div className="col-span-2 text-right">Total</div>
+          <div className="col-span-3 text-right">Total</div>
         </div>
 
         {inv.lines.length === 0 ? (
@@ -121,7 +120,6 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5">
                   {line.quantity} {line.unit} × {fmt(line.unitPrice)}
-                  {line.discount ? ` − ${line.discount}%` : ''}
                 </p>
               </div>
 
@@ -130,8 +128,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <div className="col-span-5 text-sm text-gray-900">{line.description}</div>
                 <div className="col-span-2 text-right text-sm text-gray-600">{line.quantity} {line.unit}</div>
                 <div className="col-span-2 text-right text-sm text-gray-600">{fmt(line.unitPrice)}</div>
-                <div className="col-span-1 text-right text-sm text-gray-400">{line.discount ? `${line.discount}%` : '—'}</div>
-                <div className="col-span-2 text-right text-sm font-medium text-gray-900">{fmt(line.totalWithVat)}</div>
+                <div className="col-span-3 text-right text-sm font-medium text-gray-900">{fmt(line.totalWithVat)}</div>
               </div>
             </div>
           ))

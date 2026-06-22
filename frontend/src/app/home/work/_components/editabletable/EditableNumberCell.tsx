@@ -21,7 +21,7 @@ const EditableNumberCell = React.forwardRef<EditableCellHandle<number|null>, IEd
         if (internalValue === 0) return '';
         if (isMoney) {
             if (!internalValue) return '';
-            return new Intl.NumberFormat('et-EE', { style: 'currency', currency: 'EUR' }).format(internalValue);
+            return new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' }).format(internalValue);
         }
         if (isPercentage) return internalValue + ' %';
         return internalValue;

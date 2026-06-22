@@ -23,7 +23,7 @@ export default function Saleables({
 }) {
 
      
-    const moneyFormatter = new Intl.NumberFormat('et-EE', { style: 'currency', currency: 'EUR' });
+    const moneyFormatter = new Intl.NumberFormat('en-MY', { style: 'currency', currency: 'MYR' });
  
     const dragItem = useRef<string | undefined>(null);
     const dragOverItem = useRef<string | undefined>(null);
@@ -55,9 +55,6 @@ export default function Saleables({
                                     <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
                                         Unit
                                     </th>
-                                    <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
-                                        Discount
-                                    </th>
                                     {edit && <th className="px-2 py-3.5 text-end text-sm font-semibold whitespace-nowrap text-gray-900"></th>}
                                 </tr>
                             </thead>
@@ -83,7 +80,7 @@ export default function Saleables({
                             </tbody>
                             {!edit && priceSummary && <tfoot>
                                 <tr>
-                                    <th colSpan={6}>
+                                    <th colSpan={5}>
                                         <div className="grid grid-rows-3 gap-0">
                                             <div className="flex flex-row-reverse " >
 
