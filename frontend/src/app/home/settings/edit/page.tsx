@@ -47,7 +47,7 @@ export default async function Page( ) {
                 <FormInput name='bankAccount' label='Bank account' defaultValue={options.requisites.bankAccount}></FormInput> 
               </div>
               <div className="sm:col-span-3">
-                <FormInput name='regNr' label='RegNr' defaultValue={options.requisites.regNr}></FormInput> 
+                <FormInput name='regNr' label='Registration number' defaultValue={options.requisites.regNr}></FormInput>
               </div>
               <div className="sm:col-span-3">
                 <FormInput name='kmkr' label='KMKR' defaultValue={options.requisites.kmkr}></FormInput> 

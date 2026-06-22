@@ -34,7 +34,7 @@ export default async function Page({
       dataField: 'workNr',
       headerText: 'Work',
       dataFormatter: ({ id: wid, workNr }: { id: string; workNr: string }) => (
-        <a href={'/home/work/' + wid}><h5>Work nr. {workNr}</h5></a>
+        <a href={'/home/work/' + wid}><h5>{workNr}</h5></a>
       ),
     },
     {
@@ -90,7 +90,7 @@ export default async function Page({
           <Search searchParams={mergedParams} resourceName="work" pageName={`clients/${id}/services`} idField="id" columns={columns}>
             <div className="flex gap-x-2 mb-4 items-end">
               <div className="flex-1">
-                <SearchInput searchParams={mergedParams} placeholder="work number or vehicle reg nr." />
+                <SearchInput searchParams={mergedParams} placeholder="work number or vehicle registration" />
               </div>
               <div className="mb-1">
                 <PrimaryButton id="btnSubmit">Search</PrimaryButton>

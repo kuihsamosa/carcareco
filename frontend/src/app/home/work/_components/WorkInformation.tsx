@@ -197,7 +197,7 @@ export function WorkInformation({
                 <dl className="flex flex-wrap">
                     <div className="flex-auto xl:pt-6 xl:pl-6">
                         <dt className="text-base font-semibold text-gray-900 mr-2 flex items-center gap-2 flex-wrap">
-                            Work nr {work.number}
+                            Work {work.number}
                             {/* Tap badge to change status on mobile */}
                             {!work.issuance ? (
                                 <button

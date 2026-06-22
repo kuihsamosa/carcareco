@@ -93,7 +93,7 @@ export default async function Page(
                 <div className="flex-1">
                   <SearchInput
                     searchParams={mergedParams}
-                    placeholder="work number, client, vehicle reg nr. or VIN"
+                    placeholder="work number, client, vehicle registration or VIN"
                   />
                 </div>
                 <div className="mb-1">

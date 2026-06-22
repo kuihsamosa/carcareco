@@ -64,7 +64,7 @@ export default function VehicleInput({
                         <div className="sm:col-span-2">  <FormInput name='model' defaultValue={vehicle?.model} label='Vehicle model'></FormInput></div>
                         <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='VIN Code'></FormInput></div>
                         <div className="sm:col-span-2">
-                            <FormLabel name='regNr' label='Registration nr' />
+                            <FormLabel name='regNr' label='Registration number' />
                             <div className="mt-2 flex gap-2 items-center">
                                 <input
                                     id="regNr"

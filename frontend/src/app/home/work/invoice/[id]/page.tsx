@@ -119,14 +119,14 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                   <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">{fmt(line.totalWithVat)}</p>
                 </div>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {line.quantity} {line.unit} × {fmt(line.unitPrice)}
+                  {line.quantity} × {fmt(line.unitPrice)}
                 </p>
               </div>
 
               {/* Desktop layout */}
               <div className="hidden sm:grid sm:grid-cols-12 items-center">
                 <div className="col-span-5 text-sm text-gray-900">{line.description}</div>
-                <div className="col-span-2 text-right text-sm text-gray-600">{line.quantity} {line.unit}</div>
+                <div className="col-span-2 text-right text-sm text-gray-600">{line.quantity}</div>
                 <div className="col-span-2 text-right text-sm text-gray-600">{fmt(line.unitPrice)}</div>
                 <div className="col-span-3 text-right text-sm font-medium text-gray-900">{fmt(line.totalWithVat)}</div>
               </div>

@@ -28,7 +28,7 @@ export function VehiclesCombobox( {
             return [item.producer,item.model].filter(x=>x).join(' ')+ (!item.regNr?'':` (${item.regNr})`)
         }}
         resourceName="vehicles"
-        placeholder="vin, reg nr., owner or make ..." ></SearchCombobox>)
+        placeholder="vin, registration, owner or make ..." ></SearchCombobox>)
 }
 
 export function ClientsCombobox( {

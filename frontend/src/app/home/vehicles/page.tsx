@@ -73,7 +73,7 @@ export default async function Page(
           }
         }
       ]}>
-        <SimpleSearchBar searchParams={searchParams} placeholder="vin, reg nr., owner or make ..."></SimpleSearchBar> 
+        <SimpleSearchBar searchParams={searchParams} placeholder="vin, registration, owner or make ..."></SimpleSearchBar> 
         </Search></form>
    
   </Main>

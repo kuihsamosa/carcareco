@@ -32,7 +32,7 @@ export default async function Page({
             <dl className="divide-y divide-gray-100"> 
                 <DescriptionItem label='Car make and model' value={[vehicle.producer, vehicle.model].join(' ')}></DescriptionItem>
                 <DescriptionItem label='VIN' value={vehicle.vin}></DescriptionItem>
-                <DescriptionItem label='Reg nr' value={vehicle.regNr}></DescriptionItem>
+                <DescriptionItem label='Registration number' value={vehicle.regNr}></DescriptionItem>
                 <DescriptionItem label='Odometer' value={vehicle.odo}></DescriptionItem>
                 <DescriptionItem label='Owner' value={vehicle.ownerName}></DescriptionItem>
                 <DescriptionItem label='About' value={vehicle.description}></DescriptionItem>

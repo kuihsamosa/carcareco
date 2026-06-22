@@ -27,7 +27,7 @@ export default async function Page() {
                     <DescriptionItem label='Address' value={options.requisites.address}></DescriptionItem>
                     <DescriptionItem label='Email' value={options.requisites.email}></DescriptionItem>
                     <DescriptionItem label='Bank account' value={options.requisites.bankAccount}></DescriptionItem>
-                    <DescriptionItem label='RegNr' value={options.requisites.regNr}></DescriptionItem>
+                    <DescriptionItem label='Registration number' value={options.requisites.regNr}></DescriptionItem>
                     <DescriptionItem label='Tax ID' value={options.requisites.kmkr}></DescriptionItem>
                 </dl>
             </div>
