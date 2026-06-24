@@ -18,11 +18,16 @@ import ActivitySelect from '../_components/ActivitySelect';
  
 export default async function Page({
     params,
+    searchParams,
 }: {
-    params: Promise<{ slug: string[] }>
+    params: Promise<{ slug: string[] }>,
+    searchParams: Promise<Record<string, string>>
 }) {
 
     const [id, activityId, action, startfresh] = (await params).slug;
+    // Opt-in invoice branding: only set when reached via the New Invoice flow.
+    // Absent for normal work orders, so their experience is unchanged.
+    const invoiceMode = (await searchParams)?.mode === 'invoice';
 
     let data = await httpGet('work/' + id);
     const work = await data.json() as IWorkData;
@@ -47,7 +52,7 @@ export default async function Page({
 
     return (
         <div  >
-              <Activities work={work} issueances={issueances} activities={activities}></Activities>
+              <Activities work={work} issueances={issueances} activities={activities} invoiceMode={invoiceMode}></Activities>
             <main className='pl-0 lg:pl-62  2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">
@@ -59,7 +64,7 @@ export default async function Page({
                                         <div className='grid grid-flow-col  gap-2'>
                                             <div className='-mr-2'><ActivitySelect issueances={issueances} work={work} activities={activities} ></ActivitySelect>    </div>
                                             <div className='xs:-ml-4 -ml-2 my-1'>
-                                            <h3 className={clsx(activities.items.length>1 && "hidden", "text-base  2xl:block font-semibold text-gray-900")}>{activityDisplayName}</h3>
+                                            <h3 className={clsx(activities.items.length>1 && "hidden", "text-base  2xl:block font-semibold text-gray-900")}>{invoiceMode && !work.issuance ? 'New invoice' : activityDisplayName}</h3>
                                             </div>
                                             <div  className='my-1' > 
                                                 {issuance && <PricingDownloadLink name="Offer" hideLabel={!!issuance.number} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
@@ -87,7 +92,8 @@ export default async function Page({
                                         <input type="hidden" name="activityId" value={current.id}></input>
                                         <input type="hidden" name="activityName" value={activityName}></input>
                                         <input type="hidden" name="activityNumber" value={activityNumber}></input>
-                                        <Activity issuance={issuance} edit={isEditing} work={work} activities={activities} startfresh={startfresh === 'startfresh'}  ></Activity>
+                                        {invoiceMode && <input type="hidden" name="mode" value="invoice"></input>}
+                                        <Activity issuance={issuance} edit={isEditing} work={work} activities={activities} startfresh={startfresh === 'startfresh'} invoiceMode={invoiceMode}  ></Activity>
                                     </form>
                                 }
                               

@@ -19,12 +19,14 @@ export default function Activity({
     activities,
     startfresh,
     issuance,
+    invoiceMode = false,
 }: {
     edit: boolean,
     issuance?: IOfferIssuance,
     work: IWorkData,
     activities: IActivities,
-    startfresh: boolean
+    startfresh: boolean,
+    invoiceMode?: boolean
 }) {
 
 
@@ -44,8 +46,9 @@ export default function Activity({
      const sendOfferRef = React.useRef<BaseDialogHandle>(null);
     const [data, setData] = React.useState<IProduct[]>(activities.current.products);
     const tableRef = useRef<DataItemRowHandle<IProduct>[] | null[]>([]);
-    const pathCancel = `/home/work/${work.id}/${activities.current.id}`
-    const pathEdit = pathCancel + '/edit#items'
+    const modeQuery = invoiceMode ? '?mode=invoice' : ''
+    const pathCancel = `/home/work/${work.id}/${activities.current.id}${modeQuery}`
+    const pathEdit = `/home/work/${work.id}/${activities.current.id}/edit${modeQuery}#items`
     const activityIsOffer = activities.items.find(x => x.id === activities.current.id)?.name == 'offer';
     const editOptions =work.issuance?[]: [
         { name: 'Add row', onClick: () =>{

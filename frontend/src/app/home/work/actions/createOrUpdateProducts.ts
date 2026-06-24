@@ -13,7 +13,8 @@ export async function createOrUpdateProducts(formData: FormData) {
     const activityId = formData.get('activityId');
     const activityNumber= formData.get('activityNumber');
     const activityName = formData.get('activityName');
-    const redirectUrl = `/home/work/${workId}/${activityId}` ;
+    const modeQuery = formData.get('mode') === 'invoice' ? '?mode=invoice' : '';
+    const redirectUrl = `/home/work/${workId}/${activityId}${modeQuery}` ;
     const apiUrl = `work/${activityName}/${activityId}/productsorservices`;
     
     const ids = formData.getAll('id');

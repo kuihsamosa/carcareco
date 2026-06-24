@@ -50,10 +50,14 @@ const statusOptions = [
 export function WorkInformation({
     work,
     hasRepairJobWithProductsOrServices,
+    invoiceMode = false,
 }: {
     work: IWorkData,
-    hasRepairJobWithProductsOrServices: boolean
+    hasRepairJobWithProductsOrServices: boolean,
+    invoiceMode?: boolean
 }) {
+
+    const isInvoiceDraft = invoiceMode && !work.issuance;
 
     const editPath = '/home/work/edit/' + work.id;
 
@@ -84,8 +88,11 @@ export function WorkInformation({
     const deleteWorkRef = React.useRef<ConfirmDialogHandle>(null);
     
     const workMenuOptions = work.issuance ? [] : [
-        { name: 'Make an offer', onClick: async () => { await startAnActivity(work.id, "offer") } },
-        { name: 'Start repair job', onClick: async () => { await startAnActivity(work.id, "repairjob") } },
+        // Offer / repair-job creation is work-order machinery — hidden in invoice mode.
+        ...(isInvoiceDraft ? [] : [
+            { name: 'Make an offer', onClick: async () => { await startAnActivity(work.id, "offer") } },
+            { name: 'Start repair job', onClick: async () => { await startAnActivity(work.id, "repairjob") } },
+        ]),
         { name: 'Edit', href: editPath },
         { name: 'Delete', redText:true, onClick:   () => { deleteWorkRef.current?.open({
             title:'Delete work',description:'Are you sure you want to delete it?',confirmObj:work.id
@@ -197,7 +204,7 @@ export function WorkInformation({
                 <dl className="flex flex-wrap">
                     <div className="flex-auto xl:pt-6 xl:pl-6">
                         <dt className="text-base font-semibold text-gray-900 mr-2 flex items-center gap-2 flex-wrap">
-                            Work {work.number}
+                            {isInvoiceDraft ? 'Invoice draft' : `Work ${work.number}`}
                             {/* Tap badge to change status on mobile */}
                             {!work.issuance ? (
                                 <button

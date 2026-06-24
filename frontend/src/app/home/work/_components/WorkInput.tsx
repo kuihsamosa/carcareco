@@ -69,6 +69,7 @@ export default function WorkInput({
     return (
         <>
             <PreventEnterSubmit />
+            {invoiceMode && <input type="hidden" name="invoiceMode" value="on" />}
             <div className="space-y-12 ">
                 <div className="border-b  border-gray-900/10 pb-12">
 

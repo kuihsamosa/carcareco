@@ -19,10 +19,12 @@ export default function Activities({
   work,
   activities,
   issueances,
+  invoiceMode = false,
 }: {
   work: IWorkData,
   activities: IActivities,
-  issueances: IOfferIssuance[]
+  issueances: IOfferIssuance[],
+  invoiceMode?: boolean
 }) {
  
   const confirmRemoveActivityRef = React.useRef<ConfirmDialogHandle>(null);
@@ -34,7 +36,7 @@ export default function Activities({
       <ul role="list" className="  mb-0 pb-0   inset-y-0   2xl:w-108">
         <li className='  '>
           <div className="p-5 pb-10">
-            <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} ></WorkInformation>
+            <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} invoiceMode={invoiceMode} ></WorkInformation>
           </div>
         </li>
       </ul>

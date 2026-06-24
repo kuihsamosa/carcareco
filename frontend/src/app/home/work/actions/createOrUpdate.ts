@@ -45,15 +45,17 @@ export async function createOrUpdate(
 
     const jsonResponse = await response.json();
        
-    pushToast(`Work ${(isUpdating?'updated':'saved')} successfully!`)
+    const isInvoiceDraft = formData.get('invoiceMode') === 'on';
+    pushToast(`${isInvoiceDraft ? 'Invoice draft' : 'Work'} ${(isUpdating?'updated':'saved')} successfully!`)
 
     if(id)
-        redirect(`/home/work/${jsonResponse}`) 
+        redirect(`/home/work/${jsonResponse}`)
 
     if(isUpdating){
-        redirect(`/home/work/${jsonResponse.workId}/${jsonResponse.activityId}`) 
+        redirect(`/home/work/${jsonResponse.workId}/${jsonResponse.activityId}`)
     }
-    redirect(`/home/work/${jsonResponse.workId}/${jsonResponse.activityId}/edit/startfresh`) 
+    const invoiceQuery = isInvoiceDraft ? '?mode=invoice' : '';
+    redirect(`/home/work/${jsonResponse.workId}/${jsonResponse.activityId}/edit/startfresh${invoiceQuery}`)
     
 }
 
