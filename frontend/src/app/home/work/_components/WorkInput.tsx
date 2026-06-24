@@ -23,9 +23,11 @@ import PreventEnterSubmit from '@/_components/PreventEnterSubmit';
 export default function WorkInput({
     work,
     mechanics,
+    invoiceMode = false,
 }: {
     work?: IWorkData | undefined,
-    mechanics: IMechanic[]
+    mechanics: IMechanic[],
+    invoiceMode?: boolean
 }) {
 
 
@@ -71,7 +73,7 @@ export default function WorkInput({
                 <div className="border-b  border-gray-900/10 pb-12">
 
                     <div className="grid grid grid-flow-row grid-cols-1  gap-4">
-                        {!work && <div>
+                        {!work && !invoiceMode && <div>
                             <FormLabel name='startWith' label='Start with'></FormLabel>
                             <Field className="flex mt-2 items-center">
                                 <FormSwitch
@@ -191,7 +193,7 @@ export default function WorkInput({
                             </div>
 
                         </div>
-                       <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
+                       {!invoiceMode && <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>}
                         <div className=" ">
                             <WorkAboutItems defaultValue={work?.notes} />
                         </div>

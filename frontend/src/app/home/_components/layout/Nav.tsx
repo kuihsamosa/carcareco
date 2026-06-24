@@ -19,8 +19,8 @@ const navigationIconClass = "size-6 shrink-0";
 
 const baseNavigation = [
     { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home' },
-    { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string, search: string) => path.startsWith('/home/work') && !search.includes('issued=on') },
-    { name: 'Invoices', href: '/home/work?issued=on', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (_path: string, search: string) => search.includes('issued=on') },
+    { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/work') },
+    { name: 'Invoices', href: '/home/invoices', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/invoices') },
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} /> },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} /> },
     { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} /> },

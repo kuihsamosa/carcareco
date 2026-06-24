@@ -28,6 +28,6 @@ export async function issueInvoice({
         }
     });
     await response.text();
-    pushToast('Work completed and invoice issued successfully.')
-    redirect(`/home/work/${workId}`);
+    pushToast('Invoice issued successfully.')
+    redirect(`/home/invoices/${workId}`);
 }

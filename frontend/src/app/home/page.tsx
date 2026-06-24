@@ -153,7 +153,7 @@ export default async function Page() {
                         <StatTile label="Active"   value={stats.inProgress} theme="indigo" href="/home/work?status=inprogress" />
                         <StatTile label="Open"      value={stats.waiting}    theme="amber"  href="/home/work" />
                         <StatTile label="Done"      value={stats.done}       theme="green"  href="/home/work?status=closed" />
-                        <StatTile label="Invoiced"  value={stats.invoiced}   theme="blue"   href="/home/work?issued=on" />
+                        <StatTile label="Invoiced"  value={stats.invoiced}   theme="blue"   href="/home/invoices" />
                     </div>
                 </section>
 
@@ -227,7 +227,7 @@ export default async function Page() {
                                 <QuickLink href="/home/vehicles"       icon={<TruckIcon className="size-6" />}             label="Vehicles" />
                                 <QuickLink href="/home/inventory"      icon={<CubeIcon className="size-6" />}              label="Stock" />
                                 <QuickLink href="/home/work"           icon={<QueueListIcon className="size-6" />}         label="Work list" />
-                                <QuickLink href="/home/work?issued=on" icon={<DocumentTextIcon className="size-6" />}      label="Invoices" />
+                                <QuickLink href="/home/invoices" icon={<DocumentTextIcon className="size-6" />}      label="Invoices" />
                                 <QuickLink href="/home/sales"          icon={<ChartBarIcon className="size-6" />}          label="Sales" />
                                 <QuickLink href="/home/settings"       icon={<Cog6ToothIcon className="size-6" />}         label="Settings" />
                             </div>

@@ -26,6 +26,7 @@ export default async function Search(
     idField = 'id',
     children,
     mobileCardFormatter,
+    editable = true,
   }: {
     searchParams: Promise<Record<string, string>>
     resourceName: string,
@@ -35,6 +36,7 @@ export default async function Search(
     rowClass? (item:any):string // eslint-disable-line @typescript-eslint/no-explicit-any
     children?: React.ReactNode
     mobileCardFormatter?: (item: Record<string, any>) => React.ReactNode // eslint-disable-line @typescript-eslint/no-explicit-any
+    editable?: boolean
   }) {
 
   if (!pageName) pageName = resourceName;
@@ -145,9 +147,9 @@ export default async function Search(
                         return <th key={'th' + index} className={val.headerClasses && val.headerClasses(index)}>{val.headerText}</th>
                       })
                     }
-                    <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-0">
+                    {editable && <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-0">
                       <span className="sr-only">Edit</span>
-                    </th>
+                    </th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -161,11 +163,11 @@ export default async function Search(
                           </td>
                         })
                       }
-                      <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
+                      {editable && <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
                         <a href={`/home/${pageName}/edit/${item[idField]}`} className="text-indigo-900 hover:text-indigo-500">
                           Edit
                         </a>
-                      </td>
+                      </td>}
                     </tr>
                   ))}
                 </tbody>

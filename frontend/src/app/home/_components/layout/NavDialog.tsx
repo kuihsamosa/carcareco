@@ -14,11 +14,11 @@ import clsx from 'clsx';
 const bottomTabs = [
     {
         name: 'Work', href: '/home/work', icon: QueueListIcon,
-        activeMatch: (p: string, s: string) => p.startsWith('/home/work') && !s.includes('issued=on'),
+        activeMatch: (p: string) => p.startsWith('/home/work'),
     },
     {
-        name: 'Invoices', href: '/home/work?issued=on', icon: DocumentTextIcon,
-        activeMatch: (p: string, s: string) => p.startsWith('/home/work') && s.includes('issued=on'),
+        name: 'Invoices', href: '/home/invoices', icon: DocumentTextIcon,
+        activeMatch: (p: string) => p.startsWith('/home/invoices'),
     },
     {
         name: 'Clients', href: '/home/clients', icon: UsersIcon,
