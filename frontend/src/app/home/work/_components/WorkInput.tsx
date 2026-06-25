@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation';
-import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
+import SubmitButton from '@/_components/SubmitButton';
 import { IWorkData, IMechanic } from '../model';
 import FormLabel from '@/_components/FormLabel';
 import { ClientsCombobox, VehiclesCombobox } from '../../_components/SearchCombobox';
@@ -203,7 +203,7 @@ export default function WorkInput({
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6">
                 <SecondaryButton onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton onClick={() => { }}>Save</PrimaryButton>
+                <SubmitButton>{invoiceMode ? 'Continue' : 'Save'}</SubmitButton>
             </div>
         </>
     )

@@ -1,7 +1,9 @@
 import clsx from "clsx";
 import Link from "next/link";
 import React  from "react";
-import { httpGet } from "@/_lib/server/query-api"; 
+import { httpGet } from "@/_lib/server/query-api";
+import EmptyState from "@/_components/EmptyState";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 interface DataResult {
   hasMore: boolean,
   items: Record<string, string>[]
@@ -119,9 +121,11 @@ export default async function Search(
    
       <div className="-mx-4 sm:mx-0 mt-4 flow-root">
         {data.items.length===0?
-         <div className="text-center">
-           <h3 className="mt-2 pb-6 text-sm font-semibold text-gray-900">Nothing found</h3>
-        </div>:
+         <EmptyState
+           icon={<MagnifyingGlassIcon className="size-10" />}
+           title="Nothing found"
+           description="No matches here yet. Try a different search, or add a new one using the button above."
+         />:
         <>
           {/* Mobile card view — shown when mobileCardFormatter is provided */}
           {mobileCardFormatter && (

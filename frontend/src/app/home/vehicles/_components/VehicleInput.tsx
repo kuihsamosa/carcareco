@@ -3,7 +3,7 @@
 import FormInput from '@/_components/FormInput';
 import { useRouter } from 'next/navigation';
 import FormTextArea from '@/_components/FormTextArea';
-import PrimaryButton from '@/_components/PrimaryButton';
+import SubmitButton from '@/_components/SubmitButton';
 import SecondaryButton from '@/_components/SecondaryButton'; 
 import { IVehicleData } from '../model'; 
 import TypeAheadCombobox from '../../_components/TypeAheadCombobox';
@@ -127,7 +127,7 @@ export default function VehicleInput({
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6">
                 <SecondaryButton onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton onClick={() => { }}>Save</PrimaryButton>
+                <SubmitButton>Save</SubmitButton>
             </div>
         </>
     )

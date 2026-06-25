@@ -7,7 +7,7 @@ import ClientAddress from './ClientAddressInput';
 import { useRouter } from 'next/navigation';
 import ClientEmailsInput from './ClientEmailsInput';
 import FormTextArea from '@/_components/FormTextArea';
-import PrimaryButton from '@/_components/PrimaryButton';
+import SubmitButton from '@/_components/SubmitButton';
 import SecondaryButton from '@/_components/SecondaryButton';
 import FormCheckBox from '@/_components/FormCheckbox';
 import FormSwitch from '@/_components/FormSwitch';  
@@ -112,7 +112,7 @@ export default function ClientInput({
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6"> 
                 <SecondaryButton  onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton  onClick={validate}>Save</PrimaryButton> 
+                <SubmitButton onClick={validate}>Save</SubmitButton>
             </div> 
         </>
     )
