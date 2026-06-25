@@ -34,14 +34,14 @@ export default async function Page({
       dataField: 'workNr',
       headerText: 'Work',
       dataFormatter: ({ id: wid, workNr }: { id: string; workNr: string }) => (
-        <a href={'/home/work/' + wid}><h5>{workNr}</h5></a>
+        <a href={'/home/work/' + wid}><span>{workNr}</span></a>
       ),
     },
     {
       dataField: 'vehicleId',
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string; vehicleId: string }) => (
-        <a href={'/home/vehicles/' + vehicleId}><h5>{regNr}</h5></a>
+        <a href={'/home/vehicles/' + vehicleId}><span>{regNr}</span></a>
       ),
     },
     {

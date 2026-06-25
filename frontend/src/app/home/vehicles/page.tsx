@@ -44,7 +44,7 @@ export default async function Page(
           dataFormatter: ({ regNr, id }) => {
             return (
               <a href={'/home/vehicles/' + id} >
-                <h5 className="font-semibold"> {regNr}</h5>
+                <span className="font-semibold"> {regNr}</span>
               </a>
             );
           }
@@ -56,7 +56,7 @@ export default async function Page(
             if (!ownerName) return <p className="font-italic text-gray-400">No owner</p>;
             return (
               <a href={'/home/clients/' + ownerId} >
-                <h5 >{ownerName}</h5>
+                <span >{ownerName}</span>
               </a>
             );
           }
@@ -67,7 +67,7 @@ export default async function Page(
           dataFormatter: ({ vin, id }) => {
             return (
               <a href={'/home/vehicles/' + id} >
-                <h5  >{vin}</h5>
+                <span  >{vin}</span>
               </a>
             );
           }

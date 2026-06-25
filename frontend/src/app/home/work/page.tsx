@@ -82,7 +82,7 @@ export default async function Page(
                     hideLabel={false}
                     clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" ></ArrowDownTrayIcon>} >
                   </PricingDownloadLink> </div>
-                  <div> <h5><EmailSentBadge issueance={offerIssuance}></EmailSentBadge></h5></div>
+                  <div> <span><EmailSentBadge issueance={offerIssuance}></EmailSentBadge></span></div>
                 </>
               }
             </>
@@ -101,9 +101,9 @@ export default async function Page(
 
         return (
           <a href={'/home/work/' + id}>
-            <h5 >{workNr}
+            <span >{workNr}
               {' '} {!isInvoiceView && <WorkStatusBadge status={status} ></WorkStatusBadge>}
-            </h5>
+            </span>
           </a>
         );
       }
@@ -125,7 +125,7 @@ export default async function Page(
       dataFormatter: ({ clientName, clientId }: { clientName: string, clientId: string }) => {
         return (
           <a href={'/home/clients/' + clientId} >
-            <h5 >{clientName}</h5>
+            <span >{clientName}</span>
           </a>
         );
       }
@@ -136,7 +136,7 @@ export default async function Page(
       dataFormatter: ({ regNr, vehicleId }: { regNr: string, vehicleId: string }) => {
         return (
           <a href={'/home/vehicles/' + vehicleId} >
-            <h5 className="mb-0 fs--1">{regNr}</h5>
+            <span className="mb-0 fs--1">{regNr}</span>
           </a>
         );
       }

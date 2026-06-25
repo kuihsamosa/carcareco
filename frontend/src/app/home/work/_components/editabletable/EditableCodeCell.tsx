@@ -44,7 +44,7 @@ const EditableCodeCell = React.forwardRef<EditableCellHandle<string>,IEditableCo
         comboboxOptionsAbsolute={true}
         comboboxOptionsWidth={100}
         displayFormatter={(item)=>{ return  item?.code??''; }}
-        optionFormatter={(item)=>{ return (item?.code??'')+ (item?.name?' ('+item.name+')':'') }}  
+        optionFormatter={(item)=>{ return item?.code ? item.code + (item?.name?' ('+item.name+')':'') : (item?.name??'') }}
         onItemChange={(item)=>{
             setSelectedItem(item);
            if(item?.code) setInternalValue(item?.code);
@@ -56,7 +56,7 @@ const EditableCodeCell = React.forwardRef<EditableCellHandle<string>,IEditableCo
             const inputValue =e.currentTarget.value;
             if(!inputValue) return;
             dataPage({
-                resourceName:'spareparts',
+                resourceName:'saleables',
                 searchText: inputValue ,
                 whenReady:(items)=>{
                    const data =  items as ISparePartData[];

@@ -3,7 +3,33 @@
 import Link from "next/link"
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import clsx from "clsx"; 
+import clsx from "clsx";
+import { useFormStatus } from "react-dom";
+
+// Submit buttons (no onClick) reflect the parent form's pending state: a spinner
+// + disabled while the server action runs. Outside a submitting form pending is
+// always false, so non-submit ButtonGroup uses are unaffected.
+function GroupButton({ opt, className }: { opt: IButtonOption; className: string }) {
+    const isSubmit = !opt.onClick && !opt.href;
+    const { pending } = useFormStatus();
+    const showSpinner = isSubmit && pending;
+    return (
+        <button
+            type={isSubmit ? "submit" : "button"}
+            onClick={opt.onClick}
+            disabled={showSpinner}
+            className={clsx(className, showSpinner && "opacity-70 cursor-wait")}
+        >
+            {showSpinner && (
+                <svg className="-ml-0.5 mr-1.5 inline h-4 w-4 animate-spin align-text-bottom" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+            )}
+            {opt.name}
+        </button>
+    );
+}
 
 export interface IButtonOption{
     name:string,
@@ -36,7 +62,7 @@ export default function ButtonGroup({
 
             return opt.href ?
                 <Link key={index} href={opt.href} className={className}>{opt.name}</Link> :
-                <button key={index} type={(!opt.onClick ? "submit" : "button")} onClick={opt.onClick} className={className}>{opt.name}</button>
+                <GroupButton key={index} opt={opt} className={className} />
         })}
         {menuButtons.length>0 && 
           <Menu as="div" className="relative -ml-px block">

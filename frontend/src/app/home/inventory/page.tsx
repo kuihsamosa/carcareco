@@ -15,7 +15,7 @@ export default async function Page(
       dataFormatter: ({ code, id }: { code: string, id: string }) => {
         return (
           <a href={'/home/inventory/' + id} >
-            <h5 className="mb-0 fs--1">{code} </h5>
+            <span className="mb-0 fs--1">{code} </span>
           </a>
         );
       }

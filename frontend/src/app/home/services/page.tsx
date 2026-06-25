@@ -19,7 +19,7 @@ export default async function Page(
       headerText: 'Work',
       dataFormatter: ({ id, workNr }: { id: string; workNr: string }) => (
         <a href={'/home/work/' + id}>
-          <h5>Work nr. {workNr}</h5>
+          <span>{workNr}</span>
         </a>
       ),
     },
@@ -28,7 +28,7 @@ export default async function Page(
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string; vehicleId: string }) => (
         <a href={'/home/vehicles/' + vehicleId}>
-          <h5>{regNr}</h5>
+          <span>{regNr}</span>
         </a>
       ),
     },
@@ -37,7 +37,7 @@ export default async function Page(
       headerText: 'Client',
       dataFormatter: ({ clientName, clientId }: { clientName: string; clientId: string }) => (
         <a href={'/home/clients/' + clientId}>
-          <h5>{clientName}</h5>
+          <span>{clientName}</span>
         </a>
       ),
     },
