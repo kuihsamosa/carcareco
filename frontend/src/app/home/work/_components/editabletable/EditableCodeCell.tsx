@@ -55,26 +55,28 @@ const EditableCodeCell = React.forwardRef<EditableCellHandle<string>,IEditableCo
 
             const inputValue =e.currentTarget.value;
             if(!inputValue) return;
+
+            const deliver = (items: ISparePartData[]) => {
+                const data = [...items];
+                data.unshift({ code: inputValue, name: '', price: null });
+                target(data);
+            };
+
             dataPage({
                 resourceName:'saleables',
-                searchText: inputValue ,
-                whenReady:(items)=>{
-                   const data =  items as ISparePartData[];
-                    
-                    data.unshift({
-                        code:inputValue,
-                        name:'',
-                        price: null
+                searchText: inputValue,
+                whenReady:(items) => deliver(items as ISparePartData[]),
+                onFailure:() => {
+                    dataPage({
+                        resourceName:'spareparts',
+                        searchText: inputValue,
+                        whenReady:(items) => deliver(items as ISparePartData[]),
+                        onFailure:({url,status,text})=>{
+                            console.log(url, status, text);
+                        }
                     });
-                    target(data);
-
-                },
-                onFailure:({url,status,text})=>{
-                    console.log(url);
-                    console.log(status);
-                    console.log(text);
                 }
-              })   
+              })
         }}
         > 
         </TypeAheadCombobox>
