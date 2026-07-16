@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import React from "react";
 
 export function DescriptionItem(
     {
@@ -7,7 +8,7 @@ export function DescriptionItem(
         className,
     }: {
         label: string,
-        value: string | number | null | undefined,
+        value: React.ReactNode,
         className?: string| undefined,
     }
 ) {

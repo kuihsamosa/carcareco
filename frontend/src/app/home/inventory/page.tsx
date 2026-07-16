@@ -1,6 +1,10 @@
+import { type Metadata } from 'next';
 import { Fragment } from "react";
-import Search from "../_components/Search"; 
-import Main from "../_components/Main"; 
+import Search from "../_components/Search";
+import Link from "next/link";
+
+export const metadata: Metadata = { title: 'Inventory' };
+import Main from "../_components/Main";
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SimpleSearchBar from "../_components/SimpleSearchBar";
 
@@ -14,9 +18,9 @@ export default async function Page(
       headerText: 'Product code',
       dataFormatter: ({ code, id }: { code: string, id: string }) => {
         return (
-          <a href={'/home/inventory/' + id} >
+          <Link href={'/home/inventory/' + id} >
             <span className="mb-0 fs--1">{code} </span>
-          </a>
+          </Link>
         );
       }
     },

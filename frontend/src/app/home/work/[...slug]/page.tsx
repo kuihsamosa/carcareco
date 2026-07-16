@@ -6,13 +6,15 @@ import { Card, CardHeader } from '@/_components/Card';
 import NoProducts from '../_components/NoProducts';
 import { createOrUpdateProducts } from '../actions/createOrUpdateProducts';
 import Activities from '../_components/AllActivities';
-import Activity from '../_components/Activity'; 
+import Activity from '../_components/Activity';
 import PricingDownloadLink from '../_components/activity/PricingDownloadLink';
 import { getActivityDisplayName } from '../_components/activity/getActivityDisplayName';
-import { IssuanceBadges } from '../_components/activity/badges/IssuanceBadges'; 
+import { IssuanceBadges } from '../_components/activity/badges/IssuanceBadges';
 import { ActivityCreatedBy } from '../_components/activity/ActivityCreatedBy';
-import clsx from 'clsx'; 
-import ActivitySelect from '../_components/ActivitySelect'; 
+import clsx from 'clsx';
+import ActivitySelect from '../_components/ActivitySelect';
+import Link from 'next/link';
+import { ChevronRightIcon } from '@heroicons/react/20/solid'; 
 
 
  
@@ -56,6 +58,11 @@ export default async function Page({
             <main className='pl-0 lg:pl-62  2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">
+                        <nav className="flex items-center gap-1 text-sm text-gray-400 mb-4">
+                            <Link href="/home/work" className="hover:text-gray-600 transition-colors">Work</Link>
+                            <ChevronRightIcon className="size-4" />
+                            <span className="text-gray-700 font-medium">#{work.number ?? id}</span>
+                        </nav>
                         <div className='flex flex-col border-t border-gray-200 xl:border-t-0  '>
 
                             {activity && <Card header={
@@ -79,9 +86,9 @@ export default async function Page({
                                     </div>
                                    {work.issuance && (
                                         <div className='mb-4 xl:ml-4'>
-                                            <a href={`/home/invoices/${id}`} className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
+                                            <Link href={`/home/invoices/${id}`} className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
                                                 View Invoice
-                                            </a>
+                                            </Link>
                                         </div>
                                     )}
                                   

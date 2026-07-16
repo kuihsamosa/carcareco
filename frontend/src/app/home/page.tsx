@@ -1,3 +1,4 @@
+import { type Metadata } from 'next'
 import {
     QueueListIcon, UsersIcon, TruckIcon, CubeIcon,
     WrenchScrewdriverIcon, DocumentTextIcon, ChartBarIcon, Cog6ToothIcon,
@@ -6,6 +7,8 @@ import {
 import Link from "next/link"
 import moment from "moment"
 import { httpGet } from '@/_lib/server/query-api'
+
+export const metadata: Metadata = { title: 'Dashboard' }
 
 // ─── Real data shapes ────────────────────────────────────────────────────────
 
@@ -84,11 +87,11 @@ function StatusPill({ status }: { status?: string }) {
     const s = (status ?? '').toLowerCase()
     const map: Record<string, string> = {
         completed: 'bg-blue-100 text-blue-700',
-        inprogress: 'bg-indigo-100 text-indigo-700',
-        closed: 'bg-green-100 text-green-700',
+        inprogress: 'bg-green-100 text-green-700',
+        closed: 'bg-yellow-100 text-yellow-700',
     }
     const label: Record<string, string> = {
-        completed: 'Invoiced', inprogress: 'Active', closed: 'Done',
+        completed: 'Completed', inprogress: 'In Progress', closed: 'Closed',
     }
     return (
         <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${map[s] ?? 'bg-amber-100 text-amber-700'}`}>
@@ -151,7 +154,7 @@ export default async function Page() {
                 <section className="mb-6">
                     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                         <StatTile label="Active"   value={stats.inProgress} theme="indigo" href="/home/work?status=inprogress" />
-                        <StatTile label="Open"      value={stats.waiting}    theme="amber"  href="/home/work" />
+                        <StatTile label="Open"      value={stats.waiting}    theme="amber"  href="/home/work?status=waiting" />
                         <StatTile label="Done"      value={stats.done}       theme="green"  href="/home/work?status=closed" />
                         <StatTile label="Invoiced"  value={stats.invoiced}   theme="blue"   href="/home/invoices" />
                     </div>

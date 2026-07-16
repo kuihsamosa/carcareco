@@ -1,7 +1,10 @@
- 
+import { type Metadata } from 'next';
 import Main from "../_components/Main";
 import Search from "../_components/Search";
-import { SearchCardHeader } from "../_components/SearchCardHeader"; 
+import Link from "next/link";
+
+export const metadata: Metadata = { title: 'Clients' };
+import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SimpleSearchBar from "../_components/SimpleSearchBar";
 
 export default async function Page(
@@ -19,10 +22,9 @@ export default async function Page(
         dataField: "name",
         dataFormatter: ({ id, name }) => {
           return (
-            <a href={'/home/clients/' + id}>
-
+            <Link href={'/home/clients/' + id}>
               {name}
-            </a>
+            </Link>
           );
         }
       }, {

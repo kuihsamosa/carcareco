@@ -1,9 +1,10 @@
 import Search from "../_components/Search";
 import moment from "moment";
+import Link from "next/link";
 import { Card } from "@/_components/Card";
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SearchInput from "../_components/SearchInput";
-import PrimaryButton from "@/_components/PrimaryButton";
+import SearchButton from "@/_components/SearchButton";
 import BlueBadge from "@/_components/BlueBadge";
 
 export default async function Page(
@@ -18,27 +19,27 @@ export default async function Page(
       dataField: 'workNr',
       headerText: 'Work',
       dataFormatter: ({ id, workNr }: { id: string; workNr: string }) => (
-        <a href={'/home/work/' + id}>
+        <Link href={'/home/work/' + id}>
           <span>{workNr}</span>
-        </a>
+        </Link>
       ),
     },
     {
       dataField: 'vehicleId',
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string; vehicleId: string }) => (
-        <a href={'/home/vehicles/' + vehicleId}>
+        <Link href={'/home/vehicles/' + vehicleId}>
           <span>{regNr}</span>
-        </a>
+        </Link>
       ),
     },
     {
       dataField: 'clientId',
       headerText: 'Client',
       dataFormatter: ({ clientName, clientId }: { clientName: string; clientId: string }) => (
-        <a href={'/home/clients/' + clientId}>
+        <Link href={'/home/clients/' + clientId}>
           <span>{clientName}</span>
-        </a>
+        </Link>
       ),
     },
     {
@@ -97,7 +98,7 @@ export default async function Page(
                   />
                 </div>
                 <div className="mb-1">
-                  <PrimaryButton id="btnSubmit">Search</PrimaryButton>
+                  <SearchButton id="btnSubmit">Search</SearchButton>
                 </div>
               </div>
             </Search>

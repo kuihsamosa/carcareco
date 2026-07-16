@@ -1,4 +1,4 @@
-import PrimaryButton from "@/_components/PrimaryButton";
+import SearchButton from "@/_components/SearchButton";
 import SearchInput from "./SearchInput";
 
 export default async function SimpleSearchBar({ searchParams,placeholder }: { searchParams: Promise<Record<string, string>>,placeholder:string }) {
@@ -10,7 +10,7 @@ export default async function SimpleSearchBar({ searchParams,placeholder }: { se
           <SearchInput searchParams={searchParams} placeholder={placeholder} ></SearchInput>
         </div>
         <div >
-          <PrimaryButton className="float-right" id="btnSubmit">Search</PrimaryButton>
+          <SearchButton className="float-right" id="btnSubmit">Search</SearchButton>
         </div>
       </div>
     </div>

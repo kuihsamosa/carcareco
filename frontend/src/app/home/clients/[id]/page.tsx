@@ -1,7 +1,10 @@
 'use server'
 
 import { DescriptionItem } from '@/_components/DescriptionItem';
-import { httpGet } from '@/_lib/server/query-api'
+import { httpGet } from '@/_lib/server/query-api';
+import moment from 'moment';
+import Link from 'next/link';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import Main from '../../_components/Main';
 import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import FormList from '@/_components/FormList';
@@ -37,6 +40,11 @@ export default async function Page({
 
         <Main narrow={false} header={
         <CardHeader  >
+              <nav className="flex items-center gap-1 text-sm text-gray-400 mb-2 px-1 lg:px-0">
+                  <Link href="/home/clients" className="hover:text-gray-600 transition-colors">Clients</Link>
+                  <ChevronRightIcon className="size-4" />
+                  <span className="text-gray-700 font-medium">{client.isPrivate ? [client.firstName, client.lastName].filter(Boolean).join(' ') : client.name}</span>
+              </nav>
               <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">Client Information{' '}
                         <BlueBadge text={!client.isPrivate ? ' Company' : ' Private person'}  ></BlueBadge>{' '}
                         {client.isAsshole && <YellowBadge text='complicated' ></YellowBadge>}</h3> 
@@ -50,9 +58,9 @@ export default async function Page({
                             {!client.isPrivate ?
                                 <DescriptionItem label='Company name' value={client.name}></DescriptionItem>
                                 : <DescriptionItem label='Full name' value={client.firstName + ' ' + client.lastName}></DescriptionItem>}
-                            <DescriptionItem label='Phone' value={client.phone}></DescriptionItem>
+                            <DescriptionItem label='Phone' value={client.phone ? <a href={`tel:${client.phone}`} className="text-indigo-600 hover:text-indigo-500">{client.phone}</a> : null}></DescriptionItem>
                             {(client.emailAddresses?.length ?? 0) < 2 ?
-                                <DescriptionItem label='Email address' value={client.currentEmail}></DescriptionItem>
+                                <DescriptionItem label='Email address' value={client.currentEmail ? <a href={`mailto:${client.currentEmail}`} className="text-indigo-600 hover:text-indigo-500">{client.currentEmail}</a> : null}></DescriptionItem>
                                 : <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                     <dt className="text-sm/6 font-medium text-gray-900">Email addresses</dt>
                                     <FormList
@@ -69,7 +77,7 @@ export default async function Page({
 
                             <DescriptionItem label='Address' value={[client.address?.country, client.address?.region, client.address?.city, client.address?.street, client.address?.postalCode].filter(item => item).join(', ')}></DescriptionItem>
                             <DescriptionItem label='About' value={client.description}></DescriptionItem>
-                            <DescriptionItem label='Added' value={client.introducedAt}></DescriptionItem>
+                            <DescriptionItem label='Added' value={client.introducedAt ? moment(client.introducedAt).format('LL') : null}></DescriptionItem>
                         </dl>
                     </div>
 
@@ -79,13 +87,13 @@ export default async function Page({
                             <ul className="divide-y divide-gray-100 border border-gray-100 rounded-xl overflow-hidden">
                                 {vehicles.map(v => (
                                     <li key={v.id}>
-                                        <a href={`/home/vehicles/${v.id}/services`} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
+                                        <Link href={`/home/vehicles/${v.id}/services`} className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 transition-colors">
                                             <span className="text-sm font-medium text-gray-900">
                                                 {[v.producer, v.model].filter(Boolean).join(' ')}
                                                 {v.regNr && <span className="ml-2 text-gray-500">({v.regNr})</span>}
                                             </span>
-                                            <span className="text-xs text-gray-400">{v.vin}</span>
-                                        </a>
+                                            {v.vin && <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-600">{v.vin}</span>}
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>

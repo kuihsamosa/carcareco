@@ -6,6 +6,7 @@ import Nav from './_components/layout/Nav'
 import NavDialog from './_components/layout/NavDialog'
 import OfflineIndicator from './_components/layout/OfflineIndicator'
 import ToastMessages from '@/_components/ToastMessages'
+import SlashFocusSearch from '@/_components/SlashFocusSearch'
 import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 
@@ -40,6 +41,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
             {/* <Timeout></Timeout> */}
             <ToastMessages></ToastMessages>
             <OfflineIndicator />
+            <SlashFocusSearch />
             <div>
                 {/* Static sidebar for desktop */}
                 <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-62 lg:flex-col">

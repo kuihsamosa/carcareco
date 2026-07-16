@@ -34,8 +34,7 @@ export default function Activity({
 
     useEffect(()=>{
         if(scrollDown){
-            const scrollHeight = document.body.scrollHeight;
-            window.scrollTo(0, scrollHeight);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             setScrollDown(false);
         }
     },[scrollDown])
@@ -55,7 +54,7 @@ export default function Activity({
             addEmptyRow(1);
             setScrollDown(true);
         } },
-        { name: 'Cancel ', href: pathCancel },
+        { name: 'Cancel', href: pathCancel },
         { name: 'Save', isPrimary: true },
         { name: 'Apply discount', inMenu: true, onClick: () => applyDiscountsRef.current?.open() },
         { name: 'Add more rows', inMenu: true, onClick: () =>{
@@ -67,7 +66,7 @@ export default function Activity({
     const issued = !!issuance?.issuedOn;
 
     const readOptions =work.issuance?[]: [
-        { name: 'Edit ', isPrimary: true, inMenu:issued, href: pathEdit },
+        { name: 'Edit', isPrimary: true, inMenu:issued, href: pathEdit },
 
     
     ] as IButtonOption[]
@@ -145,12 +144,11 @@ export default function Activity({
             <Saleables
                 edit={edit} data={data} priceSummary={activities.current.priceSummary} tableRef={tableRef} removeItem={removeItem} refreshData={setData} >
             </Saleables>
-            <div className="xl:flex inline-flex float-right xl:items-center">
-                <div className="xl:flex-auto mt-8 inline-flex">
-
-                </div>
-                <div className="inline-flex   mt-8 mb-8 rounded-md shadow-xs">
-                    {edit ? <ButtonGroup  options={editOptions} ></ButtonGroup> : <ButtonGroup options={readOptions} ></ButtonGroup>}
+            <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 -mx-4 px-4 py-3 mt-6 z-10">
+                <div className="flex justify-end">
+                    <div className="inline-flex rounded-md shadow-xs">
+                        {edit ? <ButtonGroup  options={editOptions} ></ButtonGroup> : <ButtonGroup options={readOptions} ></ButtonGroup>}
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,5 +1,7 @@
 import Search from '../../../_components/Search';
 import moment from 'moment';
+import Link from 'next/link';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { httpGet } from '@/_lib/server/query-api';
 import { IVehicleData } from '../../model';
 import BlueBadge from '@/_components/BlueBadge';
@@ -8,7 +10,7 @@ import { CardHeader } from '@/_components/Card';
 import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import EntityTabs from '@/_components/EntityTabs';
 import SearchInput from '../../../_components/SearchInput';
-import PrimaryButton from '@/_components/PrimaryButton';
+import SearchButton from '@/_components/SearchButton';
 
 export default async function Page({
   params,
@@ -36,14 +38,14 @@ export default async function Page({
       dataField: 'workNr',
       headerText: 'Work',
       dataFormatter: ({ id: wid, workNr }: { id: string; workNr: string }) => (
-        <a href={'/home/work/' + wid}><span>{workNr}</span></a>
+        <Link href={'/home/work/' + wid}><span>{workNr}</span></Link>
       ),
     },
     {
       dataField: 'clientId',
       headerText: 'Client',
       dataFormatter: ({ clientName, clientId }: { clientName: string; clientId: string }) => (
-        <a href={'/home/clients/' + clientId}><span>{clientName}</span></a>
+        <Link href={'/home/clients/' + clientId}><span>{clientName}</span></Link>
       ),
     },
     {
@@ -76,6 +78,11 @@ export default async function Page({
       narrow={false}
       header={
         <CardHeader>
+          <nav className="flex items-center gap-1 text-sm text-gray-400 mb-2 px-1">
+              <Link href="/home/vehicles" className="hover:text-gray-600 transition-colors">Vehicles</Link>
+              <ChevronRightIcon className="size-4" />
+              <span className="text-gray-700 font-medium">{vehicle.regNr || displayName}</span>
+          </nav>
           <h3 className="px-1 text-base font-semibold text-gray-900">Vehicle — {displayName}</h3>
           <DisplayOptionsMenu id={id} pageName="vehicles" />
         </CardHeader>
@@ -93,7 +100,7 @@ export default async function Page({
                 <SearchInput searchParams={mergedParams} placeholder="work number or client name" />
               </div>
               <div className="mb-1">
-                <PrimaryButton id="btnSubmit">Search</PrimaryButton>
+                <SearchButton id="btnSubmit">Search</SearchButton>
               </div>
             </div>
           </Search>

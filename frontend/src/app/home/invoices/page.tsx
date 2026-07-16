@@ -1,9 +1,13 @@
+import { type Metadata } from 'next';
 import Main from "../_components/Main";
 import Search from "../_components/Search";
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SearchInput from "../_components/SearchInput";
-import PrimaryButton from "@/_components/PrimaryButton";
+import SearchButton from "@/_components/SearchButton";
+import Link from "next/link";
 import moment from "moment";
+
+export const metadata: Metadata = { title: 'Invoices' };
 import { IWorkIssuance } from "../work/model";
 
 // Invoices are their own section. They are backed by issued work orders in the
@@ -31,9 +35,9 @@ export default async function Page(
       dataField: 'issuance',
       headerText: 'Invoice',
       dataFormatter: ({ issuance, id }: { issuance: IWorkIssuance; id: string }) => (
-        <a href={'/home/invoices/' + id} className="font-semibold text-gray-900">
+        <Link href={'/home/invoices/' + id} className="font-semibold text-gray-900">
           #{issuance?.invoiceNumber}
-        </a>
+        </Link>
       ),
     },
     {
@@ -46,14 +50,14 @@ export default async function Page(
       dataField: 'clientId',
       headerText: 'Client',
       dataFormatter: ({ clientName, clientId }: { clientName: string; clientId: string }) => (
-        <a href={'/home/clients/' + clientId} className="text-gray-700">{clientName || '—'}</a>
+        <Link href={'/home/clients/' + clientId} className="text-gray-700">{clientName || '—'}</Link>
       ),
     },
     {
       dataField: 'vehicleId',
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string; vehicleId: string }) => (
-        <a href={'/home/vehicles/' + vehicleId} className="text-gray-500">{regNr}</a>
+        <Link href={'/home/vehicles/' + vehicleId} className="text-gray-500">{regNr}</Link>
       ),
     },
     {
@@ -77,7 +81,7 @@ export default async function Page(
           mobileCardFormatter={(item) => {
             const issuance = item.issuance as IWorkIssuance | undefined;
             return (
-              <a
+              <Link
                 href={`/home/invoices/${item.id}`}
                 className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors active:bg-gray-50"
               >
@@ -94,7 +98,7 @@ export default async function Page(
                     {item.vehicleRegNr}
                   </span>
                 )}
-              </a>
+              </Link>
             );
           }}
         >
@@ -103,7 +107,7 @@ export default async function Page(
               <SearchInput searchParams={mergedParams} placeholder="invoice number, client or vehicle" />
             </div>
             <div className="mb-1">
-              <PrimaryButton id="btnSubmit">Search</PrimaryButton>
+              <SearchButton id="btnSubmit">Search</SearchButton>
             </div>
           </div>
         </Search>

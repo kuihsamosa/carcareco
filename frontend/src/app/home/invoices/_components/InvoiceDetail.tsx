@@ -1,5 +1,7 @@
 import { httpGet } from '@/_lib/server/query-api';
 import moment from 'moment';
+import Link from 'next/link';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import PricingDownloadLink from '../../work/_components/activity/PricingDownloadLink';
 
 interface IInvoiceLine {
@@ -41,7 +43,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
     return (
       <main className="lg:pl-62 px-4 py-8">
         <p className="text-sm text-gray-500">No invoice found.</p>
-        <a href="/home/invoices" className="mt-2 inline-block text-sm text-indigo-600 hover:text-indigo-500">← Back to invoices</a>
+        <Link href="/home/invoices" className="mt-2 inline-block text-sm text-indigo-600 hover:text-indigo-500">← Back to invoices</Link>
       </main>
     );
   }
@@ -51,6 +53,12 @@ export default async function InvoiceDetail({ id }: { id: string }) {
 
   return (
     <main className="lg:pl-62 mx-auto max-w-2xl px-4 py-6">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-1 text-sm text-gray-400 mb-4">
+          <Link href="/home/invoices" className="hover:text-gray-600 transition-colors">Invoices</Link>
+          <ChevronRightIcon className="size-4" />
+          <span className="text-gray-700 font-medium">#{inv.invoiceNumber}</span>
+      </nav>
       {/* Header */}
       <div className="mb-6 flex items-start justify-between">
         <div>
@@ -71,7 +79,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
           <div className="rounded-lg bg-gray-50 px-4 py-3">
             <p className="mb-0.5 text-xs text-gray-400">Client</p>
             <p className="text-sm font-medium text-gray-900">{inv.clientName}</p>
-            {inv.clientPhone && <p className="text-xs text-gray-500">{inv.clientPhone}</p>}
+            {inv.clientPhone && <p className="text-xs text-gray-500"><a href={`tel:${inv.clientPhone}`} className="hover:text-indigo-600">{inv.clientPhone}</a></p>}
           </div>
         )}
         {(inv.vehicleInfo || inv.vehicleRegNr) && (
@@ -151,8 +159,8 @@ export default async function InvoiceDetail({ id }: { id: string }) {
 
       {/* Links */}
       <div className="mt-8 flex items-center justify-between">
-        <a href="/home/invoices" className="text-sm text-indigo-600 hover:text-indigo-500">← Back to invoices</a>
-        <a href={`/home/work/${id}`} className="text-sm text-gray-400 hover:text-gray-600">View work order</a>
+        <Link href="/home/invoices" className="text-sm text-indigo-600 hover:text-indigo-500">← Back to invoices</Link>
+        <Link href={`/home/work/${id}`} className="text-sm text-gray-400 hover:text-gray-600">View work order</Link>
       </div>
     </main>
   );

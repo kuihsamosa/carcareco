@@ -6,7 +6,8 @@ export default async function SearchInput({ searchParams,placeholder }: { search
         <div className="  md:p-0 grid   grid-cols-1">
             <input
                 name="searchText"
-                type="searchText"
+                type="search"
+                enterKeyHint="search"
                 placeholder={placeholder}
                 defaultValue={options.searchText}
                 aria-label="Search"

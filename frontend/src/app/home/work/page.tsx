@@ -1,5 +1,9 @@
+import { type Metadata } from 'next';
 import Search from "../_components/Search";
 import moment from "moment";
+import Link from "next/link";
+
+export const metadata: Metadata = { title: 'Work' };
 import { IOfferIssuance, IWorkIssuance } from "./model";
 import PricingDownloadLink from "./_components/activity/PricingDownloadLink";
 import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
@@ -11,10 +15,10 @@ import { SearchCardHeader } from "../_components/SearchCardHeader";
 import { Card } from "@/_components/Card";
 import SearchStatusFilter from "./_components/SearchStatusFilter";
 import SearchParams from "./_components/SearchParams";
-import PrimaryButton from "@/_components/PrimaryButton";
+import SearchButton from "@/_components/SearchButton";
 import SearchInput from "../_components/SearchInput";
 import FormInput from "@/_components/FormInput";
-import { UserCircleIcon, TruckIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+import { UserCircleIcon, TruckIcon, DocumentTextIcon, ArrowsUpDownIcon } from "@heroicons/react/24/outline";
 
 function MechanicChip({ name }: { name: string }) {
   const colors = ['bg-blue-500','bg-emerald-500','bg-violet-500','bg-rose-500','bg-amber-500','bg-teal-500'];
@@ -35,6 +39,9 @@ export default async function Page(
   const options = (await searchParams);
 
   const isInvoiceView = options.issued == 'on';
+  const isDescending = options.desc === 'true';
+  const sortToggleParams = new URLSearchParams({ ...options, desc: isDescending ? 'false' : 'true' });
+  const sortToggleHref = `/home/work?${sortToggleParams.toString()}`;
 
   const secondColumn = isInvoiceView ? {
     dataField: 'issuance',
@@ -50,7 +57,7 @@ export default async function Page(
               number={issuance.invoiceNumber}
               downloadingElement={<Spinner></Spinner>}
               hidePaperClip={true}
-              clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" ></ArrowDownTrayIcon>} >
+              clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" title="Download PDF" ></ArrowDownTrayIcon>} >
             </PricingDownloadLink> </div>
             <div>
               <EmailSentBadge issueance={issuance}></EmailSentBadge>
@@ -80,7 +87,7 @@ export default async function Page(
                     downloadingElement={<Spinner></Spinner>}
                     hidePaperClip={true}
                     hideLabel={false}
-                    clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" ></ArrowDownTrayIcon>} >
+                    clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" title="Download PDF" ></ArrowDownTrayIcon>} >
                   </PricingDownloadLink> </div>
                   <div> <span><EmailSentBadge issueance={offerIssuance}></EmailSentBadge></span></div>
                 </>
@@ -100,21 +107,22 @@ export default async function Page(
       dataFormatter: ({ id, workNr, status }: { id: string, status: string, workNr: string }) => {
 
         return (
-          <a href={'/home/work/' + id}>
+          <Link href={'/home/work/' + id}>
             <span >{workNr}
               {' '} {!isInvoiceView && <WorkStatusBadge status={status} ></WorkStatusBadge>}
             </span>
-          </a>
+          </Link>
         );
       }
     },
     secondColumn,
     {
       dataField: 'startedOn',
-      headerText: 'Started on',//  {moment(activity?.startedOn, true).format('LLL')}
+      headerText: <Link href={sortToggleHref} className="inline-flex items-center gap-1 hover:text-indigo-600">Started on <ArrowsUpDownIcon className="size-3.5" /></Link>,
       dataFormatter: ({ startedOn }: { startedOn: Date }) => {
+        const m = moment(startedOn, true);
         return (
-          moment(startedOn, true).format('LL')
+          <span title={m.format('LL')}>{m.fromNow()}</span>
         );
       }
     },
@@ -124,9 +132,9 @@ export default async function Page(
       headerText: 'Client',
       dataFormatter: ({ clientName, clientId }: { clientName: string, clientId: string }) => {
         return (
-          <a href={'/home/clients/' + clientId} >
+          <Link href={'/home/clients/' + clientId} >
             <span >{clientName}</span>
-          </a>
+          </Link>
         );
       }
     },
@@ -135,9 +143,9 @@ export default async function Page(
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string, vehicleId: string }) => {
         return (
-          <a href={'/home/vehicles/' + vehicleId} >
+          <Link href={'/home/vehicles/' + vehicleId} >
             <span className="mb-0 fs--1">{regNr}</span>
-          </a>
+          </Link>
         );
       }
     },
@@ -151,6 +159,7 @@ export default async function Page(
 
   return <main className=" lg:pl-62   ">
     <form method="GET" >
+      {isDescending && <input type="hidden" name="desc" value="true" />}
       <div className=" sm:py-6 px-4 sm:px-8   sm:gap-4">
 
 
@@ -170,7 +179,7 @@ export default async function Page(
               }}
               columns={columns}
               mobileCardFormatter={(item) => (
-                <a
+                <Link
                   href={`/home/work/${item.id}`}
                   className={`block bg-white border rounded-2xl p-4 shadow-sm active:bg-gray-50 transition-colors ${item.status === 'closed' ? 'opacity-60' : 'border-gray-100'}`}
                 >
@@ -219,7 +228,7 @@ export default async function Page(
                       <span className="text-[10px] text-gray-500">Invoice #{(item.issuance as IWorkIssuance).invoiceNumber}</span>
                     </div>
                   )}
-                </a>
+                </Link>
               )}
             >
               {/* Plate-number search shortcut — mobile prominent */}
@@ -243,7 +252,7 @@ export default async function Page(
 
                   </div>
                   <div className="mx-2 text-right mt-8">
-                        <PrimaryButton   id="btnSubmit">Search</PrimaryButton>
+                        <SearchButton   id="btnSubmit">Search</SearchButton>
                    </div>
               </div>
 

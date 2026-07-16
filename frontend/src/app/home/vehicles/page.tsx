@@ -1,5 +1,9 @@
+import { type Metadata } from 'next';
 import clsx from "clsx";
 import Search from "../_components/Search";
+import Link from "next/link";
+
+export const metadata: Metadata = { title: 'Vehicles' };
 import 'car-makes-icons/dist/style.css';
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import Main from "../_components/Main";
@@ -43,9 +47,9 @@ export default async function Page(
           headerText: 'RegNr',
           dataFormatter: ({ regNr, id }) => {
             return (
-              <a href={'/home/vehicles/' + id} >
+              <Link href={'/home/vehicles/' + id} >
                 <span className="font-semibold"> {regNr}</span>
-              </a>
+              </Link>
             );
           }
         },
@@ -55,9 +59,9 @@ export default async function Page(
           dataFormatter: ({ ownerName, ownerId }) => {
             if (!ownerName) return <p className="font-italic text-gray-400">No owner</p>;
             return (
-              <a href={'/home/clients/' + ownerId} >
+              <Link href={'/home/clients/' + ownerId} >
                 <span >{ownerName}</span>
-              </a>
+              </Link>
             );
           }
         },
@@ -66,9 +70,9 @@ export default async function Page(
           headerText: 'VIN',
           dataFormatter: ({ vin, id }) => {
             return (
-              <a href={'/home/vehicles/' + id} >
+              <Link href={'/home/vehicles/' + id} >
                 <span  >{vin}</span>
-              </a>
+              </Link>
             );
           }
         }

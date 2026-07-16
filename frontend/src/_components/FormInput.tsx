@@ -23,6 +23,8 @@ export default function FormInput({
     validate,
     onKeyDown,
     inputMode,
+    autoCapitalize,
+    autoFocus,
 }: {
     name: string,
     label?: string | undefined,
@@ -36,7 +38,9 @@ export default function FormInput({
     className?: string | undefined,
     validate?: (value: string) => string | undefined,
     onKeyDown?: KeyboardEventHandler<HTMLInputElement>,
-    inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'email' | 'url' | 'search' | undefined
+    inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'email' | 'url' | 'search' | undefined,
+    autoCapitalize?: string | undefined,
+    autoFocus?: boolean | undefined,
 }) {
 
     const [blurError, setBlurError] = useState<string | undefined>(undefined)
@@ -52,6 +56,8 @@ export default function FormInput({
                     type={type}
                     step={step}
                     inputMode={inputMode}
+                    autoCapitalize={autoCapitalize}
+                    autoFocus={autoFocus}
                     onChange={onInputChange}
                     onKeyDown={onKeyDown}
                     onBlur={(e) => {

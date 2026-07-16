@@ -64,7 +64,7 @@ export default function VehicleInput({
                           ></TypeAheadCombobox> 
                        </div> 
                         <div className="sm:col-span-2">  <FormInput name='model' defaultValue={vehicle?.model} label='Vehicle model'></FormInput></div>
-                        <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='VIN Code'></FormInput></div>
+                        <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='VIN Code' autoCapitalize="characters" className="uppercase font-mono tracking-wider"></FormInput></div>
                         <div className="sm:col-span-2">
                             <FormLabel name='regNr' label='Registration number' />
                             <div className="mt-2 flex gap-2 items-center">

@@ -1,5 +1,6 @@
 import Search from '../../../_components/Search';
 import moment from 'moment';
+import Link from 'next/link';
 import { httpGet } from '@/_lib/server/query-api';
 import { IClientData } from '../../model';
 import BlueBadge from '@/_components/BlueBadge';
@@ -8,7 +9,7 @@ import { CardHeader } from '@/_components/Card';
 import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import EntityTabs from '@/_components/EntityTabs';
 import SearchInput from '../../../_components/SearchInput';
-import PrimaryButton from '@/_components/PrimaryButton';
+import SearchButton from '@/_components/SearchButton';
 
 export default async function Page({
   params,
@@ -34,14 +35,14 @@ export default async function Page({
       dataField: 'workNr',
       headerText: 'Work',
       dataFormatter: ({ id: wid, workNr }: { id: string; workNr: string }) => (
-        <a href={'/home/work/' + wid}><span>{workNr}</span></a>
+        <Link href={'/home/work/' + wid}><span>{workNr}</span></Link>
       ),
     },
     {
       dataField: 'vehicleId',
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string; vehicleId: string }) => (
-        <a href={'/home/vehicles/' + vehicleId}><span>{regNr}</span></a>
+        <Link href={'/home/vehicles/' + vehicleId}><span>{regNr}</span></Link>
       ),
     },
     {
@@ -93,7 +94,7 @@ export default async function Page({
                 <SearchInput searchParams={mergedParams} placeholder="work number or vehicle registration" />
               </div>
               <div className="mb-1">
-                <PrimaryButton id="btnSubmit">Search</PrimaryButton>
+                <SearchButton id="btnSubmit">Search</SearchButton>
               </div>
             </div>
           </Search>

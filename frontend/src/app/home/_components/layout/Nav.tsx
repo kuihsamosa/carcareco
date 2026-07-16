@@ -13,6 +13,7 @@ import {
     HomeIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx";
+import Link from "next/link";
 import { usePathname, useSearchParams } from 'next/navigation'
 
 const navigationIconClass = "size-6 shrink-0";
@@ -92,7 +93,7 @@ export default function Nav({
                         <ul role="list" className="-mx-2 space-y-1">
                             {navigation.map((item) => (
                                 <li key={item.name}>
-                                    <a
+                                    <Link
                                         href={item.href}
                                         className={clsx(
                                                isActive(item)
@@ -103,19 +104,19 @@ export default function Nav({
                                     >
                                         {item.icon}
                                         {item.name}
-                                    </a>
+                                    </Link>
                                 </li>
                             ))}
                         </ul>
                     </li>
                     <li className="mt-auto flex flex-col mb-5   ">
-                        <a
+                        <Link
                             href="/home/settings"
                             className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
                         >
                             <Cog6ToothIcon aria-hidden="true" className="size-6 shrink-0" />
                             Settings
-                        </a>
+                        </Link>
                         <ProfileMenu  fullName={fullName} imageUrl={imageUrl} onSmallScreen={onSmallScreen}></ProfileMenu>
                     </li>
                 </ul>

@@ -28,7 +28,7 @@ export default function InventoryInput({
                 <div className="border-b border-gray-900/10 pb-12">
                    
                     <div className=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                        <div className="sm:col-span-2"> <FormInput name='code' defaultValue={sparepart?.code} label='Product code'></FormInput></div>
+                        <div className="sm:col-span-2"> <FormInput name='code' defaultValue={sparepart?.code} label='Product code' autoFocus></FormInput></div>
                         <div className="sm:col-span-2"> <FormInput name='name' defaultValue={sparepart?.name} label='Product name'></FormInput></div> 
                         <div className="sm:col-span-2"> <FormInput name='price' type='number' step='any'   defaultValue={sparepart?.price} label='Price'></FormInput></div>
                         <div className="sm:col-span-2"> <FormInput name='quantity' type='number' step='any'  defaultValue={sparepart?.quantity} label='Quantity'></FormInput></div>
