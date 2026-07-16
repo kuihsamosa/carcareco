@@ -4,6 +4,7 @@ import Search from "../_components/Search";
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SearchInput from "../_components/SearchInput";
 import SearchButton from "@/_components/SearchButton";
+import InvoiceImportDialog from "./_components/InvoiceImportDialog";
 import Link from "next/link";
 import moment from "moment";
 
@@ -68,7 +69,7 @@ export default async function Page(
   ];
 
   return (
-    <Main narrow={false} header={<SearchCardHeader title="Invoices" pageName="invoices" />}>
+    <Main narrow={false} header={<SearchCardHeader title="Invoices" pageName="invoices"><InvoiceImportDialog /></SearchCardHeader>}>
       <form method="GET">
         <input type="hidden" name="issued" value="on" />
         <Search
