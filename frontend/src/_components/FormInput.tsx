@@ -25,6 +25,7 @@ export default function FormInput({
     inputMode,
     autoCapitalize,
     autoFocus,
+    required,
 }: {
     name: string,
     label?: string | undefined,
@@ -41,6 +42,7 @@ export default function FormInput({
     inputMode?: 'text' | 'numeric' | 'decimal' | 'tel' | 'email' | 'url' | 'search' | undefined,
     autoCapitalize?: string | undefined,
     autoFocus?: boolean | undefined,
+    required?: boolean | undefined,
 }) {
 
     const [blurError, setBlurError] = useState<string | undefined>(undefined)
@@ -48,7 +50,7 @@ export default function FormInput({
     const hasError = !!activeError
     return (
         <>
-            {label&&<FormLabel name={name} label={label}></FormLabel>}
+            {label&&<FormLabel name={name} label={label} required={required}></FormLabel>}
             <div className="mt-2   grid grid-cols-1">
                 <input
                     id={name}

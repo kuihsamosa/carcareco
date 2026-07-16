@@ -22,9 +22,9 @@ const baseNavigation = [
     { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home' },
     { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/work') },
     { name: 'Invoices', href: '/home/invoices', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/invoices') },
-    { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} /> },
-    { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} /> },
-    { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} /> },
+    { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/clients') },
+    { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/vehicles') },
+    { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/sales') },
 ];
 
 export default function Nav({
@@ -63,6 +63,7 @@ export default function Nav({
         ...baseNavigation.slice(0, 5),
         {
             name: 'Inventory', href: '/home/inventory',
+            activeMatch: (path: string) => path.startsWith('/home/inventory'),
             icon: (
                 <span className="relative">
                     <CubeIcon aria-hidden="true" className={navigationIconClass} />

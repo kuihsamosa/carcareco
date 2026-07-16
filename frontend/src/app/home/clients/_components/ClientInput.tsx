@@ -72,12 +72,16 @@ export default function ClientInput({
                                     inputError={companyNameRequired}
                                     onInputChange={(e) => setCompanyName(e.currentTarget.value)}
                                     defaultValue={companyName}
+                                    autoFocus={!client}
+                                    required
                                     label='Company name'></FormInput>
                             </div> : <>
                                 <div className="sm:col-span-3">
                                     <FormInput name='first-name'
                                       inputError={firstNameRequired}
                                       onInputChange={(e) => setFirstName(e.currentTarget.value)}
+                                      autoFocus={!client}
+                                      required
                                      defaultValue={firstName} label='First name'></FormInput>
                                 </div>
                                 <div className="sm:col-span-3">

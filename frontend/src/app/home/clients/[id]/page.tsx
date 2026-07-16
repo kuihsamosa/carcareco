@@ -14,6 +14,7 @@ import BlueBadge from '@/_components/BlueBadge';
 import YellowBadge from '@/_components/YellowBadge';
 import { CardHeader } from '@/_components/Card';
 import EntityTabs from '@/_components/EntityTabs';
+import CopyButton from '@/_components/CopyButton';
 
 
 interface IClientVehicle {
@@ -58,9 +59,9 @@ export default async function Page({
                             {!client.isPrivate ?
                                 <DescriptionItem label='Company name' value={client.name}></DescriptionItem>
                                 : <DescriptionItem label='Full name' value={client.firstName + ' ' + client.lastName}></DescriptionItem>}
-                            <DescriptionItem label='Phone' value={client.phone ? <a href={`tel:${client.phone}`} className="text-indigo-600 hover:text-indigo-500">{client.phone}</a> : null}></DescriptionItem>
+                            <DescriptionItem label='Phone' value={client.phone ? <span className="inline-flex items-center"><a href={`tel:${client.phone}`} className="text-indigo-600 hover:text-indigo-500">{client.phone}</a><CopyButton text={client.phone} /></span> : null}></DescriptionItem>
                             {(client.emailAddresses?.length ?? 0) < 2 ?
-                                <DescriptionItem label='Email address' value={client.currentEmail ? <a href={`mailto:${client.currentEmail}`} className="text-indigo-600 hover:text-indigo-500">{client.currentEmail}</a> : null}></DescriptionItem>
+                                <DescriptionItem label='Email address' value={client.currentEmail ? <span className="inline-flex items-center"><a href={`mailto:${client.currentEmail}`} className="text-indigo-600 hover:text-indigo-500">{client.currentEmail}</a><CopyButton text={client.currentEmail} /></span> : null}></DescriptionItem>
                                 : <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
                                     <dt className="text-sm/6 font-medium text-gray-900">Email addresses</dt>
                                     <FormList

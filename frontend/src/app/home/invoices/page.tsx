@@ -45,7 +45,7 @@ export default async function Page(
       dataField: 'issuedOn',
       headerText: 'Issued',
       dataFormatter: ({ issuance }: { issuance: IWorkIssuance }) =>
-        issuance?.issuedOn ? moment(issuance.issuedOn).format('LL') : '—',
+        issuance?.issuedOn ? <span title={moment(issuance.issuedOn).format('LL')}>{moment(issuance.issuedOn).fromNow()}</span> : '—',
     },
     {
       dataField: 'clientId',

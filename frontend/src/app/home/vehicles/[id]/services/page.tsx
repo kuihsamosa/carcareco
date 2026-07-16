@@ -58,7 +58,10 @@ export default async function Page({
     {
       dataField: 'startedOn',
       headerText: 'Started on',
-      dataFormatter: ({ startedOn }: { startedOn: Date }) => moment(startedOn, true).format('LL'),
+      dataFormatter: ({ startedOn }: { startedOn: Date }) => {
+        const m = moment(startedOn, true);
+        return <span title={m.format('LL')}>{m.fromNow()}</span>;
+      },
     },
     {
       dataField: 'mechanicNames',

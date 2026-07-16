@@ -20,6 +20,7 @@ export default async function Page(
      <form method="GET" > <Search
       searchParams={searchParams}
       resourceName="vehicles"
+      emptyAction={<Link href="/home/vehicles/new" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">+ New vehicle</Link>}
       columns={[
 
         {

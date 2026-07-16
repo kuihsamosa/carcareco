@@ -209,8 +209,8 @@ export default async function Page() {
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <span className="shrink-0 text-xs text-gray-400">
-                                                    {w.startedOn ? moment(w.startedOn).format('ll') : ''}
+                                                <span className="shrink-0 text-xs text-gray-400" title={w.startedOn ? moment(w.startedOn).format('LL') : ''}>
+                                                    {w.startedOn ? moment(w.startedOn).fromNow() : ''}
                                                 </span>
                                             </Link>
                                         </li>

@@ -3,6 +3,8 @@ import moment from 'moment';
 import Link from 'next/link';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import PricingDownloadLink from '../../work/_components/activity/PricingDownloadLink';
+import PrintButton from './PrintButton';
+import CopyButton from '@/_components/CopyButton';
 
 interface IInvoiceLine {
   nr: number;
@@ -66,6 +68,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
           <p className="mt-0.5 text-sm text-gray-500">{moment(inv.issuedOn).format('LL')}</p>
         </div>
         <div className="flex items-center gap-2">
+          <PrintButton />
           <PricingDownloadLink name="Invoice" id={id} number={inv.invoiceNumber} hidePaperClip={false} />
           <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${inv.isPaid ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
             {inv.isPaid ? 'Paid' : 'Unpaid'}
@@ -79,14 +82,14 @@ export default async function InvoiceDetail({ id }: { id: string }) {
           <div className="rounded-lg bg-gray-50 px-4 py-3">
             <p className="mb-0.5 text-xs text-gray-400">Client</p>
             <p className="text-sm font-medium text-gray-900">{inv.clientName}</p>
-            {inv.clientPhone && <p className="text-xs text-gray-500"><a href={`tel:${inv.clientPhone}`} className="hover:text-indigo-600">{inv.clientPhone}</a></p>}
+            {inv.clientPhone && <p className="text-xs text-gray-500 inline-flex items-center"><a href={`tel:${inv.clientPhone}`} className="hover:text-indigo-600">{inv.clientPhone}</a><CopyButton text={inv.clientPhone} /></p>}
           </div>
         )}
         {(inv.vehicleInfo || inv.vehicleRegNr) && (
           <div className="rounded-lg bg-gray-50 px-4 py-3">
             <p className="mb-0.5 text-xs text-gray-400">Vehicle</p>
             <p className="text-sm font-medium text-gray-900">{inv.vehicleInfo || inv.vehicleRegNr}</p>
-            {inv.vehicleInfo && inv.vehicleRegNr && <p className="text-xs text-gray-500">{inv.vehicleRegNr}</p>}
+            {inv.vehicleInfo && inv.vehicleRegNr && <p className="text-xs text-gray-500 inline-flex items-center">{inv.vehicleRegNr}<CopyButton text={inv.vehicleRegNr} /></p>}
           </div>
         )}
       </div>

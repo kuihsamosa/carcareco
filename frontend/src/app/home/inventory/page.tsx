@@ -71,7 +71,7 @@ export default async function Page(
         <SearchCardHeader title="Find Inventory" pageName="inventory">
       </SearchCardHeader>
       } narrow={false}>
-        <form method="GET" > <Search searchParams={searchParams} pageName="inventory" resourceName="spareparts" columns={columns}>
+        <form method="GET" > <Search searchParams={searchParams} pageName="inventory" resourceName="spareparts" columns={columns} emptyAction={<Link href="/home/inventory/new" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">+ New spare part</Link>}>
           <SimpleSearchBar searchParams={searchParams} placeholder="code or name ..."></SimpleSearchBar>
           </Search></form>
       </Main> 

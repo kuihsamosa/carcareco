@@ -1,11 +1,13 @@
 'use server'
 
 import { DescriptionItem } from '@/_components/DescriptionItem';
-import { httpGet } from '@/_lib/server/query-api' 
-import Main from '../../_components/Main';  
-import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu'; 
+import { httpGet } from '@/_lib/server/query-api'
+import Main from '../../_components/Main';
+import DisplayOptionsMenu from '@/_components/DisplayOptionsMenu';
 import { ISparepartData } from '../model';
 import { CardHeader } from '@/_components/Card';
+import Link from 'next/link';
+import { ChevronRightIcon } from '@heroicons/react/20/solid';
  
 
  
@@ -21,9 +23,14 @@ export default async function Page({
     return (
 
         <Main header={
-            <CardHeader  > 
-                     <h3 className="px-1 text-base font-semibold text-gray-900">Spare part information</h3> 
-                    <DisplayOptionsMenu id={id} pageName='inventory'></DisplayOptionsMenu> 
+            <CardHeader>
+                    <nav className="flex items-center gap-1 text-sm text-gray-400 mb-2 px-1 lg:px-0">
+                        <Link href="/home/inventory" className="hover:text-gray-600 transition-colors">Inventory</Link>
+                        <ChevronRightIcon className="size-4" />
+                        <span className="text-gray-700 font-medium">{sparepart.code || sparepart.name}</span>
+                    </nav>
+                    <h3 className="px-1 text-base font-semibold text-gray-900">Spare part information</h3>
+                    <DisplayOptionsMenu id={id} pageName='inventory'></DisplayOptionsMenu>
             </CardHeader>}>  
             <dl className="divide-y divide-gray-100">
                     <DescriptionItem label='Product code' value={sparepart.code}></DescriptionItem> 

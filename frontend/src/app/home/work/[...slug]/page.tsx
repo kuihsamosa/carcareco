@@ -107,9 +107,12 @@ export default async function Page({
                             </Card>}
                         </div>
                     </div>
+                    <div className="px-4 xl:px-8 pb-6">
+                        <Link href="/home/work" className="text-sm text-indigo-600 hover:text-indigo-500">← Back to work list</Link>
+                    </div>
                 </div>
             </main>
-          
+
         </div>
     )
 }

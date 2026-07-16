@@ -29,6 +29,7 @@ export default async function Search(
     children,
     mobileCardFormatter,
     editable = true,
+    emptyAction,
   }: {
     searchParams: Promise<Record<string, string>>
     resourceName: string,
@@ -39,6 +40,7 @@ export default async function Search(
     children?: React.ReactNode
     mobileCardFormatter?: (item: Record<string, any>) => React.ReactNode // eslint-disable-line @typescript-eslint/no-explicit-any
     editable?: boolean
+    emptyAction?: React.ReactNode
   }) {
 
   if (!pageName) pageName = resourceName;
@@ -127,6 +129,7 @@ export default async function Search(
            icon={<MagnifyingGlassIcon className="size-10" />}
            title="Nothing found"
            description="No matches here yet. Try a different search, or add a new one using the button above."
+           action={emptyAction}
          />:
         <>
           {/* Mobile card view — shown when mobileCardFormatter is provided */}
@@ -160,7 +163,7 @@ export default async function Search(
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {data.items.map((item, rowindex) => (
-                    <tr key={'tr' + item[idField]}  className={clsx('hover:bg-gray-50 transition-colors', rowClass && rowClass(item))}>
+                    <tr key={'tr' + item[idField]}  className={clsx('hover:bg-gray-50 transition-colors even:bg-gray-50/40', rowClass && rowClass(item))}>
                       {
                         columns?.map((col, colindex) => {
                           return <td key={'td' + colindex + item[idField] + rowindex}
