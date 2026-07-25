@@ -1,7 +1,7 @@
-import React, { useState, useImperativeHandle } from "react";
+import React, { useState, useImperativeHandle, useRef, useCallback } from "react";
 import { EditableCellHandle, IEditableBaseCellProps  } from "./EditableCell";
 import TypeAheadCombobox from "@/app/home/_components/TypeAheadCombobox";
-import { dataPage } from "@/_lib/client/query-api"; 
+import { dataPage } from "@/_lib/client/query-api";
 
  interface ISparePartData{
     code:string |null ,
@@ -20,8 +20,10 @@ const EditableCodeCell = React.forwardRef<EditableCellHandle<string>,IEditableCo
     } = props;
 
     const [internalValue, setInternalValue] = useState(defaultValue);
-     
+
     const[selectedItem,setSelectedItem]=useState<ISparePartData | null >({ code:defaultValue,name:'',price:null});
+    const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const searchSeq = useRef(0);
 
     useImperativeHandle(ref, () => ({
         getValue(): string | null{
@@ -31,9 +33,34 @@ const EditableCodeCell = React.forwardRef<EditableCellHandle<string>,IEditableCo
             return setInternalValue(value);
         },
     }));
- 
+
+    const doSearch = useCallback((inputValue: string, target: (data: ISparePartData[]) => void, seq: number) => {
+        const deliver = (items: ISparePartData[]) => {
+            if (seq !== searchSeq.current) return;
+            const data = [...items];
+            data.unshift({ code: inputValue, name: '', price: null });
+            target(data);
+        };
+
+        dataPage({
+            resourceName:'saleables',
+            searchText: inputValue,
+            whenReady:(items) => deliver(items as ISparePartData[]),
+            onFailure:() => {
+                dataPage({
+                    resourceName:'spareparts',
+                    searchText: inputValue,
+                    whenReady:(items) => deliver(items as ISparePartData[]),
+                    onFailure:({url,status,text})=>{
+                        console.log(url, status, text);
+                    }
+                });
+            }
+          });
+    }, []);
+
     if (!isEditing) return internalValue;
- 
+
     return (
         <TypeAheadCombobox
         id={id?.toString()}
@@ -52,33 +79,17 @@ const EditableCodeCell = React.forwardRef<EditableCellHandle<string>,IEditableCo
            if(item?.price && priceRef?.current) priceRef?.current.setValue(item?.price)
         }}
         onSearch={(e,target)=>{
-
             const inputValue =e.currentTarget.value;
             if(!inputValue) return;
 
-            const deliver = (items: ISparePartData[]) => {
-                const data = [...items];
-                data.unshift({ code: inputValue, name: '', price: null });
-                target(data);
-            };
+            if (debounceTimer.current) clearTimeout(debounceTimer.current);
+            const seq = ++searchSeq.current;
 
-            dataPage({
-                resourceName:'saleables',
-                searchText: inputValue,
-                whenReady:(items) => deliver(items as ISparePartData[]),
-                onFailure:() => {
-                    dataPage({
-                        resourceName:'spareparts',
-                        searchText: inputValue,
-                        whenReady:(items) => deliver(items as ISparePartData[]),
-                        onFailure:({url,status,text})=>{
-                            console.log(url, status, text);
-                        }
-                    });
-                }
-              })
+            debounceTimer.current = setTimeout(() => {
+                doSearch(inputValue, target, seq);
+            }, 200);
         }}
-        > 
+        >
         </TypeAheadCombobox>
     )
 

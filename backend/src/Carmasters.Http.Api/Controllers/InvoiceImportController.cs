@@ -42,13 +42,17 @@ namespace Carmasters.Http.Api.Controllers
 
             var conn = session.Connection;
 
-            var existingNumbers = (await conn.QueryAsync<int>("SELECT number FROM domain.invoice"))
+            var existingInvoiceNumbers = (await conn.QueryAsync<int>("SELECT number FROM domain.invoice"))
                 .ToHashSet();
+            var existingWorkNumbers = (await conn.QueryAsync<int>("SELECT number FROM domain.work"))
+                .ToHashSet();
+            var nextWorkNumber = existingWorkNumbers.Count > 0 ? existingWorkNumbers.Max() + 1 : 1;
 
             var results = new List<ImportedInvoiceResult>();
             var created = 0;
             var skipped = 0;
             var failed = 0;
+            var rowOffset = 0;
 
             foreach (var file in files)
             {
@@ -86,7 +90,7 @@ namespace Carmasters.Http.Api.Controllers
 
                 foreach (var inv in parsed)
                 {
-                    if (inv.InvoiceNumber.HasValue && existingNumbers.Contains(inv.InvoiceNumber.Value))
+                    if (inv.InvoiceNumber.HasValue && existingInvoiceNumbers.Contains(inv.InvoiceNumber.Value))
                     {
                         results.Add(new ImportedInvoiceResult
                         {
@@ -123,16 +127,30 @@ namespace Carmasters.Http.Api.Controllers
                         continue;
                     }
 
+                    var savepointName = $"inv_{rowOffset}";
                     try
                     {
-                        await InsertInvoice(conn, inv, employeeId.Value);
+                        await conn.ExecuteAsync($"SAVEPOINT {savepointName}");
+
+                        var workNumber = inv.InvoiceNumber ?? nextWorkNumber;
+                        while (existingWorkNumbers.Contains(workNumber))
+                            workNumber = nextWorkNumber++;
+                        existingWorkNumbers.Add(workNumber);
+                        nextWorkNumber = Math.Max(nextWorkNumber, workNumber + 1);
+
+                        await InsertInvoice(conn, inv, employeeId.Value, workNumber, rowOffset);
+                        rowOffset++;
+
                         if (inv.InvoiceNumber.HasValue)
-                            existingNumbers.Add(inv.InvoiceNumber.Value);
+                            existingInvoiceNumbers.Add(inv.InvoiceNumber.Value);
+
+                        await conn.ExecuteAsync($"RELEASE SAVEPOINT {savepointName}");
                         result.Status = "created";
                         created++;
                     }
                     catch (Exception ex)
                     {
+                        await conn.ExecuteAsync($"ROLLBACK TO SAVEPOINT {savepointName}");
                         result.Status = "failed";
                         result.Reason = ex.Message;
                         failed++;
@@ -334,10 +352,11 @@ namespace Carmasters.Http.Api.Controllers
             return decimal.TryParse(s.Replace(",", "").Replace(" ", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out result);
         }
 
-        private async Task InsertInvoice(System.Data.IDbConnection conn, ParsedInvoice inv, Guid employeeId)
+        private async Task InsertInvoice(System.Data.IDbConnection conn, ParsedInvoice inv, Guid employeeId, int workNumber, int rowOffset)
         {
             var issuedOn = inv.Date ?? DateTime.UtcNow;
-            var invoiceNumber = inv.InvoiceNumber ?? 0;
+            var invoiceNumber = inv.InvoiceNumber ?? workNumber;
+            var changedOn = DateTime.UtcNow.AddTicks(rowOffset);
 
             Guid? clientId = null;
             if (!string.IsNullOrWhiteSpace(inv.Customer))
@@ -396,11 +415,11 @@ namespace Carmasters.Http.Api.Controllers
                 new
                 {
                     id = workId,
-                    number = invoiceNumber,
+                    number = workNumber,
                     clientId,
                     vehicleId,
                     startedOn = issuedOn,
-                    changedOn = DateTime.UtcNow,
+                    changedOn,
                     starterId = employeeId,
                     odo = inv.Kilometers,
                     completedOn = issuedOn,
@@ -429,11 +448,12 @@ namespace Carmasters.Http.Api.Controllers
                 for (var i = 0; i < items.Count; i++)
                 {
                     var item = items[i];
+                    var desc = string.IsNullOrWhiteSpace(item.Description) ? "(imported item)" : item.Description;
                     var amt = item.Amount ?? (item.Quantity ?? 1) * (item.UnitPrice ?? 0);
                     await conn.ExecuteAsync(
                         @"INSERT INTO domain.pricingline (pricingid, nr, description, quantity, unitprice, unit, discount, total, totalwithvat)
                           VALUES (@pid, @nr, @desc, @qty, @price, 'pcs', 0, @total, @totalVat)",
-                        new { pid = pricingId, nr = (short)(i + 1), desc = item.Description?[..Math.Min(item.Description.Length, 500)], qty = item.Quantity ?? 1m, price = item.UnitPrice ?? amt, total = amt, totalVat = amt });
+                        new { pid = pricingId, nr = (short)(i + 1), desc = desc[..Math.Min(desc.Length, 500)], qty = item.Quantity ?? 1m, price = item.UnitPrice ?? amt, total = amt, totalVat = amt });
                 }
             }
             else if (inv.TotalAmount.HasValue && inv.TotalAmount > 0)
@@ -451,10 +471,11 @@ namespace Carmasters.Http.Api.Controllers
 
             foreach (var item in items)
             {
+                var salName = string.IsNullOrWhiteSpace(item.Description) ? "(imported item)" : item.Description;
                 var salId = Guid.NewGuid();
                 await conn.ExecuteAsync(
                     "INSERT INTO domain.saleable (id, name, quantity, unit, price) VALUES (@id, @name, @qty, 'pcs', @price)",
-                    new { id = salId, name = item.Description?[..Math.Min(item.Description?.Length ?? 0, 255)], qty = item.Quantity ?? 1m, price = item.UnitPrice ?? 0m });
+                    new { id = salId, name = salName[..Math.Min(salName.Length, 255)], qty = item.Quantity ?? 1m, price = item.UnitPrice ?? 0m });
                 await conn.ExecuteAsync(
                     "INSERT INTO domain.serviceperformed (id, repairjobid, mechanicid) VALUES (@id, @rjid, @mid)",
                     new { id = salId, rjid = rjId, mid = employeeId });
