@@ -7,7 +7,7 @@ export default function NotFound() {
             <div className="text-center px-4">
                 <MagnifyingGlassIcon className="mx-auto size-12 text-gray-300" />
                 <h2 className="mt-4 text-lg font-semibold text-gray-900">Page not found</h2>
-                <p className="mt-2 text-sm text-gray-500">The page you're looking for doesn't exist or has been removed.</p>
+                <p className="mt-2 text-sm text-gray-500">The page you&apos;re looking for doesn&apos;t exist or has been removed.</p>
                 <div className="mt-6 flex items-center justify-center gap-3">
                     <Link
                         href="/home"
