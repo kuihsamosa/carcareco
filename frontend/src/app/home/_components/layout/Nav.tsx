@@ -11,6 +11,7 @@ import {
     DocumentTextIcon,
     CubeIcon,
     HomeIcon,
+    PlusCircleIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx";
 import Link from "next/link";
@@ -21,7 +22,8 @@ const navigationIconClass = "size-6 shrink-0";
 const baseNavigation = [
     { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home' },
     { name: 'Work', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/work') },
-    { name: 'Invoices', href: '/home/invoices', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/invoices') },
+    { name: 'Invoices', href: '/home/invoices', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/invoices') && path !== '/home/invoices/new' },
+    { name: 'New invoice', href: '/home/invoices/new', icon: <PlusCircleIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home/invoices/new' },
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/clients') },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/vehicles') },
     { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/sales') },
@@ -59,8 +61,12 @@ export default function Nav({
         return () => clearTimeout(timer);
     }, []);
 
+    // Inventory is injected before Sales (the last baseNavigation entry) so the
+    // low-stock badge can depend on client-side state. Index derived rather than
+    // hard-coded — adding a nav item must not silently reorder the menu.
+    const inventoryAt = baseNavigation.length - 1;
     const navigation = [
-        ...baseNavigation.slice(0, 5),
+        ...baseNavigation.slice(0, inventoryAt),
         {
             name: 'Inventory', href: '/home/inventory',
             activeMatch: (path: string) => path.startsWith('/home/inventory'),
@@ -75,7 +81,7 @@ export default function Nav({
                 </span>
             ),
         },
-        ...baseNavigation.slice(5),
+        ...baseNavigation.slice(inventoryAt),
     ];
 
     function isActive(item: typeof navigation[0]) {
