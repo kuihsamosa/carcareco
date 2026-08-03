@@ -14,16 +14,16 @@ export function useTheme() {
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [theme, setTheme] = useState<Theme>('dark')
+    const [theme, setTheme] = useState<Theme>('light')
 
     useEffect(() => {
         const stored = localStorage.getItem('theme') as Theme | null
-        if (stored === 'light') {
-            setTheme('light')
-            document.documentElement.classList.remove('dark')
-        } else {
+        if (stored === 'dark') {
             setTheme('dark')
             document.documentElement.classList.add('dark')
+        } else {
+            setTheme('light')
+            document.documentElement.classList.remove('dark')
         }
     }, [])
 

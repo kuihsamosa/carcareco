@@ -17,6 +17,8 @@ import {
     Cog6ToothIcon,
     QuestionMarkCircleIcon,
     MagnifyingGlassIcon,
+    SunIcon,
+    MoonIcon,
 } from '@heroicons/react/24/outline'
 import ProfileMenu from './ProfileMenu'
 import { useTheme } from '@/components/ThemeProvider'
@@ -135,6 +137,15 @@ export default function IconRail({ fullName, imageUrl }: { fullName: string; ima
 
             {/* Bottom: Help, Settings, Profile */}
             <div className="mt-auto px-2 pb-3 flex flex-col gap-0.5">
+                <button
+                    onClick={toggle}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
+                    aria-label="Toggle theme"
+                    title={expanded ? undefined : (theme === 'dark' ? 'Light mode' : 'Dark mode')}
+                >
+                    {theme === 'dark' ? <SunIcon className="size-5 shrink-0" /> : <MoonIcon className="size-5 shrink-0" />}
+                    {expanded && <span className="whitespace-nowrap">{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span>}
+                </button>
                 <Link
                     href="/home/help"
                     className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
