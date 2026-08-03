@@ -22,11 +22,11 @@ const bottomTabs = [
     },
     {
         name: 'Clients', href: '/home/clients', icon: UsersIcon,
-        activeMatch: (p: string, _s: string) => p.startsWith('/home/clients'),
+        activeMatch: (p: string) => p.startsWith('/home/clients'),
     },
     {
         name: 'Vehicles', href: '/home/vehicles', icon: TruckIcon,
-        activeMatch: (p: string, _s: string) => p.startsWith('/home/vehicles'),
+        activeMatch: (p: string) => p.startsWith('/home/vehicles'),
     },
 ];
 

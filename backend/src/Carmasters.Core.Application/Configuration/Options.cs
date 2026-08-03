@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Permissions;
@@ -9,8 +9,19 @@ using System.Xml.Linq;
 namespace Carmasters.Core.Application.Configuration
 {
     public record JwtOptions(string Secret, string ConsumerSecret,TimeSpan SessionTimeout) { public JwtOptions() : this(default,default, default) { } }
-    public record RequisitesOptions(string Name, string Phone, string Address, string Email, string BankAccount, string RegNr, string KMKR) { public RequisitesOptions() : this(default, default, default, default, default, default, default) { } }
-    public record InvoiceOptions(int VatRate,string SurCharge, string Disclaimer, bool SignatureLine, string EmailContent) { public InvoiceOptions() : this(default,default, default, default, default) { } }
+    public record RequisitesOptions(
+        string Name, string Phone, string Address, string Email, string BankAccount, string RegNr, string KMKR,
+        string Tagline, string Website, string Address2, string City, string Postcode, string State, string Country,
+        string Currency, string LogoBase64, string LogoContentType)
+    {
+        public RequisitesOptions() : this(default, default, default, default, default, default, default,
+            default, default, default, default, default, default, default, "MYR", default, default) { }
+    }
+    public record InvoiceOptions(int VatRate, string SurCharge, string Disclaimer, bool SignatureLine, string EmailContent,
+        string TermsAndConditions, string WorkshopSignatureBase64, string InvoiceNumberPrefix, int DueDays)
+    {
+        public InvoiceOptions() : this(default, default, default, default, default, default, default, "INV", 30) { }
+    }
     public record EstimateOptions(string EmailContent) { public EstimateOptions() : this(default(string)) { } }
     public record PricingOptions(InvoiceOptions Invoice, EstimateOptions Estimate) { public PricingOptions() : this(default, default) { } }
 
@@ -28,7 +39,7 @@ namespace Carmasters.Core.Application.Configuration
         public int Port { get; set; }
         public string UserId { get; set; }
         public string Password { get; set; }
-        public string Name { get; set; } 
+        public string Name { get; set; }
         public MultiTenancyOptions MultiTenancy { get; set; }
         public class MultiTenancyOptions
         {

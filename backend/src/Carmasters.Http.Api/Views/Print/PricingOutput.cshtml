@@ -1,234 +1,322 @@
 @using Carmasters.Core.Application.Configuration
 @using Carmasters.Core.Application.Model
 @using Carmasters.Core.Domain
-@using Carmasters.Http.Api
 @model PricingPrintModel
 @{
     var pricing = (Pricing)Model.Pricing;
-    var requisitesOptions = (RequisitesOptions)Model.RequisitesOptions;
-    var pricingOptions = (PricingOptions)Model.PricingOptions;
+    var req = (RequisitesOptions)Model.RequisitesOptions;
+    var opts = (PricingOptions)Model.PricingOptions;
     var isInvoice = pricing is Carmasters.Core.Domain.Invoice;
     var invoice = pricing as Carmasters.Core.Domain.Invoice;
     var hasDiscounts = pricing.Lines.Any(x => x.Discount != 0);
     var totalExVat = pricing.GetTotal(false);
     var totalInclVat = pricing.GetTotal(true);
     var vatAmount = totalInclVat - totalExVat;
+    var currency = !string.IsNullOrWhiteSpace(req.Currency) ? req.Currency : "MYR";
+    var hasLogo = !string.IsNullOrWhiteSpace(req.LogoBase64) && !string.IsNullOrWhiteSpace(req.LogoContentType);
+
+    string Fmt(decimal n) => $"{n:N2} {currency}";
 }
 
-<!-- Top band: company identity left, document title right -->
-<div class="grid grid-cols-2 items-start">
-    <div>
-        <h1 class="text-2xl font-bold text-gray-900" id="logo">@requisitesOptions.Name</h1>
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.Address))
-        {
-            <p class="text-sm text-gray-600 mt-0.5">@requisitesOptions.Address</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.RegNr))
-        {
-            <p class="text-sm text-gray-600">Reg. no: @requisitesOptions.RegNr</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.KMKR))
-        {
-            <p class="text-sm text-gray-600">VAT no: @requisitesOptions.KMKR</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.Phone))
-        {
-            <p class="text-sm text-gray-600">@requisitesOptions.Phone</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.Email))
-        {
-            <p class="text-sm text-gray-600">@requisitesOptions.Email</p>
-        }
-    </div>
-    <div class="text-right">
-        <p class="text-3xl font-bold tracking-tight text-indigo-600 uppercase">
-            @(isInvoice ? "Invoice" : "Estimate")
-        </p>
-        <p class="text-lg font-semibold text-gray-900 mt-1">@(pricing.GetDisplayName())</p>
-        @if (isInvoice && invoice != null)
-        {
-            <p class="text-sm text-gray-600 mt-2">Date: @invoice.IssuedOn.ToString("dd.MM.yyyy")</p>
-            <p class="text-sm text-gray-600">Due: @invoice.IssuedOn.AddDays(invoice.DueDays).ToString("dd.MM.yyyy")</p>
-        }
-    </div>
-</div>
+<style>
+    .invoice-doc { font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; color: #0f172a; line-height: 1.5; }
+    .invoice-doc * { box-sizing: border-box; }
+    .inv-header { display: grid; grid-template-columns: 1fr auto; align-items: start; gap: 32px; }
+    .inv-identity { display: flex; align-items: flex-start; gap: 16px; }
+    .inv-logo { height: 56px; width: auto; max-width: 180px; object-fit: contain; }
+    .inv-company-name { font-size: 20px; font-weight: 700; color: #0f172a; margin: 0; line-height: 1.2; }
+    .inv-tagline { font-size: 12px; color: #64748b; margin: 2px 0 0; }
+    .inv-contact { font-size: 11px; color: #64748b; margin: 4px 0 0; line-height: 1.6; }
+    .inv-doc-badge { text-align: right; }
+    .inv-doc-title { font-size: 28px; font-weight: 800; letter-spacing: 1px; color: #1e3a5f; text-transform: uppercase; margin: 0; }
+    .inv-doc-number { font-size: 15px; font-weight: 600; color: #0f172a; margin: 6px 0 0; }
+    .inv-doc-dates { font-size: 12px; color: #64748b; margin: 4px 0 0; line-height: 1.7; }
+    .inv-divider { border: none; border-top: 2px solid #e2e8f0; margin: 20px 0; }
+    .inv-divider-thin { border: none; border-top: 1px solid #e2e8f0; margin: 16px 0; }
+    .inv-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .inv-party-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; margin: 0 0 8px; }
+    .inv-party-name { font-size: 14px; font-weight: 600; color: #0f172a; margin: 0; }
+    .inv-party-detail { font-size: 12px; color: #64748b; margin: 2px 0 0; }
+    table.inv-lines { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    table.inv-lines thead th { padding: 10px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #64748b; border-bottom: 2px solid #0f172a; }
+    table.inv-lines thead th:first-child { padding-left: 0; text-align: left; }
+    table.inv-lines thead th:last-child { padding-right: 0; }
+    table.inv-lines thead th.text-right { text-align: right; }
+    table.inv-lines tbody td { padding: 10px 12px; font-size: 13px; color: #334155; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    table.inv-lines tbody td:first-child { padding-left: 0; color: #0f172a; }
+    table.inv-lines tbody td:last-child { padding-right: 0; }
+    table.inv-lines tbody td.text-right { text-align: right; font-variant-numeric: tabular-nums; }
+    table.inv-lines tbody td.amount { font-weight: 600; color: #0f172a; }
+    .inv-totals { display: flex; justify-content: flex-end; margin-top: 24px; }
+    .inv-totals-box { width: 260px; }
+    .inv-total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #64748b; font-variant-numeric: tabular-nums; }
+    .inv-total-row span:last-child { font-weight: 500; color: #334155; }
+    .inv-grand-total { display: flex; justify-content: space-between; padding: 12px 0 0; margin-top: 8px; border-top: 2px solid #0f172a; font-size: 16px; font-weight: 700; color: #0f172a; font-variant-numeric: tabular-nums; }
+    .inv-section-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; margin: 0 0 10px; }
+    .inv-payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .inv-payment-item { font-size: 12px; color: #334155; line-height: 1.6; }
+    .inv-payment-item span { color: #94a3b8; }
+    .inv-terms { margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+    .inv-terms-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #94a3b8; margin: 0 0 8px; }
+    .inv-terms-body { font-size: 11px; color: #64748b; white-space: pre-line; line-height: 1.6; margin: 0; }
+    .inv-signatures { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; margin-top: 40px; }
+    .inv-sig-block { padding-top: 12px; border-top: 1px solid #94a3b8; }
+    .inv-sig-label { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+    .inv-sig-name { font-size: 13px; color: #334155; margin: 6px 0 0; }
+    .inv-sig-image { max-height: 48px; max-width: 160px; object-fit: contain; margin-top: 8px; }
+    .inv-footer { display: grid; grid-template-columns: 1fr 1fr; margin-top: 32px; padding-top: 12px; border-top: 1px solid #e2e8f0; }
+    .inv-footer p { font-size: 10px; color: #94a3b8; margin: 1px 0; }
+    .inv-footer .text-right { text-align: right; }
+    .inv-disclaimer { margin-top: 12px; font-size: 10px; color: #94a3b8; white-space: pre-line; line-height: 1.5; }
+</style>
 
-<!-- Bill-to and Vehicle blocks -->
-<div class="grid grid-cols-2 gap-8 mt-8 pt-6 border-t border-gray-200">
-    <div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Bill to</p>
-        <p class="text-sm font-semibold text-gray-900">@pricing.PartyName</p>
-        @if (!string.IsNullOrWhiteSpace(pricing.PartyCode))
-        {
-            <p class="text-sm text-gray-600">Reg. code: @pricing.PartyCode</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(pricing.PartyAddress))
-        {
-            <p class="text-sm text-gray-600">@pricing.PartyAddress</p>
-        }
-    </div>
-    <div>
-        @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine1))
-        {
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">Vehicle</p>
-            <p class="text-sm text-gray-900">@pricing.VehicleLine1</p>
-            @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine2))
+<div class="invoice-doc">
+    <!-- Header: Identity + Document badge -->
+    <div class="inv-header">
+        <div class="inv-identity">
+            @if (hasLogo)
             {
-                <p class="text-sm text-gray-600">@pricing.VehicleLine2</p>
+                <img src="data:@(req.LogoContentType);base64,@(req.LogoBase64)" alt="@req.Name" class="inv-logo" />
             }
-            @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine3))
-            {
-                <p class="text-sm text-gray-600">@pricing.VehicleLine3</p>
-            }
-            @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine4))
-            {
-                <p class="text-sm text-gray-600">@pricing.VehicleLine4</p>
-            }
-        }
-    </div>
-</div>
+            <div>
+                <p class="inv-company-name">@req.Name</p>
+                @if (!string.IsNullOrWhiteSpace(req.Tagline))
+                {
+                    <p class="inv-tagline">@req.Tagline</p>
+                }
+                <div class="inv-contact">
+                    @if (!string.IsNullOrWhiteSpace(req.Address))
+                    {
+                        @req.Address
+                        @if (!string.IsNullOrWhiteSpace(req.Address2)) { @(", " + req.Address2) }
+                        <br />
+                    }
+                    @{
+                        var cityLine = string.Join(", ", new[] { req.City, req.Postcode, req.State }.Where(s => !string.IsNullOrWhiteSpace(s)));
+                    }
+                    @if (!string.IsNullOrEmpty(cityLine))
+                    {
+                        @cityLine
+                        @if (!string.IsNullOrWhiteSpace(req.Country)) { @(", " + req.Country) }
+                        <br />
+                    }
+                    @if (!string.IsNullOrWhiteSpace(req.Phone)) { @req.Phone <br /> }
+                    @if (!string.IsNullOrWhiteSpace(req.Email)) { @req.Email }
+                    @if (!string.IsNullOrWhiteSpace(req.Website)) { @(" · " + req.Website) }
+                </div>
+            </div>
+        </div>
 
-<!-- Line items table -->
-<table class="mt-8 min-w-full">
-    <thead>
-        <tr class="border-b-2 border-gray-900">
-            <th class="pl-0 pr-3 py-2 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Description</th>
-            <th class="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Qty</th>
-            <th class="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Unit</th>
-            <th class="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Unit price</th>
-            @if (hasDiscounts)
+        <div class="inv-doc-badge">
+            <p class="inv-doc-title">@(isInvoice ? "Tax Invoice" : "Estimate")</p>
+            <p class="inv-doc-number">@(pricing.GetDisplayName())</p>
+            @if (isInvoice && invoice != null)
             {
-                <th class="px-3 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Disc.&nbsp;%</th>
+                <div class="inv-doc-dates">
+                    Date: @invoice.IssuedOn.ToString("dd MMM yyyy")<br />
+                    Due: @invoice.IssuedOn.AddDays(invoice.DueDays).ToString("dd MMM yyyy")
+                </div>
             }
-            <th class="pl-3 pr-0 py-2 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Amount</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in pricing.Lines)
-        {
-            <tr class="border-b border-gray-200">
-                <td class="pl-0 pr-3 py-2.5 text-sm text-gray-900">@item.Description</td>
-                <td class="px-3 py-2.5 text-sm text-right text-gray-700 whitespace-nowrap">@item.Quantity</td>
-                <td class="px-3 py-2.5 text-sm text-right text-gray-700 whitespace-nowrap">@item.Unit</td>
-                <td class="px-3 py-2.5 text-sm text-right text-gray-700 whitespace-nowrap">@(item.UnitPrice.ToString("0.00"))</td>
+        </div>
+    </div>
+
+    <hr class="inv-divider" />
+
+    <!-- Bill-to and Vehicle -->
+    <div class="inv-parties">
+        <div>
+            <p class="inv-party-label">Bill to</p>
+            <p class="inv-party-name">@pricing.PartyName</p>
+            @if (!string.IsNullOrWhiteSpace(pricing.PartyCode))
+            {
+                <p class="inv-party-detail">Reg. code: @pricing.PartyCode</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(pricing.PartyAddress))
+            {
+                <p class="inv-party-detail">@pricing.PartyAddress</p>
+            }
+        </div>
+        <div>
+            @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine1))
+            {
+                <p class="inv-party-label">Vehicle</p>
+                <p class="inv-party-name">@pricing.VehicleLine1</p>
+                @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine2))
+                {
+                    <p class="inv-party-detail">@pricing.VehicleLine2</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine3))
+                {
+                    <p class="inv-party-detail">@pricing.VehicleLine3</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(pricing.VehicleLine4))
+                {
+                    <p class="inv-party-detail">@pricing.VehicleLine4</p>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Line items -->
+    <table class="inv-lines">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th class="text-right">Qty</th>
+                <th class="text-right">Unit</th>
+                <th class="text-right">Unit Price</th>
                 @if (hasDiscounts)
                 {
-                    <td class="px-3 py-2.5 text-sm text-right text-gray-700 whitespace-nowrap">@((item.Discount != null && item.Discount != 0) ? $"{item.Discount}%" : "")</td>
+                    <th class="text-right">Disc.</th>
                 }
-                <td class="pl-3 pr-0 py-2.5 text-sm text-right font-medium text-gray-900 whitespace-nowrap">@item.Total.ToString("0.00")</td>
+                <th class="text-right">Amount</th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in pricing.Lines)
+            {
+                <tr>
+                    <td>@item.Description</td>
+                    <td class="text-right">@item.Quantity</td>
+                    <td class="text-right">@item.Unit</td>
+                    <td class="text-right">@Fmt(item.UnitPrice)</td>
+                    @if (hasDiscounts)
+                    {
+                        <td class="text-right">@((item.Discount != null && item.Discount != 0) ? $"{item.Discount}%" : "")</td>
+                    }
+                    <td class="text-right amount">@Fmt(item.Total)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<!-- Totals box — right-aligned -->
-<div class="flex justify-end mt-6">
-    <div class="w-64">
-        <div class="flex justify-between py-1.5 text-sm text-gray-600">
-            <span>Subtotal</span>
-            <span>@totalExVat.ToString("0.00") EUR</span>
-        </div>
-        @if (hasDiscounts)
-        {
-            <div class="flex justify-between py-1.5 text-sm text-gray-600">
-                <span>Discount</span>
-                <span>included</span>
+    <!-- Totals -->
+    <div class="inv-totals">
+        <div class="inv-totals-box">
+            <div class="inv-total-row">
+                <span>Subtotal</span>
+                <span>@Fmt(totalExVat)</span>
             </div>
-        }
-        <div class="flex justify-between py-1.5 text-sm text-gray-600">
-            <span>VAT@(pricingOptions?.Invoice?.VatRate > 0 ? $" ({pricingOptions.Invoice.VatRate}%)" : "")</span>
-            <span>@vatAmount.ToString("0.00") EUR</span>
-        </div>
-        <div class="flex justify-between pt-3 mt-2 border-t-2 border-gray-900 text-base font-bold text-gray-900">
-            <span>Total due</span>
-            <span>@totalInclVat.ToString("0.00") EUR</span>
+            @if (hasDiscounts)
+            {
+                <div class="inv-total-row">
+                    <span>Discount</span>
+                    <span>included</span>
+                </div>
+            }
+            <div class="inv-total-row">
+                <span>VAT@(opts?.Invoice?.VatRate > 0 ? $" ({opts.Invoice.VatRate}%)" : "")</span>
+                <span>@Fmt(vatAmount)</span>
+            </div>
+            <div class="inv-grand-total">
+                <span>Total Due</span>
+                <span>@Fmt(totalInclVat)</span>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Payment details -->
-@if (isInvoice)
-{
-    <div class="mt-8 pt-6 border-t border-gray-200">
-        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Payment details</p>
-        <div class="grid grid-cols-2 gap-x-8">
+    <!-- Payment details -->
+    @if (isInvoice)
+    {
+        <hr class="inv-divider-thin" style="margin-top: 24px;" />
+        <p class="inv-section-label">Payment Details</p>
+        <div class="inv-payment-grid">
             <div>
-                @if (!string.IsNullOrWhiteSpace(requisitesOptions.BankAccount))
+                @if (!string.IsNullOrWhiteSpace(req.BankAccount))
                 {
-                    <p class="text-sm text-gray-700"><span class="text-gray-500">Bank account:</span> @requisitesOptions.BankAccount</p>
+                    <p class="inv-payment-item"><span>Bank account:</span> @req.BankAccount</p>
                 }
                 @if (invoice != null)
                 {
-                    <p class="text-sm text-gray-700 mt-1">
-                        <span class="text-gray-500">Payment:</span>
+                    <p class="inv-payment-item">
+                        <span>Payment method:</span>
                         @(invoice.PaymentType == PaymentType.Cash ? "Cash" : "Bank transfer")
                     </p>
                 }
             </div>
             <div>
-                @if (pricingOptions?.Invoice != null && !string.IsNullOrWhiteSpace(pricingOptions.Invoice.SurCharge))
+                @if (opts?.Invoice != null && !string.IsNullOrWhiteSpace(opts.Invoice.SurCharge))
                 {
-                    <p class="text-sm text-gray-700"><span class="text-gray-500">Late fee:</span> @pricingOptions.Invoice.SurCharge</p>
+                    <p class="inv-payment-item"><span>Late fee:</span> @opts.Invoice.SurCharge</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(req.RegNr))
+                {
+                    <p class="inv-payment-item"><span>SSM Reg:</span> @req.RegNr</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(req.KMKR))
+                {
+                    <p class="inv-payment-item"><span>SST No:</span> @req.KMKR</p>
                 }
             </div>
         </div>
-    </div>
-}
+    }
 
-<!-- Disclaimer -->
-@if (pricingOptions?.Invoice != null && !string.IsNullOrWhiteSpace(pricingOptions.Invoice.Disclaimer))
-{
-    <div class="mt-4">
-        <p class="text-xs text-gray-500 whitespace-pre-line">@pricingOptions.Invoice.Disclaimer</p>
-    </div>
-}
+    <!-- Terms & Conditions -->
+    @if (opts?.Invoice != null && !string.IsNullOrWhiteSpace(opts.Invoice.TermsAndConditions))
+    {
+        <div class="inv-terms">
+            <p class="inv-terms-title">Terms &amp; Conditions</p>
+            <p class="inv-terms-body">@opts.Invoice.TermsAndConditions</p>
+        </div>
+    }
 
-<!-- Signature lines -->
-@if (isInvoice && pricingOptions?.Invoice?.SignatureLine == true)
-{
-    <div class="grid grid-cols-2 gap-16 mt-12">
-        <div>
-            <div class="border-t border-gray-400 pt-2">
-                <p class="text-xs text-gray-500">Issued by</p>
-                @if (invoice?.Issuer != null)
-                {
-                    <p class="text-sm text-gray-700 mt-1">@invoice.Issuer.Name</p>
-                }
+    <!-- Disclaimer -->
+    @if (opts?.Invoice != null && !string.IsNullOrWhiteSpace(opts.Invoice.Disclaimer))
+    {
+        <p class="inv-disclaimer">@opts.Invoice.Disclaimer</p>
+    }
+
+    <!-- Signatures -->
+    @if (isInvoice && opts?.Invoice?.SignatureLine == true)
+    {
+        <div class="inv-signatures">
+            <div>
+                <div class="inv-sig-block">
+                    <p class="inv-sig-label">Issued By</p>
+                    @if (invoice?.Issuer != null)
+                    {
+                        <p class="inv-sig-name">@invoice.Issuer.Name</p>
+                    }
+                    @if (opts.Invoice.WorkshopSignatureBase64 != null)
+                    {
+                        <img src="data:image/png;base64,@(opts.Invoice.WorkshopSignatureBase64)" alt="Workshop signature" class="inv-sig-image" />
+                    }
+                </div>
+            </div>
+            <div>
+                <div class="inv-sig-block">
+                    <p class="inv-sig-label">Received By</p>
+                </div>
             </div>
         </div>
-        <div>
-            <div class="border-t border-gray-400 pt-2">
-                <p class="text-xs text-gray-500">Received by</p>
-            </div>
-        </div>
-    </div>
-}
+    }
 
-<!-- Footer (screen hidden, PDF fixed-bottom via print.css) -->
-<footer class="border-t border-gray-200 w-full grid grid-cols-2 mt-8 pt-3">
-    <div>
-        <p class="text-xs text-gray-500">@requisitesOptions.Name</p>
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.Address))
-        {
-            <p class="text-xs text-gray-500">@requisitesOptions.Address</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.Email))
-        {
-            <p class="text-xs text-gray-500">@requisitesOptions.Email</p>
-        }
-    </div>
-    <div class="text-right">
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.BankAccount))
-        {
-            <p class="text-xs text-gray-500">@requisitesOptions.BankAccount</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.RegNr))
-        {
-            <p class="text-xs text-gray-500">Reg. code: @requisitesOptions.RegNr</p>
-        }
-        @if (!string.IsNullOrWhiteSpace(requisitesOptions.KMKR))
-        {
-            <p class="text-xs text-gray-500">VAT no: @requisitesOptions.KMKR</p>
-        }
-    </div>
-</footer>
+    <!-- Footer -->
+    <footer class="inv-footer">
+        <div>
+            <p>@req.Name</p>
+            @if (!string.IsNullOrWhiteSpace(req.Address))
+            {
+                <p>@req.Address</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(req.Email))
+            {
+                <p>@req.Email</p>
+            }
+        </div>
+        <div class="text-right">
+            @if (!string.IsNullOrWhiteSpace(req.BankAccount))
+            {
+                <p>@req.BankAccount</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(req.RegNr))
+            {
+                <p>SSM: @req.RegNr</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(req.KMKR))
+            {
+                <p>SST: @req.KMKR</p>
+            }
+        </div>
+    </footer>
+</div>

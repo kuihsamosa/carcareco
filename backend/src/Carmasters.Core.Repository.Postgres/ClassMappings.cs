@@ -123,6 +123,16 @@ namespace Carmasters.Core.Persistence.Postgres.Repositories
             Map(x => x.BankAccount).Column("bank_account").Access.BackingField();
             Map(x => x.RegNr).Column("reg_nr").Access.BackingField();
             Map(x => x.KMKR).Column("tax_id").Access.BackingField();
+            Map(x => x.Tagline).Column("tagline").Access.BackingField();
+            Map(x => x.Website).Column("website").Access.BackingField();
+            Map(x => x.Address2).Column("address2").Access.BackingField();
+            Map(x => x.City).Column("city").Access.BackingField();
+            Map(x => x.Postcode).Column("postcode").Access.BackingField();
+            Map(x => x.State).Column("state").Access.BackingField();
+            Map(x => x.Country).Column("country").Access.BackingField();
+            Map(x => x.Currency).Column("currency").Access.BackingField();
+            Map(x => x.Logo).Column("logo").Access.BackingField().Length(5242880);
+            Map(x => x.LogoContentType).Column("logo_content_type").Access.BackingField();
             Map(x => x.CreatedAt).Column("created_at").Access.BackingField();
             Map(x => x.UpdatedAt).Column("updated_at").Access.BackingField();
         }
@@ -146,6 +156,10 @@ namespace Carmasters.Core.Persistence.Postgres.Repositories
             Map(x => x.SignatureLine).Column("signature_line").Access.BackingField();
             Map(x => x.InvoiceEmailContent).Column("invoice_email_content").Access.BackingField();
             Map(x => x.EstimateEmailContent).Column("estimate_email_content").Access.BackingField();
+            Map(x => x.TermsAndConditions).Column("terms_and_conditions").Access.BackingField();
+            Map(x => x.WorkshopSignature).Column("workshop_signature").Access.BackingField().Length(5242880);
+            Map(x => x.InvoiceNumberPrefix).Column("invoice_number_prefix").Access.BackingField();
+            Map(x => x.DueDays).Column("due_days").Access.BackingField();
             Map(x => x.CreatedAt).Column("created_at").Access.BackingField();
             Map(x => x.UpdatedAt).Column("updated_at").Access.BackingField();
         }

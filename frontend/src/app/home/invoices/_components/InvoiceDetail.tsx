@@ -5,6 +5,7 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import PricingDownloadLink from '../../work/_components/activity/PricingDownloadLink';
 import PrintButton from './PrintButton';
 import CopyButton from '@/_components/CopyButton';
+import InvoicePreviewFrame from './InvoicePreviewFrame';
 
 interface IInvoiceLine {
   nr: number;
@@ -33,35 +34,40 @@ interface IInvoicePreview {
   totalWithVat: number;
 }
 
-function fmt(n: number) {
-  return n.toLocaleString('en-MY', { style: 'currency', currency: 'MYR' });
-}
-
-// `id` is the work id the invoice belongs to (invoices are keyed by work in the DB).
 export default async function InvoiceDetail({ id }: { id: string }) {
-  const res = await httpGet(`pricings/invoice/${id}/preview`);
+  const [previewRes, optionsRes] = await Promise.all([
+    httpGet(`pricings/invoice/${id}/preview`),
+    httpGet('options'),
+  ]);
 
-  if (!res.ok) {
+  if (!previewRes.ok) {
     return (
       <main className="lg:pl-62 px-4 py-8">
         <p className="text-sm text-gray-500">No invoice found.</p>
-        <Link href="/home/invoices" className="mt-2 inline-block text-sm text-indigo-600 hover:text-indigo-500">← Back to invoices</Link>
+        <Link href="/home/invoices" className="mt-2 inline-block text-sm text-indigo-600 hover:text-indigo-500">&larr; Back to invoices</Link>
       </main>
     );
   }
 
-  const inv = await res.json() as IInvoicePreview;
+  const inv = await previewRes.json() as IInvoicePreview;
+  const options = optionsRes.ok ? await optionsRes.json() : null;
+  const currency = options?.requisites?.currency || 'MYR';
   const dueDate = moment(inv.issuedOn).add(inv.dueDays, 'days');
 
+  function fmt(n: number) {
+    return n.toLocaleString('en-MY', { style: 'currency', currency });
+  }
+
   return (
-    <main className="lg:pl-62 mx-auto max-w-2xl px-4 py-6">
+    <main className="lg:pl-62 mx-auto max-w-5xl px-4 py-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-gray-400 mb-4">
-          <Link href="/home/invoices" className="hover:text-gray-600 transition-colors">Invoices</Link>
-          <ChevronRightIcon className="size-4" />
-          <span className="text-gray-700 font-medium">#{inv.invoiceNumber}</span>
+        <Link href="/home/invoices" className="hover:text-gray-600 transition-colors">Invoices</Link>
+        <ChevronRightIcon className="size-4" />
+        <span className="text-gray-700 font-medium">#{inv.invoiceNumber}</span>
       </nav>
-      {/* Header */}
+
+      {/* Header bar */}
       <div className="mb-6 flex items-start justify-between">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">Invoice #{inv.invoiceNumber}</h1>
@@ -76,94 +82,68 @@ export default async function InvoiceDetail({ id }: { id: string }) {
         </div>
       </div>
 
-      {/* Client + Vehicle */}
-      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {inv.clientName && (
-          <div className="rounded-lg bg-gray-50 px-4 py-3">
-            <p className="mb-0.5 text-xs text-gray-400">Client</p>
-            <p className="text-sm font-medium text-gray-900">{inv.clientName}</p>
-            {inv.clientPhone && <p className="text-xs text-gray-500 inline-flex items-center"><a href={`tel:${inv.clientPhone}`} className="hover:text-indigo-600">{inv.clientPhone}</a><CopyButton text={inv.clientPhone} /></p>}
-          </div>
-        )}
-        {(inv.vehicleInfo || inv.vehicleRegNr) && (
-          <div className="rounded-lg bg-gray-50 px-4 py-3">
-            <p className="mb-0.5 text-xs text-gray-400">Vehicle</p>
-            <p className="text-sm font-medium text-gray-900">{inv.vehicleInfo || inv.vehicleRegNr}</p>
-            {inv.vehicleInfo && inv.vehicleRegNr && <p className="text-xs text-gray-500 inline-flex items-center">{inv.vehicleRegNr}<CopyButton text={inv.vehicleRegNr} /></p>}
-          </div>
-        )}
-      </div>
-
-      {/* Payment info */}
-      <div className="mb-6 grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
-        <div>
-          <p className="text-xs text-gray-400">Due date</p>
-          <p className="font-medium text-gray-900">{dueDate.format('LL')}</p>
-        </div>
-        <div>
-          <p className="text-xs text-gray-400">Payment</p>
-          <p className="font-medium capitalize text-gray-900">{inv.paymentType?.toLowerCase().replace('banktransfer', 'Bank transfer').replace('cardpayment', 'Card payment')}</p>
-        </div>
-        <div className="col-span-2 sm:col-span-1">
-          <p className="text-xs text-gray-400">Status</p>
-          <p className="text-xs font-medium leading-5 text-gray-900">{inv.paymentStatus}</p>
-        </div>
-      </div>
-
-      {/* Lines */}
-      <div className="mb-4 overflow-hidden rounded-lg border border-gray-200">
-        <div className="hidden border-b border-gray-200 bg-gray-50 px-4 py-2 text-xs font-medium text-gray-500 sm:grid sm:grid-cols-12">
-          <div className="col-span-5">Item</div>
-          <div className="col-span-2 text-right">Qty</div>
-          <div className="col-span-2 text-right">Unit price</div>
-          <div className="col-span-3 text-right">Total</div>
-        </div>
-
-        {inv.lines.length === 0 ? (
-          <div className="px-4 py-6 text-center text-sm text-gray-400">No line items</div>
-        ) : (
-          inv.lines.map((line, i) => (
-            <div key={line.nr} className={`px-4 py-3 ${i < inv.lines.length - 1 ? 'border-b border-gray-100' : ''}`}>
-              {/* Mobile */}
-              <div className="sm:hidden">
-                <div className="flex items-start justify-between">
-                  <p className="flex-1 pr-2 text-sm font-medium text-gray-900">{line.description}</p>
-                  <p className="whitespace-nowrap text-sm font-semibold text-gray-900">{fmt(line.totalWithVat)}</p>
-                </div>
-                <p className="mt-0.5 text-xs text-gray-400">{line.quantity} × {fmt(line.unitPrice)}</p>
-              </div>
-              {/* Desktop */}
-              <div className="hidden items-center sm:grid sm:grid-cols-12">
-                <div className="col-span-5 text-sm text-gray-900">{line.description}</div>
-                <div className="col-span-2 text-right text-sm text-gray-600">{line.quantity}</div>
-                <div className="col-span-2 text-right text-sm text-gray-600">{fmt(line.unitPrice)}</div>
-                <div className="col-span-3 text-right text-sm font-medium text-gray-900">{fmt(line.totalWithVat)}</div>
-              </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+        {/* Left: summary cards */}
+        <div className="space-y-4 lg:col-span-2">
+          {/* Client + Vehicle */}
+          {inv.clientName && (
+            <div className="rounded-lg bg-gray-50 px-4 py-3">
+              <p className="mb-0.5 text-xs text-gray-400">Client</p>
+              <p className="text-sm font-medium text-gray-900">{inv.clientName}</p>
+              {inv.clientPhone && <p className="text-xs text-gray-500 inline-flex items-center"><a href={`tel:${inv.clientPhone}`} className="hover:text-indigo-600">{inv.clientPhone}</a><CopyButton text={inv.clientPhone} /></p>}
             </div>
-          ))
-        )}
-      </div>
+          )}
+          {(inv.vehicleInfo || inv.vehicleRegNr) && (
+            <div className="rounded-lg bg-gray-50 px-4 py-3">
+              <p className="mb-0.5 text-xs text-gray-400">Vehicle</p>
+              <p className="text-sm font-medium text-gray-900">{inv.vehicleInfo || inv.vehicleRegNr}</p>
+              {inv.vehicleInfo && inv.vehicleRegNr && <p className="text-xs text-gray-500 inline-flex items-center">{inv.vehicleRegNr}<CopyButton text={inv.vehicleRegNr} /></p>}
+            </div>
+          )}
 
-      {/* Totals */}
-      <div className="flex flex-col items-end gap-1 text-sm">
-        <div className="flex gap-8 text-gray-500">
-          <span>Subtotal (excl. VAT)</span>
-          <span className="min-w-[80px] text-right font-medium text-gray-700">{fmt(inv.totalWithoutVat)}</span>
-        </div>
-        <div className="flex gap-8 text-gray-500">
-          <span>VAT</span>
-          <span className="min-w-[80px] text-right font-medium text-gray-700">{fmt(inv.totalWithVat - inv.totalWithoutVat)}</span>
-        </div>
-        <div className="mt-1 flex gap-8 border-t border-gray-200 pt-2 text-base font-semibold text-gray-900">
-          <span>Total (incl. VAT)</span>
-          <span className="min-w-[80px] text-right">{fmt(inv.totalWithVat)}</span>
-        </div>
-      </div>
+          {/* Payment info */}
+          <div className="rounded-lg bg-gray-50 px-4 py-3 space-y-2">
+            <div>
+              <p className="text-xs text-gray-400">Due date</p>
+              <p className="text-sm font-medium text-gray-900">{dueDate.format('LL')}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Payment method</p>
+              <p className="text-sm font-medium capitalize text-gray-900">{inv.paymentType?.toLowerCase().replace('banktransfer', 'Bank transfer').replace('cardpayment', 'Card payment')}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400">Status</p>
+              <p className="text-sm font-medium text-gray-900">{inv.paymentStatus}</p>
+            </div>
+          </div>
 
-      {/* Links */}
-      <div className="mt-8 flex items-center justify-between">
-        <Link href="/home/invoices" className="text-sm text-indigo-600 hover:text-indigo-500">← Back to invoices</Link>
-        <Link href={`/home/work/${id}`} className="text-sm text-gray-400 hover:text-gray-600">View work order</Link>
+          {/* Totals */}
+          <div className="rounded-lg border border-gray-200 px-4 py-3 space-y-1.5">
+            <div className="flex justify-between text-sm text-gray-500">
+              <span>Subtotal</span>
+              <span className="font-medium text-gray-700 tabular-nums">{fmt(inv.totalWithoutVat)}</span>
+            </div>
+            <div className="flex justify-between text-sm text-gray-500">
+              <span>Tax</span>
+              <span className="font-medium text-gray-700 tabular-nums">{fmt(inv.totalWithVat - inv.totalWithoutVat)}</span>
+            </div>
+            <div className="flex justify-between border-t border-gray-200 pt-2 text-base font-semibold text-gray-900">
+              <span>Total</span>
+              <span className="tabular-nums">{fmt(inv.totalWithVat)}</span>
+            </div>
+          </div>
+
+          {/* Links */}
+          <div className="flex items-center justify-between pt-2">
+            <Link href="/home/invoices" className="text-sm text-indigo-600 hover:text-indigo-500">&larr; Back to invoices</Link>
+            <Link href={`/home/work/${id}`} className="text-sm text-gray-400 hover:text-gray-600">View work order</Link>
+          </div>
+        </div>
+
+        {/* Right: rendered invoice document */}
+        <div className="lg:col-span-3">
+          <InvoicePreviewFrame workId={id} />
+        </div>
       </div>
     </main>
   );
