@@ -279,9 +279,9 @@ namespace Carmasters.Http.Api.Controllers
         public IActionResult GetStats()
         {
             var sql = @"SELECT
-                count(*) filter (where userstatus = 'InProgress' and invoiceid is null) as inprogress,
-                count(*) filter (where userstatus = 'Default'    and invoiceid is null) as waiting,
-                count(*) filter (where userstatus = 'Closed'     and invoiceid is null) as done,
+                count(*) filter (where userstatus = 'InProgress' and invoiceid is null and is_direct = false) as inprogress,
+                count(*) filter (where userstatus = 'Default'    and invoiceid is null and is_direct = false) as waiting,
+                count(*) filter (where userstatus = 'Closed'     and invoiceid is null and is_direct = false) as done,
                 count(*) filter (where invoiceid is not null) as invoiced
             FROM domain.work";
             var row = session.Connection.QuerySingle(sql);
@@ -323,6 +323,10 @@ namespace Carmasters.Http.Api.Controllers
                  .PageQuery<WorkPage>(orderby, limit, offset, desc);
 
            
+            if (!onlyIssued)
+            {
+                query.Where("w.is_direct = false");
+            }
             if (!onlyIssued && !includeInvoiced)
             {
                 query.Where("w.invoiceid is null");

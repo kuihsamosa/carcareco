@@ -1,0 +1,2 @@
+ALTER TABLE domain.work
+    ADD COLUMN IF NOT EXISTS is_direct BOOLEAN NOT NULL DEFAULT false;

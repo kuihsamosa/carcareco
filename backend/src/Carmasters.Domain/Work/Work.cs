@@ -147,7 +147,8 @@ namespace Carmasters.Core.Domain
 
         public  virtual Client Client { get { return client; } } 
         public  virtual Vehicle Vehicle { get; protected set; }
-        public  virtual Invoice Invoice { get; protected set; } 
+        public  virtual Invoice Invoice { get; protected set; }
+        public virtual bool IsDirect { get; protected set; }
         public  virtual void DoneOn(Vehicle vehicle)
         {
             this.Vehicle = vehicle ?? throw new ArgumentNullException(nameof(vehicle));

@@ -342,6 +342,7 @@ namespace Carmasters.Core.Persistence.Postgres.Repositories
             Map(x => x.ChangedOn).Column("changedon").CustomType<UtcDateType>().Access.BackingField();
             Map(x => x.Odo).Column("odo").Access.BackingField();
             Map(x => x.UserStatus).Column("userstatus").Access.BackingField();
+            Map(x => x.IsDirect).Column("is_direct").Access.BackingField();
              
             References(x => x.Completer).Column("completerid").Access.BackingField();
 
