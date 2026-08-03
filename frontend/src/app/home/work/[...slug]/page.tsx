@@ -55,7 +55,7 @@ export default async function Page({
     return (
         <div  >
               <Activities work={work} issueances={issueances} activities={activities} invoiceMode={invoiceMode}></Activities>
-            <main className='pl-0 lg:pl-62  2xl:pr-108  '>
+            <main className='pl-0   2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">
                         <nav className="flex items-center gap-1 text-sm text-gray-400 mb-4">

@@ -176,7 +176,7 @@ export default function SalesTracker() {
   const periodLabel = month > 0 ? MONTHS[month - 1] + ' ' + year : String(year)
 
   return (
-    <main className="lg:pl-62 pb-8">
+    <main className=" pb-8">
       <div className="px-4 sm:py-10 sm:px-6 lg:px-8 lg:py-6 space-y-6">
 
         {/* ── Header + filters ── */}

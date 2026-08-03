@@ -75,7 +75,7 @@ export default async function Page(
   ];
 
   return (
-    <main className="lg:pl-62">
+    <main className="">
       <form method="GET">
         <input type="hidden" name="history" value="on" />
         <div className="sm:py-6 px-4 sm:px-8 sm:gap-4">

@@ -130,7 +130,7 @@ export default async function Page() {
     const totalOpen = stats.inProgress + stats.waiting;
 
     return (
-        <main className="min-h-dvh lg:pl-62">
+        <main className="min-h-dvh ">
             <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
 
                 {/* Header */}

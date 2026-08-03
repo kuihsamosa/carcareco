@@ -4,7 +4,7 @@ import { ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 
 export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
     return (
-        <main className="min-h-[60vh] flex items-center justify-center lg:pl-62">
+        <main className="min-h-[60vh] flex items-center justify-center ">
             <div className="text-center px-4">
                 <ExclamationTriangleIcon className="mx-auto size-12 text-amber-400" />
                 <h2 className="mt-4 text-lg font-semibold text-gray-900">Something went wrong</h2>

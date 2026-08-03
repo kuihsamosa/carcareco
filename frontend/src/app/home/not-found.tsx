@@ -3,7 +3,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 
 export default function NotFound() {
     return (
-        <main className="min-h-[60vh] flex items-center justify-center lg:pl-62">
+        <main className="min-h-[60vh] flex items-center justify-center ">
             <div className="text-center px-4">
                 <MagnifyingGlassIcon className="mx-auto size-12 text-gray-300" />
                 <h2 className="mt-4 text-lg font-semibold text-gray-900">Page not found</h2>

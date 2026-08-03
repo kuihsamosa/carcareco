@@ -157,7 +157,7 @@ export default async function Page(
   ]
 
 
-  return <main className=" lg:pl-62   ">
+  return <main className="    ">
     <form method="GET" >
       {isDescending && <input type="hidden" name="desc" value="true" />}
       <div className=" sm:py-6 px-4 sm:px-8   sm:gap-4">

@@ -42,7 +42,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
 
   if (!previewRes.ok) {
     return (
-      <main className="lg:pl-62 px-4 py-8">
+      <main className=" px-4 py-8">
         <p className="text-sm text-gray-500">No invoice found.</p>
         <Link href="/home/invoices" className="mt-2 inline-block text-sm text-indigo-600 hover:text-indigo-500">&larr; Back to invoices</Link>
       </main>
@@ -59,7 +59,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
   }
 
   return (
-    <main className="lg:pl-62 mx-auto max-w-5xl px-4 py-6">
+    <main className=" mx-auto max-w-5xl px-4 py-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-gray-400 mb-4">
         <Link href="/home/invoices" className="hover:text-gray-600 transition-colors">Invoices</Link>
