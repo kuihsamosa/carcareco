@@ -87,18 +87,17 @@ export default function IconRail({ fullName, imageUrl }: { fullName: string; ima
                 {expanded && <span className="ml-3 text-sm font-semibold text-foreground whitespace-nowrap">CarCare</span>}
             </div>
 
-            {/* Search trigger */}
-            <button
-                type="button"
-                onClick={() => document.dispatchEvent(new CustomEvent('toggle-command-palette'))}
+            {/* Search link */}
+            <Link
+                href="/home/search"
                 className={clsx(
                     'mx-2 mb-1 flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors',
                 )}
-                aria-label="Search (⌘K)"
+                aria-label="Search"
             >
                 <MagnifyingGlassIcon className="size-5 shrink-0" />
-                {expanded && <span className="text-sm whitespace-nowrap">Search <kbd className="ml-auto text-xs text-muted-foreground">⌘K</kbd></span>}
-            </button>
+                {expanded && <span className="text-sm whitespace-nowrap">Search</span>}
+            </Link>
 
             {/* Nav items */}
             <nav className="flex-1 flex flex-col gap-0.5 px-2 overflow-y-auto">
