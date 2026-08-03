@@ -92,7 +92,7 @@ export default async function Search(
   }
 
   const filterEntries = Object.entries(options).filter(([k, v]) =>
-    !['offset', 'limit', 'issued', 'history', 'vehicleId[value]', 'vehicleId[text]'].includes(k) && v && v !== 'all'
+    !['offset', 'limit', 'issued', 'history', 'vehicleId[value]', 'vehicleId[text]', 'invoiceFrom', 'invoiceTo', 'month', 'year', 'desc'].includes(k) && v && v !== 'all'
   );
 
   return (

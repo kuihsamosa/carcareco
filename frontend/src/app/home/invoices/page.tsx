@@ -13,6 +13,16 @@ import { CheckCircleIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/
 export const metadata: Metadata = { title: 'Invoices' };
 import { IWorkIssuance } from "../work/model";
 
+const MONTHS = [
+  { value: '', label: 'All months' },
+  { value: '1', label: 'January' }, { value: '2', label: 'February' },
+  { value: '3', label: 'March' }, { value: '4', label: 'April' },
+  { value: '5', label: 'May' }, { value: '6', label: 'June' },
+  { value: '7', label: 'July' }, { value: '8', label: 'August' },
+  { value: '9', label: 'September' }, { value: '10', label: 'October' },
+  { value: '11', label: 'November' }, { value: '12', label: 'December' },
+];
+
 function PaidPill({ issuance }: { issuance?: IWorkIssuance }) {
   if (!issuance) return null;
   const overdue = !issuance.isPaid && issuance.issuedOn
@@ -43,11 +53,40 @@ function NeedsClientBadge({ clientName }: { clientName?: string }) {
   );
 }
 
+function buildYearOptions() {
+  const currentYear = new Date().getFullYear();
+  const years: { value: string; label: string }[] = [{ value: '', label: 'All years' }];
+  for (let y = currentYear; y >= currentYear - 5; y--) {
+    years.push({ value: String(y), label: String(y) });
+  }
+  return years;
+}
+
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   const options = await searchParams;
-  const mergedParams = Promise.resolve({ ...options, issued: 'on' });
+
+  // Convert month/year into invoiceFrom/invoiceTo for the backend
+  const merged: Record<string, string> = { ...options, issued: 'on' };
+  const filterYear = options.year ? parseInt(options.year) : 0;
+  const filterMonth = options.month ? parseInt(options.month) : 0;
+
+  if (filterYear > 0 && filterMonth > 0) {
+    const from = new Date(filterYear, filterMonth - 1, 1);
+    const to = new Date(filterYear, filterMonth, 1);
+    merged.invoiceFrom = from.toISOString();
+    merged.invoiceTo = to.toISOString();
+  } else if (filterYear > 0) {
+    merged.invoiceFrom = new Date(filterYear, 0, 1).toISOString();
+    merged.invoiceTo = new Date(filterYear + 1, 0, 1).toISOString();
+  }
+  // Remove month/year so they don't get sent as unknown params to the backend
+  delete merged.month;
+  delete merged.year;
+
+  const mergedParams = Promise.resolve(merged);
+  const yearOptions = buildYearOptions();
 
   const columns = [
     {
@@ -125,11 +164,35 @@ export default async function Page(
             );
           }}
         >
-          <div className="mb-4 flex items-end gap-x-2">
-            <div className="flex-1">
+          <div className="mb-4 flex flex-wrap items-end gap-2">
+            <div className="flex-1 min-w-[180px]">
               <SearchInput searchParams={mergedParams} placeholder="invoice number, client or vehicle" />
             </div>
-            <div className="mb-1">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Month</label>
+              <select
+                name="month"
+                defaultValue={options.month ?? ''}
+                className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                {MONTHS.map(m => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Year</label>
+              <select
+                name="year"
+                defaultValue={options.year ?? ''}
+                className="rounded-lg border border-border bg-card px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+              >
+                {yearOptions.map(y => (
+                  <option key={y.value} value={y.value}>{y.label}</option>
+                ))}
+              </select>
+            </div>
+            <div className="mb-0.5">
               <SearchButton id="btnSubmit">Search</SearchButton>
             </div>
           </div>
