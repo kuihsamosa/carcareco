@@ -154,6 +154,38 @@ namespace Carmasters.Http.Api.Controllers
             return Ok(rows);
         }
 
+        [HttpGet("breakdown")]
+        public IActionResult GetBreakdown([FromQuery] int year, [FromQuery] int? month)
+        {
+            var whereMonth = month.HasValue && month.Value > 0
+                ? $"AND EXTRACT(MONTH FROM ip.issuedon) = {month.Value}"
+                : "";
+
+            var sql = $@"
+                SELECT
+                    COALESCE(SUM(CASE WHEN sp.id IS NOT NULL THEN s.price * s.quantity ELSE 0 END), 0) AS labourrevenue,
+                    COALESCE(SUM(CASE WHEN pi.id IS NOT NULL THEN s.price * s.quantity ELSE 0 END), 0) AS partsrevenue
+                FROM domain.invoice i
+                INNER JOIN domain.pricing ip ON ip.id = i.id
+                INNER JOIN domain.work w ON w.invoiceid = i.id
+                INNER JOIN domain.repairjob rj ON rj.workid = w.id
+                INNER JOIN domain.saleable s ON (s.id IN (
+                    SELECT id FROM domain.serviceperformed WHERE repairjobid = rj.id
+                    UNION ALL
+                    SELECT id FROM domain.productinstalled WHERE repairjobid = rj.id
+                ))
+                LEFT JOIN domain.serviceperformed sp ON sp.id = s.id
+                LEFT JOIN domain.productinstalled pi ON pi.id = s.id
+                WHERE EXTRACT(YEAR FROM ip.issuedon) = {year}
+                {whereMonth}";
+
+            var row = repository.GetConnection().QueryFirstOrDefault(sql);
+            return Ok(new {
+                labourRevenue = row != null ? (double)row.labourrevenue : 0.0,
+                partsRevenue  = row != null ? (double)row.partsrevenue : 0.0,
+            });
+        }
+
         [HttpPatch("invoices/{workId}/togglepaid")]
         public IActionResult TogglePaid(Guid workId)
         {

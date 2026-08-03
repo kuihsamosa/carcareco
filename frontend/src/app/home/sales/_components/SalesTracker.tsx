@@ -25,6 +25,11 @@ interface SalesTotals {
   totalOutstanding: number
 }
 
+interface SalesBreakdown {
+  labourRevenue: number
+  partsRevenue: number
+}
+
 interface SalesInvoiceRow {
   workId: string
   invoiceNumber: number
@@ -83,6 +88,7 @@ export default function SalesTracker() {
   const [month, setMonth] = useState(now.getMonth() + 1)   // 1-12; 0 = year view
   const [chartData, setChartData] = useState<SalesPeriod[]>([])
   const [totals, setTotals] = useState<SalesTotals | null>(null)
+  const [breakdown, setBreakdown] = useState<SalesBreakdown | null>(null)
   const [loading, setLoading] = useState(true)
   const [drillDay, setDrillDay] = useState<number | null>(null)
   const [invoices, setInvoices] = useState<SalesInvoiceRow[] | null>(null)
@@ -105,12 +111,14 @@ export default function SalesTracker() {
     try {
       const params: Record<string, number> = { year }
       if (month > 0) params.month = month
-      const [c, t] = await Promise.all([
+      const [c, t, b] = await Promise.all([
         queryApi<SalesPeriod[]>('sales/summary', { params }),
         queryApi<SalesTotals>('sales/totals', { params }),
+        queryApi<SalesBreakdown>('sales/breakdown', { params }).catch(() => null),
       ])
       setChartData(c)
       setTotals(t)
+      setBreakdown(b)
     } catch {
       setChartData([])
       setTotals(null)
@@ -216,12 +224,64 @@ export default function SalesTracker() {
 
         {/* ── Stat cards ── */}
         {totals && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Total Billed" value={fmt(totals.totalBilled)} color="text-foreground" />
-            <StatCard label="Paid" value={fmt(totals.totalPaid)} color="text-primary" />
-            <StatCard label="Outstanding" value={fmt(totals.totalOutstanding)} color="text-amber-500" />
-            <StatCard label="Invoices" value={String(totals.invoiceCount)} color="text-foreground" />
-          </div>
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <StatCard label="Total Revenue" value={fmt(totals.totalBilled)} color="text-foreground" />
+              <StatCard label="Collected" value={fmt(totals.totalPaid)} color="text-primary" />
+              <StatCard label="Outstanding" value={fmt(totals.totalOutstanding)} color="text-amber-500" />
+              <StatCard label="Invoices" value={String(totals.invoiceCount)} color="text-foreground" />
+            </div>
+            {breakdown && (breakdown.labourRevenue > 0 || breakdown.partsRevenue > 0) && (
+              <div className="rounded-xl border border-border bg-card p-5">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">Revenue breakdown</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Labour (services)</p>
+                    <p className="text-lg font-bold text-success mt-0.5">{fmt(breakdown.labourRevenue)}</p>
+                    <p className="text-[11px] text-muted-foreground">≈ mostly profit</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Parts (products)</p>
+                    <p className="text-lg font-bold text-foreground mt-0.5">{fmt(breakdown.partsRevenue)}</p>
+                    <p className="text-[11px] text-muted-foreground">includes cost of parts</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Labour share</p>
+                    <p className="text-lg font-bold text-primary mt-0.5">
+                      {totals.totalBilled > 0
+                        ? Math.round((breakdown.labourRevenue / totals.totalBilled) * 100)
+                        : 0}%
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-muted-foreground">Avg per invoice</p>
+                    <p className="text-lg font-bold text-foreground mt-0.5">
+                      {totals.invoiceCount > 0 ? fmt(totals.totalBilled / totals.invoiceCount) : fmt(0)}
+                    </p>
+                  </div>
+                </div>
+                {/* Visual bar */}
+                {totals.totalBilled > 0 && (
+                  <div className="mt-4 flex h-3 rounded-full overflow-hidden bg-secondary">
+                    <div
+                      className="bg-success rounded-l-full"
+                      style={{ width: `${(breakdown.labourRevenue / totals.totalBilled) * 100}%` }}
+                      title={`Labour: ${fmt(breakdown.labourRevenue)}`}
+                    />
+                    <div
+                      className="bg-primary/50"
+                      style={{ width: `${(breakdown.partsRevenue / totals.totalBilled) * 100}%` }}
+                      title={`Parts: ${fmt(breakdown.partsRevenue)}`}
+                    />
+                  </div>
+                )}
+                <div className="mt-2 flex gap-4 text-[11px] text-muted-foreground">
+                  <span className="flex items-center gap-1"><span className="inline-block size-2 rounded-full bg-success" /> Labour</span>
+                  <span className="flex items-center gap-1"><span className="inline-block size-2 rounded-full bg-primary/50" /> Parts</span>
+                </div>
+              </div>
+            )}
+          </>
         )}
 
         {/* ── Chart ── */}
