@@ -33,15 +33,23 @@ function ServiceRow({
 
     const search = useCallback((text: string) => {
         if (text.length < 2) { setSuggestions([]); setOpen(false); return }
+        const deliver = (items: ISparePart[]) => {
+            const parts = items.filter(x => x.name)
+            setSuggestions(parts)
+            setOpen(parts.length > 0)
+        }
         dataPage({
-            resourceName: 'spareparts',
+            resourceName: 'saleables',
             searchText: text,
-            whenReady: (items) => {
-                const parts = (items as ISparePart[]).filter(x => x.name)
-                setSuggestions(parts)
-                setOpen(parts.length > 0)
-            },
-            onFailure: () => { setSuggestions([]); setOpen(false) }
+            whenReady: (items) => deliver(items as ISparePart[]),
+            onFailure: () => {
+                dataPage({
+                    resourceName: 'spareparts',
+                    searchText: text,
+                    whenReady: (items) => deliver(items as ISparePart[]),
+                    onFailure: () => { setSuggestions([]); setOpen(false) }
+                })
+            }
         })
     }, [])
 
@@ -75,9 +83,10 @@ function ServiceRow({
                                     onUpdate(item.id, name)
                                     setOpen(false)
                                 }}
-                                className="px-3 py-2 cursor-pointer hover:bg-indigo-50 text-gray-900"
+                                className="px-3 py-2 cursor-pointer hover:bg-indigo-50 text-gray-900 flex items-center"
                             >
-                                {s.name}
+                                <span>{s.name}</span>
+                                {s.price != null && <span className="ml-auto text-gray-500 text-xs font-medium">{s.price.toFixed(2)}</span>}
                                 {s.code && <span className="ml-2 text-gray-400 text-xs">{s.code}</span>}
                             </li>
                         ))}

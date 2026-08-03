@@ -12,6 +12,7 @@ import {
     CubeIcon,
     HomeIcon,
     PlusCircleIcon,
+    WrenchScrewdriverIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx";
 import Link from "next/link";
@@ -26,6 +27,7 @@ const baseNavigation = [
     { name: 'New invoice', href: '/home/invoices/new', icon: <PlusCircleIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path === '/home/invoices/new' },
     { name: 'Clients', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/clients') },
     { name: 'Vehicles', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/vehicles') },
+    { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/services') },
     { name: 'Sales', href: '/home/sales', icon: <ChartBarIcon aria-hidden="true" className={navigationIconClass} />, activeMatch: (path: string) => path.startsWith('/home/sales') },
 ];
 
@@ -68,7 +70,7 @@ export default function Nav({
     const navigation = [
         ...baseNavigation.slice(0, inventoryAt),
         {
-            name: 'Inventory', href: '/home/inventory',
+            name: 'Spare parts', href: '/home/inventory',
             activeMatch: (path: string) => path.startsWith('/home/inventory'),
             icon: (
                 <span className="relative">
