@@ -7,7 +7,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 export default function SearchBox({ defaultValue }: { defaultValue: string }) {
     const router = useRouter()
     const inputRef = useRef<HTMLInputElement>(null)
-    const debounceRef = useRef<ReturnType<typeof setTimeout>>()
+    const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
     useEffect(() => {
         inputRef.current?.focus()
