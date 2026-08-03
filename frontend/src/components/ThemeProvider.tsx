@@ -41,8 +41,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }, [])
 
     return (
-        <ThemeContext value={{ theme, toggle }}>
+        <ThemeContext.Provider value={{ theme, toggle }}>
             {children}
-        </ThemeContext>
+        </ThemeContext.Provider>
     )
 }
