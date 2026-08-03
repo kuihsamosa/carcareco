@@ -54,11 +54,11 @@ export default function ProfileImage({
                     onClick={() => {
                         document.getElementById('imageUpload')?.click();
                     }}
-                    className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50"
+                    className="rounded-md bg-card px-3 py-2 text-sm font-semibold text-foreground ring-1 shadow-xs ring-border ring-inset hover:bg-secondary"
                 >
                     Change avatar
                 </button>
-                <p className="mt-2 text-xs/5 text-gray-400">JPG, GIF or PNG. 5MB max.</p>
+                <p className="mt-2 text-xs/5 text-muted-foreground">JPG, GIF or PNG. 5MB max.</p>
             </div>
         </div>
     )

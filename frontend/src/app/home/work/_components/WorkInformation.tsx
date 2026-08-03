@@ -41,7 +41,7 @@ function MechanicAvatar({ name }: { name: string }) {
 }
 
 const statusOptions = [
-    { key: 'Default',    label: '🔵 Open',        desc: 'Reset to open / pending',          bg: 'bg-gray-50 hover:bg-gray-100 text-gray-800' },
+    { key: 'Default',    label: '🔵 Open',        desc: 'Reset to open / pending',          bg: 'bg-secondary hover:bg-secondary text-foreground' },
     { key: 'InProgress', label: '🟢 In Progress',  desc: 'Mark as actively being worked on', bg: 'bg-green-50 hover:bg-green-100 text-green-900' },
     { key: 'Closed',     label: '🟡 Closed',       desc: 'Mark as finished / closed',        bg: 'bg-yellow-50 hover:bg-yellow-100 text-yellow-900' },
 ] as const;
@@ -168,8 +168,8 @@ export function WorkInformation({
                 <Dialog open={statusSheetOpen} onClose={() => setStatusSheetOpen(false)} className="relative z-50">
                     <DialogBackdrop className="fixed inset-0 bg-black/30" />
                     <div className="fixed inset-0 flex items-end justify-center pointer-events-none">
-                        <DialogPanel className="pointer-events-auto w-full max-w-sm bg-white rounded-t-2xl px-5 py-6 space-y-3 shadow-xl">
-                            <h3 className="font-semibold text-gray-900 text-base mb-1">Change Status</h3>
+                        <DialogPanel className="pointer-events-auto w-full max-w-sm bg-card rounded-t-2xl px-5 py-6 space-y-3 shadow-xl">
+                            <h3 className="font-semibold text-foreground text-base mb-1">Change Status</h3>
                             {statusOptions.map(opt => {
                                 const currentKey = work.status === 'inprogress' ? 'InProgress' : work.status === 'closed' ? 'Closed' : 'Default';
                                 const isCurrent = opt.key === currentKey;
@@ -190,7 +190,7 @@ export function WorkInformation({
                             })}
                             <button
                                 onClick={() => setStatusSheetOpen(false)}
-                                className="w-full text-center text-sm text-gray-400 py-2"
+                                className="w-full text-center text-sm text-muted-foreground py-2"
                             >
                                 Cancel
                             </button>
@@ -203,7 +203,7 @@ export function WorkInformation({
                 <h2 className="sr-only">Summary</h2>
                 <dl className="flex flex-wrap">
                     <div className="flex-auto xl:pt-6 xl:pl-6">
-                        <dt className="text-base font-semibold text-gray-900 mr-2 flex items-center gap-2 flex-wrap">
+                        <dt className="text-base font-semibold text-foreground mr-2 flex items-center gap-2 flex-wrap">
                             {isInvoiceDraft ? 'Invoice draft' : `Work ${work.number}`}
                             {/* Tap badge to change status on mobile */}
                             {!work.issuance ? (
@@ -219,7 +219,7 @@ export function WorkInformation({
                                 <WorkStatusBadge status={work.status} />
                             )}
                         </dt>
-                        <dd className="text-sm/6 text-gray-500">
+                        <dd className="text-sm/6 text-muted-foreground">
                             {editingDate ? (
                                 <input
                                     ref={dateInputRef}
@@ -228,11 +228,11 @@ export function WorkInformation({
                                     defaultValue={moment(startedOn).format('YYYY-MM-DD')}
                                     onBlur={handleDateBlur}
                                     onKeyDown={(e) => { if (e.key === 'Escape') setEditingDate(false); if (e.key === 'Enter') e.currentTarget.blur(); }}
-                                    className="text-sm border border-gray-300 rounded px-1 py-0.5"
+                                    className="text-sm border border-border rounded px-1 py-0.5"
                                 />
                             ) : (
                                 <time dateTime={startedOn?.toString()} onClick={() => !work.issuance && setEditingDate(true)}
-                                    className={!work.issuance ? 'cursor-pointer hover:text-gray-700 hover:underline decoration-dashed underline-offset-2' : ''}>
+                                    className={!work.issuance ? 'cursor-pointer hover:text-foreground hover:underline decoration-dashed underline-offset-2' : ''}>
                                     {moment(startedOn).format('LLL')}
                                 </time>
                             )}
@@ -250,9 +250,9 @@ export function WorkInformation({
                         <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
                             <dt className="flex-none">
                                 <span className="sr-only">Client</span>
-                                <UserCircleIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                                <UserCircleIcon aria-hidden="true" className="h-6 w-5 text-muted-foreground" />
                             </dt>
-                            <dd className="text-sm/6 font-medium text-gray-900">
+                            <dd className="text-sm/6 font-medium text-foreground">
                                 <span>{clientSummary}</span>
                             </dd>
                         </div>
@@ -260,9 +260,9 @@ export function WorkInformation({
 
                     {vehicleSummary && <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
                         <dt className="flex-none">
-                            <TruckIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                            <TruckIcon aria-hidden="true" className="h-6 w-5 text-muted-foreground" />
                         </dt>
-                        <dd className="text-sm/6 text-gray-500">
+                        <dd className="text-sm/6 text-muted-foreground">
                             <time dateTime="2023-01-31">{vehicleSummary}</time>
                         </dd>
                     </div>}
@@ -272,13 +272,13 @@ export function WorkInformation({
                         <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
                             <dt className="flex-none">
                                 <span className="sr-only">Mechanics</span>
-                                <WrenchScrewdriverIcon aria-hidden="true" className="h-6 w-5 text-gray-400 mt-1" />
+                                <WrenchScrewdriverIcon aria-hidden="true" className="h-6 w-5 text-muted-foreground mt-1" />
                             </dt>
                             <dd className="flex flex-wrap gap-2 items-center">
                                 {work.mechanics.map((m) => (
                                     <span key={m.id} className="flex items-center gap-1.5">
                                         <MechanicAvatar name={m.name} />
-                                        <span className="text-sm/6 text-gray-500">{m.name}</span>
+                                        <span className="text-sm/6 text-muted-foreground">{m.name}</span>
                                     </span>
                                 ))}
                             </dd>
@@ -287,9 +287,9 @@ export function WorkInformation({
                     {work.notes && <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
                         <dt className="flex-none">
                             <span className="sr-only">Notes</span>
-                            <DocumentTextIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                            <DocumentTextIcon aria-hidden="true" className="h-6 w-5 text-muted-foreground" />
                         </dt>
-                        <dd className="text-sm/6 text-gray-500 whitespace-pre-line">{work.notes}</dd>
+                        <dd className="text-sm/6 text-muted-foreground whitespace-pre-line">{work.notes}</dd>
                     </div>}
                     <div className="mt-6 flex gap-x-2 xl:px-6   ">  
                         {work.issuance && <>
@@ -311,7 +311,7 @@ export function WorkInformation({
                                >
                                </FormSwitch>
                             <Label as="span" className="ml-3 text-sm"> 
-                                <span className="text-gray-500">Is in progress</span>
+                                <span className="text-muted-foreground">Is in progress</span>
                             </Label>
                             </Field> } 
                         </dt>

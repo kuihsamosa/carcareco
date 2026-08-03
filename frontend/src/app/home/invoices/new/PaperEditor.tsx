@@ -193,7 +193,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
     return (
         <div className="min-h-screen bg-neutral-950 py-8 px-4 flex flex-col items-center">
             {/* Paper */}
-            <div className="bg-white w-full max-w-[794px] shadow-2xl rounded-sm p-10 md:p-14 relative" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", color: '#0f172a', lineHeight: 1.5 }}>
+            <div className="bg-card w-full max-w-[794px] shadow-2xl rounded-sm p-10 md:p-14 relative" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", color: '#0f172a', lineHeight: 1.5 }}>
 
                 {/* DRAFT badge */}
                 <div style={{ position: 'absolute', top: 24, right: 24, background: '#fef3c7', color: '#92400e', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 4, letterSpacing: 1, textTransform: 'uppercase' }}>
@@ -381,7 +381,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                     type="button"
                     onClick={handleSave}
                     disabled={isPending}
-                    className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
+                    className="bg-primary hover:bg-primary/100 disabled:opacity-50 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-colors"
                 >
                     {isPending ? 'Saving…' : 'Save & Print'}
                 </button>
@@ -390,7 +390,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
             {/* No-client confirmation dialog */}
             {showNoClientConfirm && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[60]" onClick={() => setShowNoClientConfirm(false)}>
-                    <div className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+                    <div className="bg-card rounded-xl p-6 max-w-sm mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center gap-3 mb-3">
                             <ExclamationTriangleIcon className="w-6 h-6 text-amber-500 shrink-0" />
                             <h3 className="font-semibold text-neutral-900">Save without a client?</h3>

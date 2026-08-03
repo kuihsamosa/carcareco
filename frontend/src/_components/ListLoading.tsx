@@ -11,7 +11,7 @@ export default function ListLoading({ title }: { title?: string }) {
             <div className="px-4 sm:py-10 sm:px-6 lg:px-8 lg:py-6">
                 <div className="mb-6 flex items-center justify-between">
                     {title
-                        ? <h1 className="text-base font-semibold text-gray-900">{title}</h1>
+                        ? <h1 className="text-base font-semibold text-foreground">{title}</h1>
                         : <SkeletonLine className="h-5 w-40" />}
                     <SkeletonLine className="h-9 w-28 rounded-lg" />
                 </div>

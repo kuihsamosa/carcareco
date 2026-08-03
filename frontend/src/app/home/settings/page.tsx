@@ -23,9 +23,9 @@ export default async function Page() {
 
             {/* Workshop Identity */}
             <div className="px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900 my-4">Workshop Identity</h3>
+                <h3 className="text-base/7 font-semibold text-foreground my-4">Workshop Identity</h3>
             </div>
-            <div className="mt-4 border-t border-gray-100">
+            <div className="mt-4 border-t border-border">
                 {hasLogo && (
                     <div className="py-4">
                         <Image
@@ -38,7 +38,7 @@ export default async function Page() {
                         />
                     </div>
                 )}
-                <dl className="divide-y divide-gray-100">
+                <dl className="divide-y divide-border">
                     <DescriptionItem label="Name" value={r.name} />
                     {r.tagline && <DescriptionItem label="Tagline" value={r.tagline} />}
                 </dl>
@@ -46,10 +46,10 @@ export default async function Page() {
 
             {/* Contact & Address */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Contact &amp; Address</h3>
+                <h3 className="text-base/7 font-semibold text-foreground">Contact &amp; Address</h3>
             </div>
-            <div className="mt-4 border-t border-gray-100">
-                <dl className="divide-y divide-gray-100">
+            <div className="mt-4 border-t border-border">
+                <dl className="divide-y divide-border">
                     <DescriptionItem label="Phone" value={r.phone} />
                     <DescriptionItem label="Email" value={r.email} />
                     {r.website && <DescriptionItem label="Website" value={r.website} />}
@@ -59,10 +59,10 @@ export default async function Page() {
 
             {/* Legal & Tax */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Legal &amp; Tax</h3>
+                <h3 className="text-base/7 font-semibold text-foreground">Legal &amp; Tax</h3>
             </div>
-            <div className="mt-4 border-t border-gray-100">
-                <dl className="divide-y divide-gray-100">
+            <div className="mt-4 border-t border-border">
+                <dl className="divide-y divide-border">
                     <DescriptionItem label="SSM registration" value={r.regNr} />
                     <DescriptionItem label="SST registration" value={r.kmkr} />
                     <DescriptionItem label="Tax rate" value={inv.vatRate ? `${inv.vatRate}%` : ''} />
@@ -72,20 +72,20 @@ export default async function Page() {
 
             {/* Banking */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Banking</h3>
+                <h3 className="text-base/7 font-semibold text-foreground">Banking</h3>
             </div>
-            <div className="mt-4 border-t border-gray-100">
-                <dl className="divide-y divide-gray-100">
+            <div className="mt-4 border-t border-border">
+                <dl className="divide-y divide-border">
                     <DescriptionItem label="Bank account" value={r.bankAccount} />
                 </dl>
             </div>
 
             {/* Invoice Defaults */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Invoice Defaults</h3>
+                <h3 className="text-base/7 font-semibold text-foreground">Invoice Defaults</h3>
             </div>
-            <div className="mt-4 border-t border-gray-100">
-                <dl className="divide-y divide-gray-100">
+            <div className="mt-4 border-t border-border">
+                <dl className="divide-y divide-border">
                     <DescriptionItem label="Number prefix" value={inv.invoiceNumberPrefix || 'INV'} />
                     <DescriptionItem label="Payment due" value={`${inv.dueDays || 30} days`} />
                     <DescriptionItem label="Late fee" value={inv.surCharge} />
@@ -97,10 +97,10 @@ export default async function Page() {
 
             {/* Email Templates */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Email Templates</h3>
+                <h3 className="text-base/7 font-semibold text-foreground">Email Templates</h3>
             </div>
-            <div className="mt-4 border-t border-gray-100">
-                <dl className="divide-y divide-gray-100">
+            <div className="mt-4 border-t border-border">
+                <dl className="divide-y divide-border">
                     <DescriptionItem label="Invoice email" className="whitespace-pre-line" value={inv.emailContent} />
                     <DescriptionItem label="Estimate email" className="whitespace-pre-line" value={options.pricing.estimate.emailContent} />
                 </dl>
@@ -108,7 +108,7 @@ export default async function Page() {
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
                 <Link href="/home/settings/edit"
-                    className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    className="inline-flex items-center gap-x-1.5 rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-primary/100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     Edit
                 </Link>

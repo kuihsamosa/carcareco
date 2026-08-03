@@ -69,10 +69,10 @@ function ServiceRow({
                     }}
                     onBlur={() => setTimeout(() => setOpen(false), 150)}
                     onFocus={() => query.length >= 2 && suggestions.length > 0 && setOpen(true)}
-                    className="block w-full rounded-md bg-white py-1.5 px-3 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
+                    className="block w-full rounded-md bg-card py-1.5 px-3 text-sm text-foreground outline-1 -outline-offset-1 outline-border placeholder:text-muted-foreground focus:outline-2 focus:-outline-offset-2 focus:outline-primary"
                 />
                 {open && suggestions.length > 0 && (
-                    <ul className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg border border-gray-200 max-h-48 overflow-auto text-sm">
+                    <ul className="absolute z-10 mt-1 w-full rounded-md bg-card shadow-lg border border-border max-h-48 overflow-auto text-sm">
                         {suggestions.map((s, i) => (
                             <li
                                 key={i}
@@ -83,11 +83,11 @@ function ServiceRow({
                                     onUpdate(item.id, name)
                                     setOpen(false)
                                 }}
-                                className="px-3 py-2 cursor-pointer hover:bg-indigo-50 text-gray-900 flex items-center"
+                                className="px-3 py-2 cursor-pointer hover:bg-primary/10 text-foreground flex items-center"
                             >
                                 <span>{s.name}</span>
-                                {s.price != null && <span className="ml-auto text-gray-500 text-xs font-medium">{s.price.toFixed(2)}</span>}
-                                {s.code && <span className="ml-2 text-gray-400 text-xs">{s.code}</span>}
+                                {s.price != null && <span className="ml-auto text-muted-foreground text-xs font-medium">{s.price.toFixed(2)}</span>}
+                                {s.code && <span className="ml-2 text-muted-foreground text-xs">{s.code}</span>}
                             </li>
                         ))}
                     </ul>
@@ -96,7 +96,7 @@ function ServiceRow({
             <button
                 type="button"
                 onClick={() => onRemove(item.id)}
-                className="flex-shrink-0 text-gray-400 hover:text-red-500 transition-colors"
+                className="flex-shrink-0 text-muted-foreground hover:text-red-500 transition-colors"
             >
                 <XMarkIcon className="h-5 w-5" />
             </button>
@@ -143,7 +143,7 @@ export default function WorkAboutItems({ defaultValue }: { defaultValue?: string
                 <button
                     type="button"
                     onClick={addRow}
-                    className="flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-800 transition-colors mt-1"
+                    className="flex items-center gap-1 text-sm text-primary hover:text-indigo-800 transition-colors mt-1"
                 >
                     <PlusIcon className="h-4 w-4" />
                     Add service

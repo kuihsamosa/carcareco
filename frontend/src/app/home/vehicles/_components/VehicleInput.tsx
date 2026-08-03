@@ -76,7 +76,7 @@ export default function VehicleInput({
                                     onChange={e => setRegNr(e.target.value.toUpperCase())}
                                     placeholder="AB 123 CD"
                                     autoCapitalize="characters"
-                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-sm font-mono font-bold tracking-widest text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-slate-800"
+                                    className="block w-full rounded-md bg-card px-3 py-1.5 text-sm font-mono font-bold tracking-widest text-foreground outline-1 -outline-offset-1 outline-border focus:outline-2 focus:-outline-offset-2 focus:outline-slate-800"
                                 />
                                 {/* Hidden file input: camera capture on mobile */}
                                 <input
@@ -95,7 +95,7 @@ export default function VehicleInput({
                                     type="button"
                                     title="Scan plate with camera"
                                     onClick={() => cameraInputRef.current?.click()}
-                                    className="flex items-center justify-center w-9 h-9 rounded-lg bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-600 transition-colors flex-shrink-0"
+                                    className="flex items-center justify-center w-9 h-9 rounded-lg bg-secondary hover:bg-secondary/80 active:bg-gray-300 text-muted-foreground transition-colors flex-shrink-0"
                                 >
                                     <CameraIcon className="size-5" />
                                 </button>

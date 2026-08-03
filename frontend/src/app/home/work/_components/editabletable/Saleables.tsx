@@ -36,29 +36,29 @@ export default function Saleables({
             <div className="flow-root">
                 <div className="  overflow-x-auto  ">
                     <div className=" inline-block  min-w-full py-2 align-middle  ">
-                        <table id="items" border={1} className=" min-w-full divide-y divide-gray-300">
+                        <table id="items" border={1} className=" min-w-full divide-y divide-border">
                             <thead>
                                 <tr>
                                     {edit && <th></th>}
-                                    <th className="py-3.5 pr-3 pl-4   text-sm font-semibold whitespace-nowrap text-gray-900 sm:pl-0"
+                                    <th className="py-3.5 pr-3 pl-4   text-sm font-semibold whitespace-nowrap text-foreground sm:pl-0"
                                     >Code
                                     </th>
-                                    <th className="px-2 py-3.5  text-sm font-semibold whitespace-nowrap text-gray-900">
+                                    <th className="px-2 py-3.5  text-sm font-semibold whitespace-nowrap text-foreground">
                                         Name
                                     </th>
-                                    <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
+                                    <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-foreground">
                                         Price
                                     </th>
-                                    <th className="px-2 py-3.5 text-end   text-sm font-semibold whitespace-nowrap text-gray-900">
+                                    <th className="px-2 py-3.5 text-end   text-sm font-semibold whitespace-nowrap text-foreground">
                                         Quantity
                                     </th>
-                                    <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
+                                    <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-foreground">
                                         Unit
                                     </th>
-                                    {edit && <th className="px-2 py-3.5 text-end text-sm font-semibold whitespace-nowrap text-gray-900"></th>}
+                                    {edit && <th className="px-2 py-3.5 text-end text-sm font-semibold whitespace-nowrap text-foreground"></th>}
                                 </tr>
                             </thead>
-                            <tbody className={clsx(!edit && "divide-y divide-gray-200", " bg-white")}>
+                            <tbody className={clsx(!edit && "divide-y divide-border", " bg-card")}>
                                 {data.filter(x=>x).map((product, index) => {
                                     
                                     return (
@@ -84,17 +84,17 @@ export default function Saleables({
                                         <div className="grid grid-rows-3 gap-0">
                                             <div className="flex flex-row-reverse " >
 
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithoutVat)}</div>
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Subtotal</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-muted-foreground sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithoutVat)}</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-muted-foreground sm:table-cell sm:pl-0">Subtotal</div>
                                             </div>
                                             <div className="flex flex-row-reverse " >
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat - priceSummary.totalWithoutVat)}</div>
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Tax</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-muted-foreground sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat - priceSummary.totalWithoutVat)}</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-muted-foreground sm:table-cell sm:pl-0">Tax</div>
                                             </div>
                                             <div className="flex flex-row-reverse  " >
 
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat)}</div>
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Total</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-foreground sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat)}</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-foreground sm:table-cell sm:pl-0">Total</div>
                                             </div>
                                         </div>
                                     </th>

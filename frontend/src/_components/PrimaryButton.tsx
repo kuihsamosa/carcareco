@@ -31,7 +31,7 @@ export default function PrimaryButton({
                 className,
                 success
                     ? "rounded-md bg-green-700 px-3 py-2 text-sm font-semibold text-white shadow-xs"
-                    : "rounded-md bg-slate-800 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-800",
+                    : "rounded-md bg-primary/90 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-primary/80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-800",
                 (disabled || loading) && "opacity-60 cursor-not-allowed min-h-[44px] min-w-[44px]",
                 "min-h-[44px] min-w-[44px] flex items-center justify-center gap-2"
             )}

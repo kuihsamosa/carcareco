@@ -58,12 +58,12 @@ export default async function Page({
             <main className='pl-0   2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">
-                        <nav className="flex items-center gap-1 text-sm text-gray-400 mb-4">
-                            <Link href="/home/work" className="hover:text-gray-600 transition-colors">Work</Link>
+                        <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-4">
+                            <Link href="/home/work" className="hover:text-foreground transition-colors">Work</Link>
                             <ChevronRightIcon className="size-4" />
-                            <span className="text-gray-700 font-medium">#{work.number ?? id}</span>
+                            <span className="text-foreground font-medium">#{work.number ?? id}</span>
                         </nav>
-                        <div className='flex flex-col border-t border-gray-200 xl:border-t-0  '>
+                        <div className='flex flex-col border-t border-border xl:border-t-0  '>
 
                             {activity && <Card header={
                                 <CardHeader> 
@@ -71,7 +71,7 @@ export default async function Page({
                                         <div className='grid grid-flow-col  gap-2'>
                                             <div className='-mr-2'><ActivitySelect issueances={issueances} work={work} activities={activities} ></ActivitySelect>    </div>
                                             <div className='xs:-ml-4 -ml-2 my-1'>
-                                            <h3 className={clsx(activities.items.length>1 && "hidden", "text-base  2xl:block font-semibold text-gray-900")}>{invoiceMode && !work.issuance ? 'New invoice' : activityDisplayName}</h3>
+                                            <h3 className={clsx(activities.items.length>1 && "hidden", "text-base  2xl:block font-semibold text-foreground")}>{invoiceMode && !work.issuance ? 'New invoice' : activityDisplayName}</h3>
                                             </div>
                                             <div  className='my-1' > 
                                                 {issuance && <PricingDownloadLink name="Offer" hideLabel={!!issuance.number} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
@@ -86,7 +86,7 @@ export default async function Page({
                                     </div>
                                    {work.issuance && (
                                         <div className='mb-4 xl:ml-4'>
-                                            <Link href={`/home/invoices/${id}`} className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50">
+                                            <Link href={`/home/invoices/${id}`} className="inline-flex items-center gap-x-1.5 rounded-md bg-card px-3 py-2 text-sm font-semibold text-foreground ring-1 shadow-xs ring-border ring-inset hover:bg-secondary">
                                                 View Invoice
                                             </Link>
                                         </div>
@@ -108,7 +108,7 @@ export default async function Page({
                         </div>
                     </div>
                     <div className="px-4 xl:px-8 pb-6">
-                        <Link href="/home/work" className="text-sm text-indigo-600 hover:text-indigo-500">← Back to work list</Link>
+                        <Link href="/home/work" className="text-sm text-primary hover:text-primary/80">← Back to work list</Link>
                     </div>
                 </div>
             </main>

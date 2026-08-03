@@ -18,7 +18,7 @@ export default async function Page(
     <form method="GET" > <Search
       searchParams={searchParams}
       resourceName="clients"
-      emptyAction={<Link href="/home/clients/new" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">+ New client</Link>}
+      emptyAction={<Link href="/home/clients/new" className="text-sm font-medium text-primary hover:text-primary/80">+ New client</Link>}
       columns={[{
         dataField: "name",
         dataFormatter: ({ id, name }) => {

@@ -83,7 +83,7 @@ export default function NavDialog({
 
             {/* Mobile bottom tab bar */}
             <nav
-                className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 lg:hidden"
+                className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border lg:hidden"
                 style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
             >
                 <div className="flex items-stretch h-16">
@@ -97,7 +97,7 @@ export default function NavDialog({
                                 href={tab.href}
                                 className={clsx(
                                     'flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors',
-                                    active ? 'text-slate-900' : 'text-gray-400',
+                                    active ? 'text-slate-900' : 'text-muted-foreground',
                                 )}
                             >
                                 <Icon className="size-5" aria-hidden="true" />
@@ -111,10 +111,10 @@ export default function NavDialog({
                         href="/home/work/new"
                         className="flex flex-col items-center justify-end pb-1 px-3 flex-shrink-0"
                     >
-                        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-900 shadow-lg -translate-y-3">
+                        <span className="flex items-center justify-center w-12 h-12 rounded-full bg-primary shadow-lg -translate-y-3">
                             <PlusIcon className="size-6 text-white" aria-hidden="true" />
                         </span>
-                        <span className="text-[10px] font-medium text-slate-600 -mt-1.5">New Job</span>
+                        <span className="text-[10px] font-medium text-muted-foreground -mt-1.5">New Job</span>
                     </Link>
 
                     {/* Right two tabs */}
@@ -127,7 +127,7 @@ export default function NavDialog({
                                 href={tab.href}
                                 className={clsx(
                                     'flex flex-1 flex-col items-center justify-center gap-0.5 transition-colors',
-                                    active ? 'text-slate-900' : 'text-gray-400',
+                                    active ? 'text-slate-900' : 'text-muted-foreground',
                                 )}
                             >
                                 <Icon className="size-5" aria-hidden="true" />
@@ -140,7 +140,7 @@ export default function NavDialog({
                     <button
                         type="button"
                         onClick={() => setSidebarOpen(true)}
-                        className="flex flex-1 flex-col items-center justify-center gap-0.5 text-gray-400"
+                        className="flex flex-1 flex-col items-center justify-center gap-0.5 text-muted-foreground"
                     >
                         <Bars3Icon className="size-5" aria-hidden="true" />
                         <span className="text-[10px] font-medium">More</span>

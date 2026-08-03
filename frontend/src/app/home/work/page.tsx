@@ -57,7 +57,7 @@ export default async function Page(
               number={issuance.invoiceNumber}
               downloadingElement={<Spinner></Spinner>}
               hidePaperClip={true}
-              clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" title="Download PDF" ></ArrowDownTrayIcon>} >
+              clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-muted-foreground" title="Download PDF" ></ArrowDownTrayIcon>} >
             </PricingDownloadLink> </div>
             <div>
               <EmailSentBadge issueance={issuance}></EmailSentBadge>
@@ -87,7 +87,7 @@ export default async function Page(
                     downloadingElement={<Spinner></Spinner>}
                     hidePaperClip={true}
                     hideLabel={false}
-                    clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-gray-400" title="Download PDF" ></ArrowDownTrayIcon>} >
+                    clickableElement={<ArrowDownTrayIcon aria-hidden="true" className="h-6 w-5 text-muted-foreground" title="Download PDF" ></ArrowDownTrayIcon>} >
                   </PricingDownloadLink> </div>
                   <div> <span><EmailSentBadge issueance={offerIssuance}></EmailSentBadge></span></div>
                 </>
@@ -118,7 +118,7 @@ export default async function Page(
     secondColumn,
     {
       dataField: 'startedOn',
-      headerText: <Link href={sortToggleHref} className="inline-flex items-center gap-1 hover:text-indigo-600">Started on <ArrowsUpDownIcon className="size-3.5" /></Link>,
+      headerText: <Link href={sortToggleHref} className="inline-flex items-center gap-1 hover:text-primary">Started on <ArrowsUpDownIcon className="size-3.5" /></Link>,
       dataFormatter: ({ startedOn }: { startedOn: Date }) => {
         const m = moment(startedOn, true);
         return (
@@ -181,37 +181,37 @@ export default async function Page(
               mobileCardFormatter={(item) => (
                 <Link
                   href={`/home/work/${item.id}`}
-                  className={`block bg-white border rounded-2xl p-4 shadow-sm active:bg-gray-50 transition-colors ${item.status === 'closed' ? 'opacity-60' : 'border-gray-100'}`}
+                  className={`block bg-card border border-border rounded-2xl p-4 shadow-sm active:bg-secondary transition-colors ${item.status === 'closed' ? 'opacity-60' : ''}`}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <div className="font-semibold text-sm text-gray-900">Work #{item.workNr ?? item.number}</div>
-                      <div className="text-[11px] text-gray-400 mt-0.5">{moment(item.startedOn).format('ll')}</div>
+                      <div className="font-semibold text-sm text-foreground">Work #{item.workNr ?? item.number}</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5">{moment(item.startedOn).format('ll')}</div>
                     </div>
                     <WorkStatusBadge status={item.status} />
                   </div>
 
                   {item.vehicleRegNr && (
                     <div className="flex items-center gap-2 mb-2">
-                      <TruckIcon className="size-3.5 text-gray-400 shrink-0" />
-                      <span className="bg-slate-100 text-slate-700 font-mono font-bold text-[11px] px-2 py-0.5 rounded uppercase tracking-wider">
+                      <TruckIcon className="size-3.5 text-muted-foreground shrink-0" />
+                      <span className="bg-secondary text-muted-foreground font-mono font-bold text-[11px] px-2 py-0.5 rounded uppercase tracking-wider">
                         {item.vehicleRegNr}
                       </span>
                       {(item.vehicleProducer || item.vehicleModel) && (
-                        <span className="text-[11px] text-gray-500 truncate">{item.vehicleProducer} {item.vehicleModel}</span>
+                        <span className="text-[11px] text-muted-foreground truncate">{item.vehicleProducer} {item.vehicleModel}</span>
                       )}
                     </div>
                   )}
 
                   {item.clientName && (
-                    <div className="flex items-center gap-1.5 text-[11px] text-gray-500 mb-1">
+                    <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mb-1">
                       <UserCircleIcon className="size-3.5 shrink-0" />
                       {item.clientName}
                     </div>
                   )}
 
                   {item.notes && (
-                    <p className="text-[11px] text-gray-400 truncate mt-1">{item.notes}</p>
+                    <p className="text-[11px] text-muted-foreground truncate mt-1">{item.notes}</p>
                   )}
 
                   {item.mechanicNames && (
@@ -224,8 +224,8 @@ export default async function Page(
 
                   {item.issuance && (
                     <div className="mt-2 flex items-center gap-1">
-                      <DocumentTextIcon className="size-3.5 text-gray-400" />
-                      <span className="text-[10px] text-gray-500">Invoice #{(item.issuance as IWorkIssuance).invoiceNumber}</span>
+                      <DocumentTextIcon className="size-3.5 text-muted-foreground" />
+                      <span className="text-[10px] text-muted-foreground">Invoice #{(item.issuance as IWorkIssuance).invoiceNumber}</span>
                     </div>
                   )}
                 </Link>
@@ -233,7 +233,7 @@ export default async function Page(
             >
               {/* Plate-number search shortcut — mobile prominent */}
               <div className="mb-3 md:hidden">
-                <label className="text-xs font-semibold text-gray-500 mb-1 block uppercase tracking-wide">🔍 Search by plate or client</label>
+                <label className="text-xs font-semibold text-muted-foreground mb-1 block uppercase tracking-wide">🔍 Search by plate or client</label>
                 <SearchInput searchParams={searchParams} placeholder="AB 123 CD · client name · VIN…" />
               </div>
 

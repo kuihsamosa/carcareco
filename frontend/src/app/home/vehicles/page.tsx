@@ -20,7 +20,7 @@ export default async function Page(
      <form method="GET" > <Search
       searchParams={searchParams}
       resourceName="vehicles"
-      emptyAction={<Link href="/home/vehicles/new" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">+ New vehicle</Link>}
+      emptyAction={<Link href="/home/vehicles/new" className="text-sm font-medium text-primary hover:text-primary/80">+ New vehicle</Link>}
       columns={[
 
         {
@@ -58,7 +58,7 @@ export default async function Page(
           dataField: 'ownerName',
           headerText: 'Owner',
           dataFormatter: ({ ownerName, ownerId }) => {
-            if (!ownerName) return <p className="font-italic text-gray-400">No owner</p>;
+            if (!ownerName) return <p className="font-italic text-muted-foreground">No owner</p>;
             return (
               <Link href={'/home/clients/' + ownerId} >
                 <span >{ownerName}</span>

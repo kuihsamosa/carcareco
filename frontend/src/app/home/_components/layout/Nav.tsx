@@ -107,7 +107,7 @@ export default function Nav({
                                         className={clsx(
                                                isActive(item)
                                                 ? 'bg-gray-800 text-white'
-                                                : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                                : 'text-muted-foreground hover:bg-gray-800 hover:text-white',
                                             'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
                                         )}
                                     >
@@ -121,7 +121,7 @@ export default function Nav({
                     <li className="mt-auto flex flex-col mb-5   ">
                         <Link
                             href="/home/settings"
-                            className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-gray-400 hover:bg-gray-800 hover:text-white"
+                            className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold text-muted-foreground hover:bg-gray-800 hover:text-white"
                         >
                             <Cog6ToothIcon aria-hidden="true" className="size-6 shrink-0" />
                             Settings

@@ -25,15 +25,15 @@ export default function InvoicePreviewFrame({ workId }: { workId: string }) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-8">
-        <p className="text-sm text-gray-400">Could not load invoice preview.</p>
+      <div className="flex items-center justify-center rounded-lg border border-border bg-secondary p-8">
+        <p className="text-sm text-muted-foreground">Could not load invoice preview.</p>
       </div>
     );
   }
 
   if (!html) {
     return (
-      <div className="flex items-center justify-center rounded-lg border border-gray-200 bg-white p-16">
+      <div className="flex items-center justify-center rounded-lg border border-border bg-card p-16">
         <Spinner />
       </div>
     );
@@ -58,9 +58,9 @@ export default function InvoicePreviewFrame({ workId }: { workId: string }) {
   const srcDoc = wrappedHtml;
 
   return (
-    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-100 bg-gray-50 px-4 py-2">
-        <span className="text-xs font-medium text-gray-500">Invoice Document Preview</span>
+    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+      <div className="flex items-center justify-between border-b border-border bg-secondary px-4 py-2">
+        <span className="text-xs font-medium text-muted-foreground">Invoice Document Preview</span>
       </div>
       <iframe
         srcDoc={srcDoc}

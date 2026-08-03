@@ -32,17 +32,17 @@ export default function SalesPinGate({ children }: { children: React.ReactNode }
   if (unlocked) return <>{children}</>
 
   if (!CORRECT_PIN) return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-secondary">
       <p className="text-red-500 text-sm">Sales PIN not configured (NEXT_PUBLIC_SALES_PIN missing).</p>
     </div>
   )
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-secondary">
       <div className="flex flex-col items-center gap-6">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-800">Sales Tracker</h2>
-          <p className="text-sm text-gray-500 mt-1">Enter your PIN to continue</p>
+          <h2 className="text-xl font-semibold text-foreground">Sales Tracker</h2>
+          <p className="text-sm text-muted-foreground mt-1">Enter your PIN to continue</p>
         </div>
 
         <div className={`flex gap-3 ${shake ? 'animate-shake' : ''}`}>
@@ -52,7 +52,7 @@ export default function SalesPinGate({ children }: { children: React.ReactNode }
               className={`w-4 h-4 rounded-full border-2 transition-colors ${
                 i < pin.length
                   ? 'bg-gray-800 border-gray-800'
-                  : 'bg-white border-gray-300'
+                  : 'bg-card border-border'
               }`}
             />
           ))}
@@ -75,7 +75,7 @@ export default function SalesPinGate({ children }: { children: React.ReactNode }
             <button
               key={n}
               onClick={() => setPin(p => p.length < CORRECT_PIN.length ? p + n : p)}
-              className="w-16 h-16 rounded-full text-xl font-medium text-gray-800 bg-white border border-gray-200 hover:bg-gray-100 active:bg-gray-200 transition-colors shadow-sm"
+              className="w-16 h-16 rounded-full text-xl font-medium text-foreground bg-card border border-border hover:bg-secondary active:bg-gray-200 transition-colors shadow-sm"
             >
               {n}
             </button>
@@ -83,13 +83,13 @@ export default function SalesPinGate({ children }: { children: React.ReactNode }
           <div />
           <button
             onClick={() => setPin(p => p.length < CORRECT_PIN.length ? p + '0' : p)}
-            className="w-16 h-16 rounded-full text-xl font-medium text-gray-800 bg-white border border-gray-200 hover:bg-gray-100 active:bg-gray-200 transition-colors shadow-sm"
+            className="w-16 h-16 rounded-full text-xl font-medium text-foreground bg-card border border-border hover:bg-secondary active:bg-gray-200 transition-colors shadow-sm"
           >
             0
           </button>
           <button
             onClick={() => setPin(p => p.slice(0, -1))}
-            className="w-16 h-16 rounded-full text-xl font-medium text-gray-500 bg-white border border-gray-200 hover:bg-gray-100 active:bg-gray-200 transition-colors shadow-sm"
+            className="w-16 h-16 rounded-full text-xl font-medium text-muted-foreground bg-card border border-border hover:bg-secondary active:bg-gray-200 transition-colors shadow-sm"
           >
             ⌫
           </button>

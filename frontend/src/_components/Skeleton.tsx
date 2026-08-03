@@ -14,7 +14,7 @@ export function SkeletonAvatar({ className }: { className?: string }) {
 
 export function SkeletonCard() {
     return (
-        <div className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-100">
+        <div className="flex items-center gap-3 bg-card rounded-lg p-3 border border-border">
             <SkeletonAvatar className="w-9 h-9 shrink-0" />
             <div className="flex-1 flex flex-col gap-2">
                 <SkeletonLine className="h-3 w-3/5" />
@@ -38,7 +38,7 @@ export function SkeletonList({ rows = 3 }: { rows?: number }) {
 export function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number, cols?: number }) {
     return (
         <div className="overflow-hidden">
-            <div className="flex gap-4 px-4 py-2 border-b border-gray-100 mb-1">
+            <div className="flex gap-4 px-4 py-2 border-b border-border mb-1">
                 {Array.from({ length: cols }).map((_, i) => (
                     <SkeletonLine key={i} className="h-3 flex-1" />
                 ))}

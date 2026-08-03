@@ -43,7 +43,7 @@ export default function LogoUpload({
 
             {previewSrc ? (
                 <div className="flex items-center gap-4">
-                    <div className="flex h-16 w-44 items-center justify-center rounded-lg border border-gray-200 bg-gray-50 p-2">
+                    <div className="flex h-16 w-44 items-center justify-center rounded-lg border border-border bg-secondary p-2">
                         <Image
                             src={previewSrc}
                             alt="Workshop logo"
@@ -57,7 +57,7 @@ export default function LogoUpload({
                         <button
                             type="button"
                             onClick={() => document.getElementById('logo-file-input')?.click()}
-                            className="cursor-pointer rounded-md bg-white px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-300 ring-inset transition-colors hover:bg-gray-50"
+                            className="cursor-pointer rounded-md bg-card px-3 py-1.5 text-sm font-medium text-foreground ring-1 ring-border ring-inset transition-colors hover:bg-secondary"
                         >
                             Change
                         </button>
@@ -83,15 +83,15 @@ export default function LogoUpload({
                     }}
                     className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-8 transition-colors ${
                         dragOver
-                            ? 'border-indigo-400 bg-indigo-50'
-                            : 'border-gray-300 hover:border-gray-400'
+                            ? 'border-indigo-400 bg-primary/10'
+                            : 'border-border hover:border-gray-400'
                     }`}
                 >
-                    <PhotoIcon className="mx-auto size-10 text-gray-300" />
-                    <p className="mt-2 text-sm text-gray-600">
-                        <span className="font-semibold text-indigo-600">Click to upload</span> or drag and drop
+                    <PhotoIcon className="mx-auto size-10 text-muted-foreground/50" />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                        <span className="font-semibold text-primary">Click to upload</span> or drag and drop
                     </p>
-                    <p className="mt-1 text-xs text-gray-400">PNG, JPG, or SVG up to 2 MB</p>
+                    <p className="mt-1 text-xs text-muted-foreground">PNG, JPG, or SVG up to 2 MB</p>
                 </div>
             )}
 

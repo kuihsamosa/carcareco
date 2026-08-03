@@ -32,7 +32,7 @@ export default function Activities({
   const items = activities.items??[];
   //todo fix bordering 
   return (
-    <aside className="2xl:fixed  pl-0  2xl:pl-0    bg-white  border-l-1  border-l-gray-200  overflow-y-auto overflow-x-hidden  inset-y-0 right-0    2xl:w-108    ">
+    <aside className="2xl:fixed  pl-0  2xl:pl-0    bg-card  border-l-1  border-l-gray-200  overflow-y-auto overflow-x-hidden  inset-y-0 right-0    2xl:w-108    ">
       <ul role="list" className="  mb-0 pb-0   inset-y-0   2xl:w-108">
         <li className='  '>
           <div className="p-5 pb-10">
@@ -65,12 +65,12 @@ export default function Activities({
 
         
           return (
-            <li key={id} className={clsx(isSelected ? " border  border-gray-900/5  rounded-xl bg-gray-50 " : "  ",
+            <li key={id} className={clsx(isSelected ? " border  border-gray-900/5  rounded-xl bg-secondary " : "  ",
               "  px-4 xl:px-8 flex  m-4   items-center  justify-between gap-x-6 ")}>
                
               <div className="min-w-0  py-5">
                 <div className="flex gap-x-1 xl:gap-x-2 ">
-                  <p className={clsx(isSelected && "font-semibold", "truncate text-sm/6  text-gray-900")}>
+                  <p className={clsx(isSelected && "font-semibold", "truncate text-sm/6  text-foreground")}>
                     <Link href={href}>
                       {name} 
                     </Link>

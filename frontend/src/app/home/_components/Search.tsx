@@ -60,9 +60,8 @@ export default async function Search(
 
   const response = await httpGet(`${resourceName}/page?${queryString}`);
   const data = (await response.json() as DataResult);
-  
+
   if (data.items.length > 0) {
-    //if no columns defined show all what data has
     if (!columns || columns.length === 0) {
       columns = Object.getOwnPropertyNames(data.items[0]).map((item) => {
         return {
@@ -70,7 +69,6 @@ export default async function Search(
         } as DataRowModel
       })
     }
-    //populate defaults
     columns.forEach((col) => {
       if (col.headerText === undefined) col.headerText = String(col.dataField).charAt(0).toUpperCase() + String(col.dataField).slice(1);
       if (!col.dataFormatter) {
@@ -80,14 +78,14 @@ export default async function Search(
       }
       if (!col.headerClasses) {
         col.headerClasses = (index) => {
-          return clsx(index === 0 ? "py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0" : "px-3 py-3.5 text-left text-sm font-semibold text-gray-900")
+          return clsx(index === 0 ? "py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-foreground sm:pl-0" : "px-3 py-3.5 text-left text-sm font-semibold text-foreground")
         }
       }
       if (!col.dataClasses) {
         col.dataClasses = (item, index) => {
           return clsx(index === 0 ?
-            "py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-0" :
-            "px-3 py-4 text-sm whitespace-nowrap text-gray-500");
+            "py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-foreground sm:pl-0" :
+            "px-3 py-4 text-sm whitespace-nowrap text-muted-foreground");
         }
       }
     })
@@ -112,17 +110,17 @@ export default async function Search(
             <Link
               key={k}
               href={`/home/${pageName}?${clearParams.toString()}`}
-              className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors"
+              className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary hover:bg-primary/20 transition-colors"
             >
-              <span className="text-indigo-400">{k.replace(/([A-Z])/g, ' $1').replace(/^\w/, c => c.toUpperCase())}:</span>
+              <span className="text-primary/70">{k.replace(/([A-Z])/g, ' $1').replace(/^\w/, c => c.toUpperCase())}:</span>
               {v}
-              <span className="text-indigo-400 ml-0.5">×</span>
+              <span className="text-primary/70 ml-0.5">×</span>
             </Link>
           );
         })}
       </div>
     )}
-   
+
       <div className="-mx-4 sm:mx-0 mt-4 flow-root">
         {data.items.length===0?
          <EmptyState
@@ -132,7 +130,6 @@ export default async function Search(
            action={emptyAction}
          />:
         <>
-          {/* Mobile card view — shown when mobileCardFormatter is provided */}
           {mobileCardFormatter && (
             <div className="md:hidden space-y-3 px-1 mb-4">
               {data.items.map((item) => (
@@ -142,14 +139,13 @@ export default async function Search(
               ))}
             </div>
           )}
-          {/* Desktop table view */}
           <div className={mobileCardFormatter ? 'hidden md:block' : ''}>
           <div className="overflow-x-auto">
           <div className=" overflow-x-auto  ">
             <div className="inline-block min-w-full   align-middle  ">
 
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="sticky top-0 bg-white z-10">
+              <table className="min-w-full divide-y divide-border">
+                <thead className="sticky top-0 bg-card z-10">
                   <tr>
                     {
                       columns?.map((val, index) => {
@@ -161,9 +157,9 @@ export default async function Search(
                     </th>}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-border">
                   {data.items.map((item, rowindex) => (
-                    <tr key={'tr' + item[idField]}  className={clsx('hover:bg-gray-50 transition-colors even:bg-gray-50/40', rowClass && rowClass(item))}>
+                    <tr key={'tr' + item[idField]}  className={clsx('hover:bg-secondary transition-colors even:bg-secondary/40', rowClass && rowClass(item))}>
                       {
                         columns?.map((col, colindex) => {
                           return <td key={'td' + colindex + item[idField] + rowindex}
@@ -173,7 +169,7 @@ export default async function Search(
                         })
                       }
                       {editable && <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
-                        <Link href={`/home/${pageName}/edit/${item[idField]}`} className="text-indigo-900 hover:text-indigo-500">
+                        <Link href={`/home/${pageName}/edit/${item[idField]}`} className="text-primary hover:text-primary/80">
                           Edit
                         </Link>
                       </td>}
@@ -185,27 +181,27 @@ export default async function Search(
           </div>
           <nav
             aria-label="Pagination"
-            className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6"
+            className="flex items-center justify-between border-t border-border bg-card px-4 py-3 sm:px-6"
           >
             <div className="hidden sm:flex sm:items-center sm:gap-4">
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-muted-foreground">
                 Showing <span className="font-medium">{offset + 1}</span> to <span className="font-medium">{offset + data.items.length}</span>
               </p>
               {hasFilters && (
-                <Link href={`/home/${pageName}`} className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
+                <Link href={`/home/${pageName}`} className="text-xs font-medium text-primary hover:text-primary/80">
                   Clear filters
                 </Link>
               )}
             </div>
             <div className="flex flex-1 items-center justify-between sm:justify-end gap-3">
-              <div className="hidden sm:flex items-center gap-1.5 text-sm text-gray-500">
+              <div className="hidden sm:flex items-center gap-1.5 text-sm text-muted-foreground">
                 <span>Show</span>
                 {[30, 50, 100].map(n => {
                   const href = page + new URLSearchParams({ ...options, limit: n.toString(), offset: '0' }).toString();
                   return (
                     <Link key={n} href={href}
                       className={clsx(
-                        n === limit ? 'bg-slate-800 text-white' : 'text-gray-600 hover:bg-gray-100',
+                        n === limit ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-secondary',
                         'px-2 py-0.5 rounded text-xs font-medium'
                       )}>
                       {n}
@@ -216,10 +212,10 @@ export default async function Search(
               <div className="flex gap-2">
                 <Link href={prevPage}
                   className={
-                    clsx(offset <= 0 ? "pointer-events-none text-gray-400" : "text-gray-900", "relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0")} >Previous</Link>
+                    clsx(offset <= 0 ? "pointer-events-none text-muted-foreground" : "text-foreground", "relative inline-flex items-center rounded-md bg-card px-3 py-2 text-sm font-semibold ring-1 ring-border ring-inset hover:bg-secondary focus-visible:outline-offset-0")} >Previous</Link>
                 <Link href={nextPage}
                   className={
-                    clsx(!data.hasMore ? "pointer-events-none text-gray-400" : "text-gray-900", "relative inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold ring-1 ring-gray-300 ring-inset hover:bg-gray-50 focus-visible:outline-offset-0")}>Next</Link>
+                    clsx(!data.hasMore ? "pointer-events-none text-muted-foreground" : "text-foreground", "relative inline-flex items-center rounded-md bg-card px-3 py-2 text-sm font-semibold ring-1 ring-border ring-inset hover:bg-secondary focus-visible:outline-offset-0")}>Next</Link>
               </div>
             </div>
           </nav>
@@ -229,7 +225,7 @@ export default async function Search(
         }
 
       </div>
-      
+
        </>
 
   )

@@ -24,15 +24,15 @@ export default async function Page({
 
         <Main header={
             <CardHeader>
-                    <nav className="flex items-center gap-1 text-sm text-gray-400 mb-2 px-1 lg:px-0">
-                        <Link href="/home/inventory" className="hover:text-gray-600 transition-colors">Inventory</Link>
+                    <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-2 px-1 lg:px-0">
+                        <Link href="/home/inventory" className="hover:text-muted-foreground transition-colors">Inventory</Link>
                         <ChevronRightIcon className="size-4" />
-                        <span className="text-gray-700 font-medium">{sparepart.code || sparepart.name}</span>
+                        <span className="text-foreground font-medium">{sparepart.code || sparepart.name}</span>
                     </nav>
-                    <h3 className="px-1 text-base font-semibold text-gray-900">Spare part information</h3>
+                    <h3 className="px-1 text-base font-semibold text-foreground">Spare part information</h3>
                     <DisplayOptionsMenu id={id} pageName='inventory'></DisplayOptionsMenu>
             </CardHeader>}>  
-            <dl className="divide-y divide-gray-100">
+            <dl className="divide-y divide-border">
                     <DescriptionItem label='Product code' value={sparepart.code}></DescriptionItem> 
                     <DescriptionItem label='Product name' value={sparepart.name}></DescriptionItem>   
                     <DescriptionItem label='Quantity' value={sparepart.quantity}></DescriptionItem>  

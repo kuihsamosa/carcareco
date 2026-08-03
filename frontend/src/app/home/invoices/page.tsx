@@ -7,28 +7,46 @@ import SearchButton from "@/_components/SearchButton";
 import InvoiceImportDialog from "./_components/InvoiceImportDialog";
 import Link from "next/link";
 import moment from "moment";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircleIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/16/solid';
 
 export const metadata: Metadata = { title: 'Invoices' };
 import { IWorkIssuance } from "../work/model";
-
-// Invoices are their own section. They are backed by issued work orders in the
-// DB (every invoice belongs to a work), but the UI treats them as standalone:
-// this list, the /home/invoices/[id] detail, and a New Invoice flow.
 
 function PaidPill({ issuance }: { issuance?: IWorkIssuance }) {
   if (!issuance) return null;
   const overdue = !issuance.isPaid && issuance.issuedOn
     && moment(issuance.issuedOn).add(issuance.dueDays ?? 0, 'days').isBefore(moment());
-  if (issuance.isPaid) return <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700">Paid</span>;
-  if (overdue) return <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700">Overdue</span>;
-  return <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700">Unpaid</span>;
+  if (issuance.isPaid) return (
+    <Badge variant="outline" className="border-success/30 bg-success/10 text-success gap-1">
+      <CheckCircleIcon className="size-3" /> Paid
+    </Badge>
+  );
+  if (overdue) return (
+    <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive gap-1">
+      <ExclamationTriangleIcon className="size-3" /> Overdue
+    </Badge>
+  );
+  return (
+    <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning gap-1">
+      <ClockIcon className="size-3" /> Unpaid
+    </Badge>
+  );
+}
+
+function NeedsClientBadge({ clientName }: { clientName?: string }) {
+  if (clientName && clientName.trim()) return null;
+  return (
+    <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning gap-1 text-[10px]">
+      <ExclamationTriangleIcon className="size-3" /> Needs client
+    </Badge>
+  );
 }
 
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   const options = await searchParams;
-  // issued=on tells the work/page endpoint to return invoiced works only.
   const mergedParams = Promise.resolve({ ...options, issued: 'on' });
 
   const columns = [
@@ -36,7 +54,7 @@ export default async function Page(
       dataField: 'issuance',
       headerText: 'Invoice',
       dataFormatter: ({ issuance, id }: { issuance: IWorkIssuance; id: string }) => (
-        <Link href={'/home/invoices/' + id} className="font-semibold text-gray-900">
+        <Link href={'/home/invoices/' + id} className="font-semibold text-foreground tabular-nums">
           #{issuance?.invoiceNumber}
         </Link>
       ),
@@ -45,20 +63,23 @@ export default async function Page(
       dataField: 'issuedOn',
       headerText: 'Issued',
       dataFormatter: ({ issuance }: { issuance: IWorkIssuance }) =>
-        issuance?.issuedOn ? <span title={moment(issuance.issuedOn).format('LL')}>{moment(issuance.issuedOn).fromNow()}</span> : '—',
+        issuance?.issuedOn ? <span className="text-muted-foreground" title={moment(issuance.issuedOn).format('LL')}>{moment(issuance.issuedOn).fromNow()}</span> : '—',
     },
     {
       dataField: 'clientId',
       headerText: 'Client',
       dataFormatter: ({ clientName, clientId }: { clientName: string; clientId: string }) => (
-        <Link href={'/home/clients/' + clientId} className="text-gray-700">{clientName || '—'}</Link>
+        <span className="flex items-center gap-2">
+          <Link href={'/home/clients/' + clientId} className="text-foreground">{clientName || '—'}</Link>
+          <NeedsClientBadge clientName={clientName} />
+        </span>
       ),
     },
     {
       dataField: 'vehicleId',
       headerText: 'Vehicle',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string; vehicleId: string }) => (
-        <Link href={'/home/vehicles/' + vehicleId} className="text-gray-500">{regNr}</Link>
+        <Link href={'/home/vehicles/' + vehicleId} className="text-muted-foreground">{regNr}</Link>
       ),
     },
     {
@@ -84,18 +105,19 @@ export default async function Page(
             return (
               <Link
                 href={`/home/invoices/${item.id}`}
-                className="block rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-colors active:bg-gray-50"
+                className="block rounded-xl border border-border bg-card p-4 shadow-sm transition-colors active:bg-secondary"
               >
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-gray-900">Invoice #{issuance?.invoiceNumber}</span>
+                  <span className="text-sm font-semibold text-foreground tabular-nums">Invoice #{issuance?.invoiceNumber}</span>
                   <PaidPill issuance={issuance} />
                 </div>
-                <div className="text-[11px] text-gray-400">
+                <div className="text-[11px] text-muted-foreground">
                   {issuance?.issuedOn ? moment(issuance.issuedOn).format('ll') : ''}
                 </div>
-                {item.clientName && <div className="mt-1 text-xs text-gray-600">{item.clientName}</div>}
+                {item.clientName && <div className="mt-1 text-xs text-foreground">{item.clientName}</div>}
+                <NeedsClientBadge clientName={item.clientName} />
                 {item.vehicleRegNr && (
-                  <span className="mt-1 inline-block rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700">
+                  <span className="mt-1 inline-block rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                     {item.vehicleRegNr}
                   </span>
                 )}

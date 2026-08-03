@@ -14,7 +14,7 @@ export default function CopyButton({ text }: { text: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 1500);
       }}
-      className="ml-1.5 inline-flex text-gray-300 hover:text-gray-500 transition-colors"
+      className="ml-1.5 inline-flex text-muted-foreground/50 hover:text-muted-foreground transition-colors"
       title="Copy"
     >
       {copied

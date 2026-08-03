@@ -83,7 +83,7 @@ const ToastMessages = () => {
                         setIsError(false);
                         setAction(undefined);
                       }}
-                      className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
+                      className="inline-flex rounded-md bg-card text-muted-foreground hover:text-muted-foreground focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:outline-hidden"
                     >
                       <span className="sr-only">Close</span>
                       <XMarkIcon aria-hidden="true" className={clsx(isError ? "bg-red-50" : "bg-green-50", "size-5")} />

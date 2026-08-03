@@ -28,9 +28,9 @@ export default async function Page() {
                 <div className="space-y-10">
 
                     {/* ── Workshop Identity ── */}
-                    <section className="border-b border-gray-200 pb-10">
-                        <h2 className="text-base font-semibold text-gray-900">Workshop Identity</h2>
-                        <p className="mt-1 text-sm text-gray-500">Your logo and name appear on invoices and estimates.</p>
+                    <section className="border-b border-border pb-10">
+                        <h2 className="text-base font-semibold text-foreground">Workshop Identity</h2>
+                        <p className="mt-1 text-sm text-muted-foreground">Your logo and name appear on invoices and estimates.</p>
 
                         <div className="mt-6 space-y-6">
                             <div>
@@ -52,8 +52,8 @@ export default async function Page() {
                     </section>
 
                     {/* ── Contact & Address ── */}
-                    <section className="border-b border-gray-200 pb-10">
-                        <h2 className="text-base font-semibold text-gray-900">Contact &amp; Address</h2>
+                    <section className="border-b border-border pb-10">
+                        <h2 className="text-base font-semibold text-foreground">Contact &amp; Address</h2>
 
                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                             <div className="sm:col-span-3">
@@ -87,8 +87,8 @@ export default async function Page() {
                     </section>
 
                     {/* ── Legal & Tax ── */}
-                    <section className="border-b border-gray-200 pb-10">
-                        <h2 className="text-base font-semibold text-gray-900">Legal &amp; Tax</h2>
+                    <section className="border-b border-border pb-10">
+                        <h2 className="text-base font-semibold text-foreground">Legal &amp; Tax</h2>
 
                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                             <div className="sm:col-span-3">
@@ -118,8 +118,8 @@ export default async function Page() {
                     </section>
 
                     {/* ── Banking ── */}
-                    <section className="border-b border-gray-200 pb-10">
-                        <h2 className="text-base font-semibold text-gray-900">Banking</h2>
+                    <section className="border-b border-border pb-10">
+                        <h2 className="text-base font-semibold text-foreground">Banking</h2>
 
                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                             <div className="sm:col-span-4">
@@ -129,8 +129,8 @@ export default async function Page() {
                     </section>
 
                     {/* ── Invoice Defaults ── */}
-                    <section className="border-b border-gray-200 pb-10">
-                        <h2 className="text-base font-semibold text-gray-900">Invoice Defaults</h2>
+                    <section className="border-b border-border pb-10">
+                        <h2 className="text-base font-semibold text-foreground">Invoice Defaults</h2>
 
                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                             <div className="sm:col-span-2">
@@ -165,7 +165,7 @@ export default async function Page() {
 
                     {/* ── Email Templates ── */}
                     <section className="pb-10">
-                        <h2 className="text-base font-semibold text-gray-900">Email Templates</h2>
+                        <h2 className="text-base font-semibold text-foreground">Email Templates</h2>
 
                         <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-6">
                             <div className="sm:col-span-full">
@@ -178,9 +178,9 @@ export default async function Page() {
                     </section>
                 </div>
 
-                <div className="sticky bottom-0 -mx-4 border-t border-gray-200 bg-white/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
+                <div className="sticky bottom-0 -mx-4 border-t border-border bg-card/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
                     <div className="flex items-center justify-end gap-x-4">
-                        <a href="/home/settings" className="text-sm font-medium text-gray-500 hover:text-gray-700">Cancel</a>
+                        <a href="/home/settings" className="text-sm font-medium text-muted-foreground hover:text-foreground">Cancel</a>
                         <SubmitButton>Save settings</SubmitButton>
                     </div>
                 </div>

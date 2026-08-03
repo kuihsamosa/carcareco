@@ -15,13 +15,13 @@ function BulletChartRow({ item }: { item: IBulletChartItem }) {
 
     return (
         <div>
-            <div className="flex justify-between text-xs text-gray-500 mb-1">
+            <div className="flex justify-between text-xs text-muted-foreground mb-1">
                 <span>{label}</span>
-                <span className="font-medium text-gray-800">
+                <span className="font-medium text-foreground">
                     {actual.toLocaleString()}{unit} / {target.toLocaleString()}{unit}
                 </span>
             </div>
-            <div className="relative h-5 bg-gray-100 rounded overflow-hidden">
+            <div className="relative h-5 bg-secondary rounded overflow-hidden">
                 <div
                     className="absolute left-0 top-1 h-3 rounded-l"
                     style={{ width: `${pct(bad)}%`, background: '#FFCDD2' }}
@@ -39,7 +39,7 @@ function BulletChartRow({ item }: { item: IBulletChartItem }) {
                     style={{ width: `${pct(actual)}%`, background: '#1976D2' }}
                 />
                 <div
-                    className="absolute right-0 top-0 w-0.5 h-5 bg-slate-800 rounded"
+                    className="absolute right-0 top-0 w-0.5 h-5 bg-primary/90 rounded"
                 />
             </div>
         </div>
@@ -60,7 +60,7 @@ export default function BulletChart({ items, legend = true }: { items: IBulletCh
                         { color: '#C8E6C9', label: 'Target zone' },
                         { color: '#1976D2', label: 'Actual' },
                     ].map(({ color, label }) => (
-                        <span key={label} className="flex items-center gap-1.5 text-xs text-gray-500">
+                        <span key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: color }} />
                             {label}
                         </span>

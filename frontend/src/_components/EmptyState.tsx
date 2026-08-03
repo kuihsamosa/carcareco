@@ -16,17 +16,17 @@ export default function EmptyState({
     return (
         <div className={clsx(
             "flex flex-col items-center justify-center text-center py-12 px-6",
-            "border border-dashed border-gray-200 rounded-lg bg-gray-50",
+            "border border-dashed border-border rounded-lg bg-secondary",
             className
         )}>
             {icon && (
-                <div className="text-gray-300 mb-4 text-5xl leading-none">
+                <div className="text-muted-foreground/50 mb-4 text-5xl leading-none">
                     {icon}
                 </div>
             )}
-            <p className="text-sm font-semibold text-gray-800 mb-1">{title}</p>
+            <p className="text-sm font-semibold text-foreground mb-1">{title}</p>
             {description && (
-                <p className="text-sm text-gray-500 mb-5 max-w-xs">{description}</p>
+                <p className="text-sm text-muted-foreground mb-5 max-w-xs">{description}</p>
             )}
             {action && <div>{action}</div>}
         </div>

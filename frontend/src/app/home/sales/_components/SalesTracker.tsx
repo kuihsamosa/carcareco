@@ -54,11 +54,11 @@ function ChartTooltip({ active, payload, label }: TooltipProps) {
   const paid = payload.find((p) => p.dataKey === 'totalPaid')?.value ?? 0
   const outstanding = payload.find((p) => p.dataKey === 'totalOutstanding')?.value ?? 0
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3 text-sm">
-      <p className="font-semibold text-gray-800 mb-1">{label}</p>
-      <p className="text-indigo-600">Paid: {fmt(paid)}</p>
+    <div className="bg-card border border-border rounded-lg shadow-lg p-3 text-sm">
+      <p className="font-semibold text-foreground mb-1">{label}</p>
+      <p className="text-primary">Paid: {fmt(paid)}</p>
       <p className="text-amber-500">Outstanding: {fmt(outstanding)}</p>
-      <p className="text-gray-600 border-t mt-1 pt-1">Total: {fmt(paid + outstanding)}</p>
+      <p className="text-muted-foreground border-t mt-1 pt-1">Total: {fmt(paid + outstanding)}</p>
     </div>
   )
 }
@@ -67,8 +67,8 @@ function ChartTooltip({ active, payload, label }: TooltipProps) {
 
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5">
-      <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</p>
+    <div className="bg-card rounded-xl border border-border p-5">
+      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{label}</p>
       <p className={`text-2xl font-bold mt-1 ${color}`}>{value}</p>
     </div>
   )
@@ -182,15 +182,15 @@ export default function SalesTracker() {
         {/* ── Header + filters ── */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Sales Tracker</h1>
-            <p className="text-sm text-gray-500 mt-0.5">{periodLabel}</p>
+            <h1 className="text-2xl font-bold text-foreground">Sales Tracker</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">{periodLabel}</p>
           </div>
           <div className="flex items-center gap-3 flex-wrap">
             {/* Year */}
             <select
               value={year}
               onChange={e => { setYear(+e.target.value); setMonth(now.getMonth() + 1) }}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
@@ -198,7 +198,7 @@ export default function SalesTracker() {
             <select
               value={month}
               onChange={e => setMonth(+e.target.value)}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="rounded-lg border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value={0}>All months</option>
               {MONTHS.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
@@ -206,7 +206,7 @@ export default function SalesTracker() {
             {month > 0 && (
               <button
                 onClick={() => setMonth(0)}
-                className="text-sm text-indigo-600 hover:text-indigo-800 underline"
+                className="text-sm text-primary hover:text-indigo-800 underline"
               >
                 ← Year view
               </button>
@@ -217,22 +217,22 @@ export default function SalesTracker() {
         {/* ── Stat cards ── */}
         {totals && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard label="Total Billed" value={fmt(totals.totalBilled)} color="text-gray-900" />
-            <StatCard label="Paid" value={fmt(totals.totalPaid)} color="text-indigo-600" />
+            <StatCard label="Total Billed" value={fmt(totals.totalBilled)} color="text-foreground" />
+            <StatCard label="Paid" value={fmt(totals.totalPaid)} color="text-primary" />
             <StatCard label="Outstanding" value={fmt(totals.totalOutstanding)} color="text-amber-500" />
-            <StatCard label="Invoices" value={String(totals.invoiceCount)} color="text-gray-700" />
+            <StatCard label="Invoices" value={String(totals.invoiceCount)} color="text-foreground" />
           </div>
         )}
 
         {/* ── Chart ── */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           {loading ? (
-            <div className="flex items-center justify-center h-64 text-gray-400 text-sm">Loading…</div>
+            <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">Loading…</div>
           ) : chartData.length === 0 ? (
-            <div className="flex items-center justify-center h-64 text-gray-400 text-sm">No data for this period.</div>
+            <div className="flex items-center justify-center h-64 text-muted-foreground text-sm">No data for this period.</div>
           ) : (
             <>
-              <p className="text-xs text-gray-400 mb-4">
+              <p className="text-xs text-muted-foreground mb-4">
                 {month > 0 ? 'Click a day to see invoices' : 'Click a month to drill down'}
               </p>
               <ResponsiveContainer width="100%" height={300}>
@@ -277,43 +277,43 @@ export default function SalesTracker() {
 
         {/* ── Drill-down invoice list ── */}
         {month > 0 && drillDay !== null && (
-          <div className="bg-white rounded-xl border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-gray-800">
+          <div className="bg-card rounded-xl border border-border">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-foreground">
                 Invoices — {MONTHS[month - 1]} {drillDay}, {year}
               </h2>
               <button
                 onClick={() => { setDrillDay(null); setInvoices(null) }}
-                className="text-xs text-gray-400 hover:text-gray-600"
+                className="text-xs text-muted-foreground hover:text-muted-foreground"
               >
                 ✕ close
               </button>
             </div>
             {loadingInvoices ? (
-              <div className="px-6 py-8 text-sm text-gray-400">Loading invoices…</div>
+              <div className="px-6 py-8 text-sm text-muted-foreground">Loading invoices…</div>
             ) : invoices && invoices.length === 0 ? (
-              <div className="px-6 py-8 text-sm text-gray-400">No invoices found.</div>
+              <div className="px-6 py-8 text-sm text-muted-foreground">No invoices found.</div>
             ) : (
-              <table className="min-w-full divide-y divide-gray-100 text-sm">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-border text-sm">
+                <thead className="bg-secondary">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehicle</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">#</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Vehicle</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Total</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-muted-foreground uppercase">Status</th>
                     <th className="px-6 py-3" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-border">
                   {invoices?.map(inv => (
-                    <tr key={inv.workId} className="hover:bg-gray-50">
-                      <td className="px-6 py-3 font-medium text-gray-900 whitespace-nowrap">
+                    <tr key={inv.workId} className="hover:bg-secondary">
+                      <td className="px-6 py-3 font-medium text-foreground whitespace-nowrap">
                         {inv.invoiceNumber}
                       </td>
-                      <td className="px-6 py-3 text-gray-700">{inv.customerName || '—'}</td>
-                      <td className="px-6 py-3 text-gray-500">{inv.vehicleLine || '—'}</td>
-                      <td className="px-6 py-3 text-right font-medium text-gray-900">
+                      <td className="px-6 py-3 text-foreground">{inv.customerName || '—'}</td>
+                      <td className="px-6 py-3 text-muted-foreground">{inv.vehicleLine || '—'}</td>
+                      <td className="px-6 py-3 text-right font-medium text-foreground">
                         {fmt(inv.total)}
                       </td>
                       <td className="px-6 py-3 text-center">
@@ -334,7 +334,7 @@ export default function SalesTracker() {
                       <td className="px-6 py-3 text-right">
                         <a
                           href={`/home/work/${inv.workId}`}
-                          className="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                          className="text-primary hover:text-indigo-800 text-xs font-medium"
                         >
                           View →
                         </a>

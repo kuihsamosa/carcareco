@@ -77,7 +77,7 @@ export default async function Page({
       narrow={false}
       header={
         <CardHeader>
-          <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">{displayName}</h3>
+          <h3 className="px-1 lg:px-0 text-base font-semibold text-foreground">{displayName}</h3>
           <DisplayOptionsMenu id={id} pageName="clients" />
         </CardHeader>
       }

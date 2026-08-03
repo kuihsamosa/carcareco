@@ -10,8 +10,6 @@ import { httpGet } from '@/_lib/server/query-api'
 
 export const metadata: Metadata = { title: 'Dashboard' }
 
-// ─── Real data shapes ────────────────────────────────────────────────────────
-
 interface WorkStats {
     inProgress: number;
     waiting: number;
@@ -31,13 +29,11 @@ interface RecentWork {
     vehicleModel?: string;
 }
 
-// ─── Stat tile (tappable → filters the work list) ────────────────────────────
-
 const STAT_THEME = {
-    indigo: { tint: 'bg-indigo-50', ring: 'ring-indigo-100', dot: 'bg-indigo-500', value: 'text-indigo-700' },
-    amber:  { tint: 'bg-amber-50',  ring: 'ring-amber-100',  dot: 'bg-amber-500',  value: 'text-amber-700' },
-    green:  { tint: 'bg-green-50',  ring: 'ring-green-100',  dot: 'bg-green-500',  value: 'text-green-700' },
-    blue:   { tint: 'bg-blue-50',   ring: 'ring-blue-100',   dot: 'bg-blue-500',   value: 'text-blue-700' },
+    indigo:  { tint: 'bg-primary/10', ring: 'ring-primary/20', dot: 'bg-primary', value: 'text-primary' },
+    amber:   { tint: 'bg-warning/10', ring: 'ring-warning/20', dot: 'bg-warning', value: 'text-warning' },
+    green:   { tint: 'bg-success/10', ring: 'ring-success/20', dot: 'bg-success', value: 'text-success' },
+    blue:    { tint: 'bg-accent/10',  ring: 'ring-accent/20',  dot: 'bg-accent',  value: 'text-accent' },
 } as const
 
 function StatTile({ label, value, theme, href }: {
@@ -51,17 +47,15 @@ function StatTile({ label, value, theme, href }: {
         >
             <div className="flex items-center gap-2">
                 <span className={`h-2 w-2 rounded-full ${t.dot}`} />
-                <span className="text-xs font-medium text-gray-500">{label}</span>
+                <span className="text-xs font-medium text-muted-foreground">{label}</span>
             </div>
             <div className="flex items-end justify-between">
                 <span className={`text-3xl font-bold leading-none tabular-nums ${t.value}`}>{value}</span>
-                <ArrowRightIcon className="size-4 text-gray-300 transition-colors group-hover:text-gray-500" />
+                <ArrowRightIcon className="size-4 text-muted-foreground/50 transition-colors group-hover:text-muted-foreground" />
             </div>
         </Link>
     )
 }
-
-// ─── Quick-action button ─────────────────────────────────────────────────────
 
 function QuickLink({ href, icon, label, primary }: {
     href: string; icon: React.ReactNode; label: string; primary?: boolean
@@ -71,8 +65,8 @@ function QuickLink({ href, icon, label, primary }: {
             href={href}
             className={`flex min-h-[76px] flex-col items-center justify-center gap-1.5 rounded-2xl p-3 text-center transition-colors ${
                 primary
-                    ? 'bg-slate-900 text-white hover:bg-slate-800'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
             }`}
         >
             <span>{icon}</span>
@@ -81,26 +75,22 @@ function QuickLink({ href, icon, label, primary }: {
     )
 }
 
-// ─── Status pill for the recent-work list ────────────────────────────────────
-
 function StatusPill({ status }: { status?: string }) {
     const s = (status ?? '').toLowerCase()
     const map: Record<string, string> = {
-        completed: 'bg-blue-100 text-blue-700',
-        inprogress: 'bg-green-100 text-green-700',
-        closed: 'bg-yellow-100 text-yellow-700',
+        completed: 'bg-accent/10 text-accent',
+        inprogress: 'bg-success/10 text-success',
+        closed: 'bg-warning/10 text-warning',
     }
     const label: Record<string, string> = {
         completed: 'Completed', inprogress: 'In Progress', closed: 'Closed',
     }
     return (
-        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${map[s] ?? 'bg-amber-100 text-amber-700'}`}>
+        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${map[s] ?? 'bg-warning/10 text-warning'}`}>
             {label[s] ?? 'Open'}
         </span>
     )
 }
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function Page() {
     let stats: WorkStats = { inProgress: 0, waiting: 0, done: 0, invoiced: 0 };
@@ -130,27 +120,25 @@ export default async function Page() {
     const totalOpen = stats.inProgress + stats.waiting;
 
     return (
-        <main className="min-h-dvh ">
+        <main className="min-h-dvh">
             <div className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-6 sm:py-8">
 
-                {/* Header */}
                 <div className="mb-5 flex items-end justify-between">
                     <div>
-                        <h1 className="text-xl font-semibold text-gray-900 sm:text-2xl">Dashboard</h1>
-                        <p className="mt-0.5 text-sm text-gray-400">
+                        <h1 className="text-xl font-semibold text-foreground sm:text-2xl">Dashboard</h1>
+                        <p className="mt-0.5 text-sm text-muted-foreground">
                             {moment().format('dddd, D MMMM YYYY')}
                         </p>
                     </div>
                     <Link
                         href="/home/work/new"
-                        className="hidden items-center gap-1.5 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 sm:inline-flex"
+                        className="hidden items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 sm:inline-flex"
                     >
                         <WrenchScrewdriverIcon className="size-4" />
                         New Job
                     </Link>
                 </div>
 
-                {/* Stat tiles — real data, tappable filters */}
                 <section className="mb-6">
                     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                         <StatTile label="Active"   value={stats.inProgress} theme="indigo" href="/home/work?status=inprogress" />
@@ -160,47 +148,45 @@ export default async function Page() {
                     </div>
                 </section>
 
-                {/* Main grid: recent work + quick actions */}
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
 
-                    {/* Recent work — live list */}
                     <section className="lg:col-span-2">
-                        <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-5">
+                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
                             <div className="mb-3 flex items-center justify-between">
-                                <h2 className="text-sm font-semibold text-gray-900">Recent work</h2>
-                                <Link href="/home/work" className="text-xs font-medium text-indigo-600 hover:text-indigo-500">
+                                <h2 className="text-sm font-semibold text-foreground">Recent work</h2>
+                                <Link href="/home/work" className="text-xs font-medium text-primary hover:text-primary/80">
                                     View all
                                 </Link>
                             </div>
 
                             {recent.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
-                                    <QueueListIcon className="size-8 text-gray-300" />
-                                    <p className="text-sm text-gray-400">
+                                    <QueueListIcon className="size-8 text-muted-foreground/50" />
+                                    <p className="text-sm text-muted-foreground">
                                         {totalOpen > 0 ? 'No recent work to show.' : 'No work orders yet.'}
                                     </p>
-                                    <Link href="/home/work/new" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                    <Link href="/home/work/new" className="text-sm font-medium text-primary hover:text-primary/80">
                                         Create the first one →
                                     </Link>
                                 </div>
                             ) : (
-                                <ul className="divide-y divide-gray-100">
+                                <ul className="divide-y divide-border">
                                     {recent.map((w) => (
                                         <li key={w.id}>
                                             <Link
                                                 href={`/home/work/${w.id}`}
-                                                className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-gray-50"
+                                                className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition-colors hover:bg-secondary"
                                             >
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-sm font-semibold text-gray-900">
+                                                        <span className="text-sm font-semibold text-foreground">
                                                             Work {w.workNr ?? w.number}
                                                         </span>
                                                         <StatusPill status={w.status} />
                                                     </div>
-                                                    <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                                                    <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                                                         {w.vehicleRegNr && (
-                                                            <span className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-slate-700">
+                                                            <span className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                                                                 {w.vehicleRegNr}
                                                             </span>
                                                         )}
@@ -209,7 +195,7 @@ export default async function Page() {
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <span className="shrink-0 text-xs text-gray-400" title={w.startedOn ? moment(w.startedOn).format('LL') : ''}>
+                                                <span className="shrink-0 text-xs text-muted-foreground" title={w.startedOn ? moment(w.startedOn).format('LL') : ''}>
                                                     {w.startedOn ? moment(w.startedOn).fromNow() : ''}
                                                 </span>
                                             </Link>
@@ -220,10 +206,9 @@ export default async function Page() {
                         </div>
                     </section>
 
-                    {/* Quick actions */}
                     <section className="lg:col-span-1">
-                        <div className="rounded-2xl border border-gray-100 bg-white p-4 sm:p-5">
-                            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Quick actions</p>
+                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-5">
+                            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Quick actions</p>
                             <div className="grid grid-cols-4 gap-2 lg:grid-cols-2">
                                 <QuickLink href="/home/work/new"       icon={<WrenchScrewdriverIcon className="size-6" />} label="New Job" primary />
                                 <QuickLink href="/home/clients"        icon={<UsersIcon className="size-6" />}             label="Clients" />

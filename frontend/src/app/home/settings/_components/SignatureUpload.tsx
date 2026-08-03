@@ -33,11 +33,11 @@ export default function SignatureUpload({
     return (
         <div className="space-y-2">
             <input type="hidden" name={fieldName} value={base64} />
-            <label className="block text-sm font-medium text-gray-900">{label}</label>
+            <label className="block text-sm font-medium text-foreground">{label}</label>
 
             {previewSrc ? (
                 <div className="flex items-center gap-3">
-                    <div className="flex h-14 w-40 items-center justify-center rounded border border-gray-200 bg-white p-2">
+                    <div className="flex h-14 w-40 items-center justify-center rounded border border-border bg-card p-2">
                         <Image
                             src={previewSrc}
                             alt={label}
@@ -50,7 +50,7 @@ export default function SignatureUpload({
                     <button
                         type="button"
                         onClick={() => document.getElementById(`sig-${fieldName}`)?.click()}
-                        className="cursor-pointer text-sm text-indigo-600 hover:text-indigo-500"
+                        className="cursor-pointer text-sm text-primary hover:text-primary/80"
                     >
                         Change
                     </button>
@@ -66,7 +66,7 @@ export default function SignatureUpload({
                 <button
                     type="button"
                     onClick={() => document.getElementById(`sig-${fieldName}`)?.click()}
-                    className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-500 transition-colors hover:border-gray-400 hover:text-gray-600"
+                    className="flex cursor-pointer items-center gap-2 rounded-md border border-dashed border-border px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-gray-400 hover:text-muted-foreground"
                 >
                     <PencilSquareIcon className="size-5" />
                     Upload signature image
@@ -83,7 +83,7 @@ export default function SignatureUpload({
                     if (file) processFile(file);
                 }}
             />
-            <p className="text-xs text-gray-400">PNG or JPG, transparent background recommended</p>
+            <p className="text-xs text-muted-foreground">PNG or JPG, transparent background recommended</p>
         </div>
     );
 }

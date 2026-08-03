@@ -144,7 +144,7 @@ export default function Activity({
             <Saleables
                 edit={edit} data={data} priceSummary={activities.current.priceSummary} tableRef={tableRef} removeItem={removeItem} refreshData={setData} >
             </Saleables>
-            <div className="sticky bottom-0 bg-white/95 backdrop-blur-sm border-t border-gray-100 -mx-4 px-4 py-3 mt-6 z-10">
+            <div className="sticky bottom-0 bg-card/95 backdrop-blur-sm border-t border-border -mx-4 px-4 py-3 mt-6 z-10">
                 <div className="flex justify-end">
                     <div className="inline-flex rounded-md shadow-xs">
                         {edit ? <ButtonGroup  options={editOptions} ></ButtonGroup> : <ButtonGroup options={readOptions} ></ButtonGroup>}

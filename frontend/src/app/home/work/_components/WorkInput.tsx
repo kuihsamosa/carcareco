@@ -93,7 +93,7 @@ export default function WorkInput({
 
                         <div className=" ">
                             <FormLabel name='clientId' label='Client'>
-                                <span className="ml-4 float-right text-gray-500">
+                                <span className="ml-4 float-right text-muted-foreground">
                                     Undisclosed{' '}
                                     <FormSwitch
                                         name='clientUndisclosed'
@@ -126,13 +126,13 @@ export default function WorkInput({
                                     </div>
                                     {!work && (
                                         <button type="button" onClick={() => { setNewClientMode(true); setIsDirty(true); }}
-                                            className="mt-0 text-sm text-indigo-600 hover:text-indigo-500 whitespace-nowrap">
+                                            className="mt-0 text-sm text-primary hover:text-primary/80 whitespace-nowrap">
                                             + New
                                         </button>
                                     )}
                                 </div>}
                             {!clientUndisclosed && newClientMode && (
-                                <div className="mt-2 space-y-2 rounded-xl border border-gray-200 p-3 bg-gray-50">
+                                <div className="mt-2 space-y-2 rounded-xl border border-border p-3 bg-secondary">
                                     <input type="hidden" name="newClientMode" value="on" />
                                     <div className="flex gap-2">
                                         <FormInput placeholder="First name" name="newClientFirstName" className="flex-1" />
@@ -140,7 +140,7 @@ export default function WorkInput({
                                     </div>
                                     <FormInput type="tel" inputMode="tel" placeholder="Phone" name="newClientPhone" />
                                     <button type="button" onClick={() => setNewClientMode(false)}
-                                        className="text-xs text-gray-400 hover:text-gray-600">
+                                        className="text-xs text-muted-foreground hover:text-muted-foreground">
                                         Cancel — use existing client
                                     </button>
                                 </div>
@@ -148,7 +148,7 @@ export default function WorkInput({
                         </div>
                         <div className='  ' >
                             <FormLabel name='vehicleId' label='Vehicle'>
-                                {!clientUndisclosed && <span className="ml-2 float-right text-gray-500">
+                                {!clientUndisclosed && <span className="ml-2 float-right text-muted-foreground">
                                     Search all vehicles{' '}
                                     <FormSwitch
                                         name='onlyClientVehicles'

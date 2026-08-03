@@ -17,7 +17,7 @@ export default function EntityTabs({ basePath }: { basePath: string }) {
         <select
           defaultValue={tabs.find(t => t.exact ? currentPath === t.href : currentPath.startsWith(t.href))?.href ?? basePath}
           aria-label="Select a tab"
-          className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-2 pr-8 pl-3 text-sm font-medium text-gray-900 outline-1 -outline-offset-1 outline-gray-300"
+          className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-card py-2 pr-8 pl-3 text-sm font-medium text-foreground outline-1 -outline-offset-1 outline-border"
           onChange={(e) => { window.location.href = e.currentTarget.value; }}
         >
           {tabs.map(tab => <option key={tab.name} value={tab.href}>{tab.name}</option>)}
@@ -32,11 +32,11 @@ export default function EntityTabs({ basePath }: { basePath: string }) {
                 key={tab.name}
                 href={tab.href}
                 className={clsx(
-                  isActive ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
+                  isActive ? 'border-indigo-500 text-primary' : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground',
                   'group inline-flex items-center border-b-2 px-1 py-4 text-sm font-medium',
                 )}
               >
-                <tab.icon aria-hidden="true" className={clsx(isActive ? 'text-indigo-500' : 'text-gray-400 group-hover:text-gray-500', 'mr-2 -ml-0.5 size-5')} />
+                <tab.icon aria-hidden="true" className={clsx(isActive ? 'text-primary/80' : 'text-muted-foreground group-hover:text-muted-foreground', 'mr-2 -ml-0.5 size-5')} />
                 {tab.name}
               </a>
             );

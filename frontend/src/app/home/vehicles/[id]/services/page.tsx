@@ -81,12 +81,12 @@ export default async function Page({
       narrow={false}
       header={
         <CardHeader>
-          <nav className="flex items-center gap-1 text-sm text-gray-400 mb-2 px-1">
-              <Link href="/home/vehicles" className="hover:text-gray-600 transition-colors">Vehicles</Link>
+          <nav className="flex items-center gap-1 text-sm text-muted-foreground mb-2 px-1">
+              <Link href="/home/vehicles" className="hover:text-muted-foreground transition-colors">Vehicles</Link>
               <ChevronRightIcon className="size-4" />
-              <span className="text-gray-700 font-medium">{vehicle.regNr || displayName}</span>
+              <span className="text-foreground font-medium">{vehicle.regNr || displayName}</span>
           </nav>
-          <h3 className="px-1 text-base font-semibold text-gray-900">Vehicle — {displayName}</h3>
+          <h3 className="px-1 text-base font-semibold text-foreground">Vehicle — {displayName}</h3>
           <DisplayOptionsMenu id={id} pageName="vehicles" />
         </CardHeader>
       }

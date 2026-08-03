@@ -25,11 +25,11 @@ export default async function Page({
 
         <Main narrow={false} header={
             <CardHeader  >
-                 <h3 className="px-1 text-base font-semibold text-gray-900">Vehicle Information</h3>
+                 <h3 className="px-1 text-base font-semibold text-foreground">Vehicle Information</h3>
                 <DisplayOptionsMenu id={id} pageName='vehicles'></DisplayOptionsMenu>
             </CardHeader>}>
             <EntityTabs basePath={`/home/vehicles/${id}`} />
-            <dl className="divide-y divide-gray-100"> 
+            <dl className="divide-y divide-border"> 
                 <DescriptionItem label='Car make and model' value={[vehicle.producer, vehicle.model].join(' ')}></DescriptionItem>
                 <DescriptionItem label='VIN' value={vehicle.vin}></DescriptionItem>
                 <DescriptionItem label='Registration number' value={vehicle.regNr}></DescriptionItem>
