@@ -40,8 +40,15 @@ export default function CommandPalette() {
                 setOpen(o => !o)
             }
         }
+        function onToggle() {
+            setOpen(o => !o)
+        }
         document.addEventListener('keydown', onKeyDown)
-        return () => document.removeEventListener('keydown', onKeyDown)
+        document.addEventListener('toggle-command-palette', onToggle)
+        return () => {
+            document.removeEventListener('keydown', onKeyDown)
+            document.removeEventListener('toggle-command-palette', onToggle)
+        }
     }, [])
 
     const go = useCallback((href: string) => {

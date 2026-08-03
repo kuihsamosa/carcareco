@@ -90,7 +90,7 @@ export default function IconRail({ fullName, imageUrl }: { fullName: string; ima
             {/* Search trigger */}
             <button
                 type="button"
-                onClick={() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
+                onClick={() => document.dispatchEvent(new CustomEvent('toggle-command-palette'))}
                 className={clsx(
                     'mx-2 mb-1 flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors',
                 )}
