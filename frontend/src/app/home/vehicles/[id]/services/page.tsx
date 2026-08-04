@@ -97,7 +97,28 @@ export default async function Page({
         <input type="hidden" name="vehicleId[value]" value={id} />
         <input type="hidden" name="vehicleId[text]" value={displayName} />
         <div className="mt-4">
-          <Search searchParams={mergedParams} resourceName="work" pageName={`vehicles/${id}/services`} idField="id" columns={columns}>
+          <Search searchParams={mergedParams} resourceName="work" pageName={`vehicles/${id}/services`} idField="id" columns={columns}
+            mobileCardFormatter={(item) => (
+              <Link
+                href={`/home/work/${item.id}`}
+                className="block rounded-xl border border-border bg-card p-4 shadow-sm transition-colors active:bg-secondary"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-semibold text-foreground">Work #{item.workNr}</span>
+                  <span className="text-[11px] text-muted-foreground">{moment(item.startedOn).format('ll')}</span>
+                </div>
+                {item.clientName && (
+                  <div className="text-xs text-muted-foreground mb-1">{item.clientName}</div>
+                )}
+                {item.hasRepairs && (
+                  <span className="inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">Repair</span>
+                )}
+                {item.notes && (
+                  <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{item.notes}</p>
+                )}
+              </Link>
+            )}
+          >
             <div className="flex gap-x-2 mb-4 items-end">
               <div className="flex-1">
                 <SearchInput searchParams={mergedParams} placeholder="work number or client name" />

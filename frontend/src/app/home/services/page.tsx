@@ -50,6 +50,17 @@ export default async function Page(
               idField="id"
               editable={false}
               columns={columns}
+              mobileCardFormatter={(item) => (
+                <Link
+                  href={`/home/work/${item.id}`}
+                  className="block rounded-xl border border-border bg-card p-4 shadow-sm transition-colors active:bg-secondary"
+                >
+                  <div className="text-sm font-semibold text-foreground">Work #{item.workNr}</div>
+                  {item.notes && (
+                    <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{item.notes}</p>
+                  )}
+                </Link>
+              )}
             >
               <div className="flex gap-x-2 mb-4 items-end">
                 <div className="flex-1">

@@ -141,8 +141,7 @@ export default async function Search(
           )}
           <div className={mobileCardFormatter ? 'hidden md:block' : ''}>
           <div className="overflow-x-auto">
-          <div className=" overflow-x-auto  ">
-            <div className="inline-block min-w-full   align-middle  ">
+            <div className="inline-block min-w-full align-middle">
 
               <table className="min-w-full divide-y divide-border">
                 <thead className="sticky top-0 bg-card z-10">
@@ -178,6 +177,7 @@ export default async function Search(
                 </tbody>
               </table>
             </div>
+          </div>
           </div>
           <nav
             aria-label="Pagination"
@@ -219,8 +219,6 @@ export default async function Search(
               </div>
             </div>
           </nav>
-        </div>
-        </div>
         </>
         }
 

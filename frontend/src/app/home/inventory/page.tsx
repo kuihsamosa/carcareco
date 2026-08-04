@@ -71,7 +71,28 @@ export default async function Page(
         <SearchCardHeader title="Find Inventory" pageName="inventory">
       </SearchCardHeader>
       } narrow={false}>
-        <form method="GET" > <Search searchParams={searchParams} pageName="inventory" resourceName="spareparts" columns={columns} emptyAction={<Link href="/home/inventory/new" className="text-sm font-medium text-primary hover:text-primary/80">+ New spare part</Link>}>
+        <form method="GET" > <Search searchParams={searchParams} pageName="inventory" resourceName="spareparts" columns={columns}
+          emptyAction={<Link href="/home/inventory/new" className="text-sm font-medium text-primary hover:text-primary/80">+ New spare part</Link>}
+          mobileCardFormatter={(item) => (
+            <Link
+              href={`/home/inventory/${item.id}`}
+              className="block rounded-xl border border-border bg-card p-4 shadow-sm transition-colors active:bg-secondary"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-mono text-muted-foreground">{item.code}</span>
+                {item.price != null && (
+                  <span className="text-sm font-semibold text-foreground tabular-nums">RM {Number(item.price).toFixed(2)}</span>
+                )}
+              </div>
+              <div className="text-sm font-medium text-foreground truncate">{item.name || '—'}</div>
+              <div className="mt-1.5 flex items-center gap-3 text-[11px] text-muted-foreground">
+                {item.quantity != null && <span>Qty: {item.quantity}</span>}
+                {item.discount > 0 && <span>Disc: {Number(item.discount).toFixed(0)}%</span>}
+                {item.storageName && <span className="truncate">{item.storageName}</span>}
+              </div>
+            </Link>
+          )}
+        >
           <SimpleSearchBar searchParams={searchParams} placeholder="code or name ..."></SimpleSearchBar>
           </Search></form>
       </Main> 

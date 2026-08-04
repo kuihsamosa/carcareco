@@ -21,6 +21,35 @@ export default async function Page(
       searchParams={searchParams}
       resourceName="vehicles"
       emptyAction={<Link href="/home/vehicles/new" className="text-sm font-medium text-primary hover:text-primary/80">+ New vehicle</Link>}
+      mobileCardFormatter={(item) => {
+        const producerSlug = (item.producer ?? '').trim().replace(' ', '-').toLowerCase();
+        return (
+          <Link
+            href={`/home/vehicles/${item.id}`}
+            className="block rounded-xl border border-border bg-card p-4 shadow-sm transition-colors active:bg-secondary"
+          >
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-2">
+                {producerSlug && <i className={clsx('text-xl', 'car-' + producerSlug)} />}
+                <span className="text-sm font-semibold text-foreground">
+                  {[item.producer, item.model].filter(Boolean).join(' ') || '—'}
+                </span>
+              </div>
+              {item.regNr && (
+                <span className="rounded bg-secondary px-2 py-0.5 font-mono text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {item.regNr}
+                </span>
+              )}
+            </div>
+            {item.ownerName && (
+              <div className="text-xs text-muted-foreground">Owner: {item.ownerName}</div>
+            )}
+            {item.vin && (
+              <div className="mt-0.5 text-[11px] text-muted-foreground font-mono truncate">VIN: {item.vin}</div>
+            )}
+          </Link>
+        );
+      }}
       columns={[
 
         {
