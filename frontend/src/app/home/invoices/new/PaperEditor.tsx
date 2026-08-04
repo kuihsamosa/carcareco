@@ -5,7 +5,32 @@ import { createDirectInvoice } from './actions'
 import { Reorder, useDragControls } from 'framer-motion'
 import { TrashIcon, PlusIcon, Bars3Icon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
-import DescriptionAutosuggest, { ISaleableSuggestion } from './DescriptionAutosuggest'
+import Autosuggest from './Autosuggest'
+import { dataPage, queryApi } from '@/_lib/client/query-api'
+
+interface ISaleableSuggestion {
+    code: string | null
+    name: string
+    price: number | null
+}
+
+interface IClientSuggestion {
+    id: string
+    name: string
+    phone: string | null
+}
+
+interface IClientVehicle {
+    id: string
+    producer: string | null
+    model: string | null
+    regNr: string | null
+    vin: string | null
+}
+
+function vehicleLabel(v: IClientVehicle): string {
+    return [v.producer, v.model].filter(Boolean).join(' ').trim()
+}
 
 interface LineItem {
     id: string
@@ -75,8 +100,11 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
     const taxMultiplier = 1 + vatRate / 100
 
     const [clientName, setClientName] = useState('')
-    const [clientRegCode, setClientRegCode] = useState('')
-    const [clientAddress, setClientAddress] = useState('')
+    const [clientPhone, setClientPhone] = useState('')
+    // Set only when an existing client is picked; a typed-in name stays null and
+    // the backend creates the client on save.
+    const [clientId, setClientId] = useState<string | null>(null)
+    const [clientVehicles, setClientVehicles] = useState<IClientVehicle[]>([])
     const [vehicleLine1, setVehicleLine1] = useState('')
     const [vehicleLine2, setVehicleLine2] = useState('')
     const [vehicleLine3, setVehicleLine3] = useState('')
@@ -99,8 +127,8 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
             if (saved) {
                 const draft = JSON.parse(saved)
                 if (draft.clientName) setClientName(draft.clientName)
-                if (draft.clientRegCode) setClientRegCode(draft.clientRegCode)
-                if (draft.clientAddress) setClientAddress(draft.clientAddress)
+                if (draft.clientPhone) setClientPhone(draft.clientPhone)
+                if (draft.clientId) setClientId(draft.clientId)
                 if (draft.vehicleLine1) setVehicleLine1(draft.vehicleLine1)
                 if (draft.vehicleLine2) setVehicleLine2(draft.vehicleLine2)
                 if (draft.vehicleLine3) setVehicleLine3(draft.vehicleLine3)
@@ -120,12 +148,55 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
         if (!draftLoaded.current) return
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify({
-                clientName, clientRegCode, clientAddress,
+                clientName, clientPhone, clientId,
                 vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4,
                 invoiceDate, isPaid, termsAndConditions, disclaimer, lines,
             }))
         } catch { /* ignore */ }
-    }, [clientName, clientRegCode, clientAddress, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, termsAndConditions, disclaimer, lines])
+    }, [clientName, clientPhone, clientId, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, termsAndConditions, disclaimer, lines])
+
+    // A picked client's vehicles back the vehicle autosuggest. Typed-in clients
+    // have none, so that field simply stays free text.
+    useEffect(() => {
+        if (!clientId) { setClientVehicles([]); return }
+        let cancelled = false
+        queryApi<IClientVehicle[]>(`vehicles/client/${clientId}`)
+            .then(v => { if (!cancelled) setClientVehicles(v ?? []) })
+            .catch(() => { if (!cancelled) setClientVehicles([]) })
+        return () => { cancelled = true }
+    }, [clientId])
+
+    const fetchClients = useCallback((searchText: string, deliver: (items: IClientSuggestion[]) => void) => {
+        dataPage({
+            resourceName: 'clients',
+            searchText,
+            whenReady: items => deliver(items as IClientSuggestion[]),
+            onFailure: ({ url, status, text }) => console.log('Client autosuggest failed:', url, status, text),
+        })
+    }, [])
+
+    const fetchVehicles = useCallback((searchText: string, deliver: (items: IClientVehicle[]) => void) => {
+        const q = searchText.toLowerCase()
+        deliver(clientVehicles.filter(v =>
+            `${vehicleLabel(v)} ${v.regNr ?? ''} ${v.vin ?? ''}`.toLowerCase().includes(q)))
+    }, [clientVehicles])
+
+    const fetchSaleables = useCallback((searchText: string, deliver: (items: ISaleableSuggestion[]) => void) => {
+        dataPage({
+            resourceName: 'saleables',
+            searchText,
+            whenReady: items => deliver(items as ISaleableSuggestion[]),
+            onFailure: () => {
+                // Older backends expose only the raw parts table.
+                dataPage({
+                    resourceName: 'spareparts',
+                    searchText,
+                    whenReady: items => deliver(items as ISaleableSuggestion[]),
+                    onFailure: ({ url, status, text }) => console.log('Item autosuggest failed:', url, status, text),
+                })
+            },
+        })
+    }, [])
 
     // Warn as soon as the content grows past a single sheet, rather than letting
     // it silently spill onto a second page at print time.
@@ -193,15 +264,15 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
             return
         }
         doSave()
-    }, [clientName, clientRegCode, clientAddress, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, lines]) // eslint-disable-line react-hooks/exhaustive-deps
+    }, [clientName, clientPhone, clientId, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, lines]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const doSave = useCallback(() => {
         setShowNoClientConfirm(false)
         startTransition(async () => {
             await createDirectInvoice({
+                clientId: clientId || undefined,
                 clientName: clientName.trim() || undefined,
-                clientAddress: clientAddress.trim() || undefined,
-                clientRegCode: clientRegCode.trim() || undefined,
+                clientPhone: clientPhone.trim() || undefined,
                 vehicleLine1: vehicleLine1.trim() || undefined,
                 vehicleLine2: vehicleLine2.trim() || undefined,
                 vehicleLine3: vehicleLine3.trim() || undefined,
@@ -219,7 +290,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
             })
             localStorage.removeItem(STORAGE_KEY)
         })
-    }, [clientName, clientRegCode, clientAddress, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, dueDays, lines])
+    }, [clientName, clientPhone, clientId, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, dueDays, lines])
 
     return (
         <div className="min-h-screen bg-neutral-950 py-8 px-4 flex flex-col items-center overflow-x-auto">
@@ -281,7 +352,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                     </div>
 
                     <div style={{ textAlign: 'right' }}>
-                        <p style={{ fontSize: 28, fontWeight: 800, letterSpacing: 1, color: '#1e3a5f', textTransform: 'uppercase', margin: 0 }}>Tax Invoice</p>
+                        <p style={{ fontSize: 28, fontWeight: 800, letterSpacing: 1, color: '#1e3a5f', textTransform: 'uppercase', margin: 0 }}>Invoice</p>
                         <div style={{ fontSize: 12, color: '#64748b', marginTop: 4, lineHeight: 1.7 }}>
                             Date: <DocInput type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} style={{ width: 130 }} /><br />
                             Due: {dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
@@ -295,14 +366,40 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
                     <div>
                         <p id="lbl-billto" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#94a3b8', margin: '0 0 8px' }}>Bill to</p>
-                        <DocInput placeholder="Client name" value={clientName} onChange={e => setClientName(e.target.value)} aria-labelledby="lbl-billto" style={{ fontSize: 14, fontWeight: 600 }} />
-                        <DocInput placeholder="Reg. code" value={clientRegCode} onChange={e => setClientRegCode(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
-                        <DocInput placeholder="Address" value={clientAddress} onChange={e => setClientAddress(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
+                        <Autosuggest<IClientSuggestion>
+                            value={clientName}
+                            placeholder="Client name"
+                            inputStyle={{ ...docInputStyle, fontSize: 14, fontWeight: 600 }}
+                            fetchItems={fetchClients}
+                            primary={c => c.name}
+                            secondary={c => c.phone}
+                            onChange={v => { setClientName(v); setClientId(null) }}
+                            onSelect={c => {
+                                setClientName(c.name)
+                                setClientId(c.id)
+                                if (c.phone) setClientPhone(c.phone)
+                            }}
+                        />
+                        <DocInput placeholder="Phone" value={clientPhone} onChange={e => setClientPhone(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
                     </div>
                     <div>
                         <p id="lbl-vehicle" style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 1.5, color: '#94a3b8', margin: '0 0 8px' }}>Vehicle</p>
-                        <DocInput placeholder="Vehicle line 1" value={vehicleLine1} onChange={e => setVehicleLine1(e.target.value)} aria-labelledby="lbl-vehicle" style={{ fontSize: 14, fontWeight: 600 }} />
-                        <DocInput placeholder="Reg nr" value={vehicleLine2} onChange={e => setVehicleLine2(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
+                        <Autosuggest<IClientVehicle>
+                            value={vehicleLine1}
+                            placeholder="Vehicle"
+                            inputStyle={{ ...docInputStyle, fontSize: 14, fontWeight: 600 }}
+                            minLength={0}
+                            fetchItems={fetchVehicles}
+                            primary={v => vehicleLabel(v) || (v.regNr ?? '')}
+                            secondary={v => v.regNr}
+                            onChange={setVehicleLine1}
+                            onSelect={v => {
+                                setVehicleLine1(vehicleLabel(v) || (v.regNr ?? ''))
+                                if (v.regNr) setVehicleLine2(v.regNr)
+                                if (v.vin) setVehicleLine4(v.vin)
+                            }}
+                        />
+                        <DocInput placeholder="Plate number" value={vehicleLine2} onChange={e => setVehicleLine2(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
                         <DocInput placeholder="Odometer" value={vehicleLine3} onChange={e => setVehicleLine3(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
                         <DocInput placeholder="VIN" value={vehicleLine4} onChange={e => setVehicleLine4(e.target.value)} style={{ fontSize: 12, color: '#64748b', marginTop: 2 }} />
                     </div>
@@ -327,6 +424,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                                 key={line.id}
                                 line={line}
                                 currency={currency}
+                                fetchSaleables={fetchSaleables}
                                 onUpdate={updateLine}
                                 onApplySuggestion={applySuggestion}
                                 onRemove={removeLine}
@@ -374,8 +472,6 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                     </div>
                     <div>
                         {inv?.surCharge && <p style={{ fontSize: 12, color: '#334155', lineHeight: 1.6 }}><span style={{ color: '#94a3b8' }}>Late fee:</span> {inv.surCharge}</p>}
-                        {req.regNr && <p style={{ fontSize: 12, color: '#334155', lineHeight: 1.6 }}><span style={{ color: '#94a3b8' }}>SSM Reg:</span> {req.regNr}</p>}
-                        {req.kmkr && <p style={{ fontSize: 12, color: '#334155', lineHeight: 1.6 }}><span style={{ color: '#94a3b8' }}>SST No:</span> {req.kmkr}</p>}
                     </div>
                 </div>
 
@@ -531,9 +627,10 @@ const tdStyle: React.CSSProperties = {
     verticalAlign: 'middle',
 }
 
-function LineItemRow({ line, currency, onUpdate, onApplySuggestion, onRemove, onMove, canRemove }: {
+function LineItemRow({ line, currency, fetchSaleables, onUpdate, onApplySuggestion, onRemove, onMove, canRemove }: {
     line: LineItem
     currency: string
+    fetchSaleables: (searchText: string, deliver: (items: ISaleableSuggestion[]) => void) => void
     onUpdate: (id: string, field: keyof LineItem, value: string | number) => void
     onApplySuggestion: (id: string, item: ISaleableSuggestion) => void
     onRemove: (id: string) => void
@@ -549,13 +646,16 @@ function LineItemRow({ line, currency, onUpdate, onApplySuggestion, onRemove, on
     return (
         <Reorder.Item as="tr" value={line} dragListener={false} dragControls={dragControls} style={{ ...tdStyle, cursor: 'default' }}>
             <td style={tdStyle}>
-                <DescriptionAutosuggest
+                <Autosuggest<ISaleableSuggestion>
                     value={line.description}
-                    currency={currency}
+                    placeholder="Description"
+                    inputStyle={{ ...docInputStyle, fontSize: 13, color: '#0f172a' }}
+                    fetchItems={fetchSaleables}
+                    primary={item => item.code ? `${item.name}  ${item.code}` : item.name}
+                    secondary={item => item.price != null ? `${item.price.toFixed(2)} ${currency}` : null}
                     onChange={v => onUpdate(line.id, 'description', v)}
                     onSelect={item => onApplySuggestion(line.id, item)}
-                    onMove={dir => onMove(line.id, dir)}
-                    inputStyle={{ ...docInputStyle, fontSize: 13, color: '#0f172a' }}
+                    onAltMove={dir => onMove(line.id, dir)}
                 />
             </td>
             <td style={{ ...tdStyle, textAlign: 'right' }}>

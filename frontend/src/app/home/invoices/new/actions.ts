@@ -6,8 +6,7 @@ import { redirect } from 'next/navigation'
 export async function createDirectInvoice(data: {
     clientId?: string | null
     clientName?: string
-    clientAddress?: string
-    clientRegCode?: string
+    clientPhone?: string
     vehicleLine1?: string
     vehicleLine2?: string
     vehicleLine3?: string
@@ -28,8 +27,7 @@ export async function createDirectInvoice(data: {
         body: {
             clientId: data.clientId || null,
             clientName: data.clientName || null,
-            clientAddress: data.clientAddress || null,
-            clientRegCode: data.clientRegCode || null,
+            clientPhone: data.clientPhone || null,
             vehicleLine1: data.vehicleLine1 || null,
             vehicleLine2: data.vehicleLine2 || null,
             vehicleLine3: data.vehicleLine3 || null,

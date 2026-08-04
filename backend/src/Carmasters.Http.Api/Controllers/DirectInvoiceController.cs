@@ -49,6 +49,27 @@ namespace Carmasters.Http.Api.Controllers
             var pricingId = Guid.NewGuid();
             var invoiceDate = model.InvoiceDate ?? now;
 
+            // A name typed in without picking an existing client becomes a new
+            // client record, so the next invoice can autosuggest it.
+            var clientId = model.ClientId;
+            if (clientId == null && !string.IsNullOrWhiteSpace(model.ClientName))
+            {
+                var newClientId = Guid.NewGuid();
+                var name = model.ClientName.Trim();
+                var split = name.IndexOf(' ');
+                var firstName = split < 0 ? name : name[..split];
+                var lastName = split < 0 ? null : name[(split + 1)..].Trim();
+
+                await conn.ExecuteAsync(
+                    "INSERT INTO domain.client (id, phone, introducedat) VALUES (@id, @phone, @introducedAt)",
+                    new { id = newClientId, phone = model.ClientPhone, introducedAt = now });
+                await conn.ExecuteAsync(
+                    "INSERT INTO domain.privateclient (id, firstname, lastname) VALUES (@id, @firstName, @lastName)",
+                    new { id = newClientId, firstName, lastName });
+
+                clientId = newClientId;
+            }
+
             await conn.ExecuteAsync(
                 @"INSERT INTO domain.work (id, number, clientid, vehicleid, startedon, changedon, starterid, userstatus, completedon, completerid, is_direct)
                   VALUES (@id, @number, @clientId, NULL, @startedOn, @changedOn, @starterId, 'Default', @completedOn, @completerId, true)",
@@ -56,7 +77,7 @@ namespace Carmasters.Http.Api.Controllers
                 {
                     id = workId,
                     number = workNumber,
-                    clientId = model.ClientId,
+                    clientId,
                     startedOn = invoiceDate,
                     changedOn = now,
                     starterId = employeeId.Value,
@@ -71,8 +92,9 @@ namespace Carmasters.Http.Api.Controllers
                 {
                     id = pricingId,
                     partyName = string.IsNullOrWhiteSpace(model.ClientName) ? (string)null : model.ClientName,
-                    partyAddress = model.ClientAddress,
-                    partyCode = model.ClientRegCode,
+                    // The bill-to contact line carries the phone number now.
+                    partyAddress = model.ClientPhone,
+                    partyCode = (string)null,
                     vl1 = model.VehicleLine1,
                     vl2 = model.VehicleLine2,
                     vl3 = model.VehicleLine3,
@@ -148,8 +170,7 @@ namespace Carmasters.Http.Api.Controllers
     {
         public Guid? ClientId { get; set; }
         public string ClientName { get; set; }
-        public string ClientAddress { get; set; }
-        public string ClientRegCode { get; set; }
+        public string ClientPhone { get; set; }
         public string VehicleLine1 { get; set; }
         public string VehicleLine2 { get; set; }
         public string VehicleLine3 { get; set; }

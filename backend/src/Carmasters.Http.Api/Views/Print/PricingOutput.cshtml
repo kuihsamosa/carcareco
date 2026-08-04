@@ -16,6 +16,7 @@
     var hasLogo = !string.IsNullOrWhiteSpace(req.LogoBase64) && !string.IsNullOrWhiteSpace(req.LogoContentType);
 
     string Fmt(decimal n) => $"{n:N2} {currency}";
+    var docNumber = isInvoice && invoice != null ? $"Invoice {invoice.Number}" : pricing.GetDisplayName();
 }
 
 <style>
@@ -108,8 +109,8 @@
         </div>
 
         <div class="inv-doc-badge">
-            <p class="inv-doc-title">@(isInvoice ? "Tax Invoice" : "Estimate")</p>
-            <p class="inv-doc-number">@(pricing.GetDisplayName())</p>
+            <p class="inv-doc-title">@(isInvoice ? "Invoice" : "Estimate")</p>
+            <p class="inv-doc-number">@docNumber</p>
             @if (isInvoice && invoice != null)
             {
                 <div class="inv-doc-dates">
@@ -127,10 +128,6 @@
         <div>
             <p class="inv-party-label">Bill to</p>
             <p class="inv-party-name">@pricing.PartyName</p>
-            @if (!string.IsNullOrWhiteSpace(pricing.PartyCode))
-            {
-                <p class="inv-party-detail">Reg. code: @pricing.PartyCode</p>
-            }
             @if (!string.IsNullOrWhiteSpace(pricing.PartyAddress))
             {
                 <p class="inv-party-detail">@pricing.PartyAddress</p>
@@ -235,17 +232,10 @@
                 }
             </div>
             <div>
+                @* SSM Reg / SST No intentionally omitted here — they appear once, in the footer. *@
                 @if (opts?.Invoice != null && !string.IsNullOrWhiteSpace(opts.Invoice.SurCharge))
                 {
                     <p class="inv-payment-item"><span>Late fee:</span> @opts.Invoice.SurCharge</p>
-                }
-                @if (!string.IsNullOrWhiteSpace(req.RegNr))
-                {
-                    <p class="inv-payment-item"><span>SSM Reg:</span> @req.RegNr</p>
-                }
-                @if (!string.IsNullOrWhiteSpace(req.KMKR))
-                {
-                    <p class="inv-payment-item"><span>SST No:</span> @req.KMKR</p>
                 }
             </div>
         </div>
