@@ -5,6 +5,7 @@ import { createDirectInvoice } from './actions'
 import { Reorder, useDragControls } from 'framer-motion'
 import { TrashIcon, PlusIcon, Bars3Icon, ExclamationTriangleIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import DescriptionAutosuggest, { ISaleableSuggestion } from './DescriptionAutosuggest'
 
 interface LineItem {
     id: string
@@ -51,6 +52,13 @@ interface AppOptions {
 
 const STORAGE_KEY = 'carcareco-draft-invoice'
 
+// A4 at 96dpi. CSS absolute units are exact (1mm = 96/25.4px), so the sheet on
+// screen is the sheet that prints — no measuring or scaling needed.
+const A4_WIDTH = '210mm'
+const A4_HEIGHT = '297mm'
+const A4_PADDING = '14mm'
+const A4_HEIGHT_PX = 297 * 96 / 25.4
+
 function newLine(): LineItem {
     return { id: crypto.randomUUID(), description: '', quantity: 1, unit: 'pcs', unitPrice: 0, discount: 0 }
 }
@@ -81,6 +89,8 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
     const [showNoClientConfirm, setShowNoClientConfirm] = useState(false)
     const [isPending, startTransition] = useTransition()
     const draftLoaded = useRef(false)
+    const paperRef = useRef<HTMLDivElement>(null)
+    const [overflowsPage, setOverflowsPage] = useState(false)
 
     // Load draft from localStorage
     useEffect(() => {
@@ -117,8 +127,29 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
         } catch { /* ignore */ }
     }, [clientName, clientRegCode, clientAddress, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, termsAndConditions, disclaimer, lines])
 
+    // Warn as soon as the content grows past a single sheet, rather than letting
+    // it silently spill onto a second page at print time.
+    useEffect(() => {
+        const el = paperRef.current
+        if (!el) return
+        const check = () => setOverflowsPage(el.offsetHeight > A4_HEIGHT_PX + 1)
+        check()
+        const observer = new ResizeObserver(check)
+        observer.observe(el)
+        return () => observer.disconnect()
+    }, [])
+
     const updateLine = useCallback((id: string, field: keyof LineItem, value: string | number) => {
         setLines(prev => prev.map(l => l.id === id ? { ...l, [field]: value } : l))
+    }, [])
+
+    // Applying a suggestion sets the description and the price in one update, so
+    // the two never render out of step. A suggestion without a known price
+    // leaves whatever price is already on the line untouched.
+    const applySuggestion = useCallback((id: string, item: ISaleableSuggestion) => {
+        setLines(prev => prev.map(l => l.id === id
+            ? { ...l, description: item.name, unitPrice: item.price ?? l.unitPrice }
+            : l))
     }, [])
 
     const removeLine = useCallback((id: string) => {
@@ -191,9 +222,40 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
     }, [clientName, clientRegCode, clientAddress, vehicleLine1, vehicleLine2, vehicleLine3, vehicleLine4, invoiceDate, isPaid, dueDays, lines])
 
     return (
-        <div className="min-h-screen bg-neutral-950 py-8 px-4 flex flex-col items-center">
-            {/* Paper */}
-            <div className="bg-card w-full max-w-[794px] shadow-2xl rounded-sm p-10 md:p-14 relative" style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", color: '#0f172a', lineHeight: 1.5 }}>
+        <div className="min-h-screen bg-neutral-950 py-8 px-4 flex flex-col items-center overflow-x-auto">
+            <style>{`
+                @media print {
+                    @page { size: A4; margin: 0; }
+                    body { background: #fff; }
+                    .no-print { display: none !important; }
+                }
+            `}</style>
+
+            {/* Paper — exact A4, so what is edited here is what prints */}
+            <div
+                ref={paperRef}
+                className="bg-card shadow-2xl rounded-sm relative shrink-0"
+                style={{
+                    fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif",
+                    color: '#0f172a',
+                    lineHeight: 1.5,
+                    width: A4_WIDTH,
+                    minHeight: A4_HEIGHT,
+                    padding: A4_PADDING,
+                }}
+            >
+                {/* Page boundary — only shown once the content runs past one sheet */}
+                {overflowsPage && (
+                    <div
+                        aria-hidden
+                        className="no-print"
+                        style={{ position: 'absolute', left: 0, right: 0, top: A4_HEIGHT, borderTop: '1px dashed #f87171', pointerEvents: 'none' }}
+                    >
+                        <span style={{ position: 'absolute', right: 4, top: 4, fontSize: 9, color: '#ef4444', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                            Page 2
+                        </span>
+                    </div>
+                )}
 
                 {/* DRAFT badge */}
                 <div style={{ position: 'absolute', top: 24, right: 24, background: '#fef3c7', color: '#92400e', fontSize: 11, fontWeight: 700, padding: '4px 12px', borderRadius: 4, letterSpacing: 1, textTransform: 'uppercase' }}>
@@ -266,6 +328,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                                 line={line}
                                 currency={currency}
                                 onUpdate={updateLine}
+                                onApplySuggestion={applySuggestion}
                                 onRemove={removeLine}
                                 onMove={moveLine}
                                 canRemove={lines.length > 1}
@@ -273,7 +336,7 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
                         ))}
                     </Reorder.Group>
                 </table>
-                <button type="button" onClick={addLine} style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#5E6AD2', background: 'none', border: 'none', cursor: 'pointer', marginTop: 8, padding: '4px 0' }}>
+                <button type="button" onClick={addLine} className="no-print" style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, color: '#5E6AD2', background: 'none', border: 'none', cursor: 'pointer', marginTop: 8, padding: '4px 0' }}>
                     <PlusIcon style={{ width: 14, height: 14 }} /> Add line
                 </button>
 
@@ -370,7 +433,16 @@ export default function PaperEditor({ options }: { options: AppOptions }) {
             </div>
 
             {/* Floating action bar */}
-            <div className="fixed bottom-6 right-6 flex items-center gap-3 bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-3 shadow-2xl z-50">
+            <div className="no-print fixed bottom-6 right-6 flex items-center gap-3 bg-neutral-900 border border-neutral-700 rounded-xl px-5 py-3 shadow-2xl z-50">
+                {overflowsPage && (
+                    <>
+                        <span className="flex items-center gap-1.5 text-xs text-amber-400" title="Remove or shorten lines to keep the invoice on one sheet">
+                            <ExclamationTriangleIcon className="w-4 h-4 shrink-0" />
+                            Over one A4 page
+                        </span>
+                        <div className="w-px h-6 bg-neutral-700" />
+                    </>
+                )}
                 <label className="flex items-center gap-2 text-sm text-neutral-300 cursor-pointer select-none">
                     <input type="checkbox" checked={isPaid} onChange={e => setIsPaid(e.target.checked)} className="accent-emerald-500 w-4 h-4" />
                     Paid
@@ -459,10 +531,11 @@ const tdStyle: React.CSSProperties = {
     verticalAlign: 'middle',
 }
 
-function LineItemRow({ line, currency, onUpdate, onRemove, onMove, canRemove }: {
+function LineItemRow({ line, currency, onUpdate, onApplySuggestion, onRemove, onMove, canRemove }: {
     line: LineItem
     currency: string
     onUpdate: (id: string, field: keyof LineItem, value: string | number) => void
+    onApplySuggestion: (id: string, item: ISaleableSuggestion) => void
     onRemove: (id: string) => void
     onMove: (id: string, dir: -1 | 1) => void
     canRemove: boolean
@@ -476,17 +549,13 @@ function LineItemRow({ line, currency, onUpdate, onRemove, onMove, canRemove }: 
     return (
         <Reorder.Item as="tr" value={line} dragListener={false} dragControls={dragControls} style={{ ...tdStyle, cursor: 'default' }}>
             <td style={tdStyle}>
-                <input
+                <DescriptionAutosuggest
                     value={line.description}
-                    onChange={e => onUpdate(line.id, 'description', e.target.value)}
-                    placeholder="Description"
-                    style={{ ...docInputStyle, fontSize: 13, color: '#0f172a' }}
-                    onFocus={e => { e.target.style.borderBottomColor = '#5E6AD2'; e.target.style.background = '#f8fafc' }}
-                    onBlur={e => { e.target.style.borderBottomColor = 'transparent'; e.target.style.background = 'transparent' }}
-                    onKeyDown={e => {
-                        if (e.altKey && e.key === 'ArrowUp') { e.preventDefault(); onMove(line.id, -1) }
-                        if (e.altKey && e.key === 'ArrowDown') { e.preventDefault(); onMove(line.id, 1) }
-                    }}
+                    currency={currency}
+                    onChange={v => onUpdate(line.id, 'description', v)}
+                    onSelect={item => onApplySuggestion(line.id, item)}
+                    onMove={dir => onMove(line.id, dir)}
+                    inputStyle={{ ...docInputStyle, fontSize: 13, color: '#0f172a' }}
                 />
             </td>
             <td style={{ ...tdStyle, textAlign: 'right' }}>
