@@ -1,21 +1,23 @@
-'use server'; 
-import { httpGet } from "@/_lib/server/query-api"; 
+'use server';
+import { httpGet } from "@/_lib/server/query-api";
 
 
 export async function downloadPricing({
     pricingId,
     pricingName,
-    downloadHtml, 
+    downloadHtml,
 }:{
     pricingId:string,
     pricingName:string,
-    downloadHtml?:boolean| undefined 
+    downloadHtml?:boolean| undefined
 }) {
 
- 
     const response = await httpGet(`pricings/${pricingName}/${pricingId}/${downloadHtml?'html':'pdf'}`);
 
-    const responseObj = downloadHtml? (await response.text()):(await response.blob());
- 
-    return responseObj;
+    if (downloadHtml) {
+        return await response.text();
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer).toString('base64');
 }

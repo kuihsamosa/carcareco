@@ -12,18 +12,23 @@ import PrintPricingLink from './PrintPricingLink';
 
 const handleFileDownload = async (pricingId:string, pricingName: string,fileName: string) => {
     try {
-      const blob = await downloadPricing({
+      const base64 = await downloadPricing({
         pricingId,pricingName
-      });
-     // Create a temporary anchor element to trigger the download
-     const url = window.URL.createObjectURL(new Blob([blob]));
+      }) as string;
+     const binaryString = atob(base64);
+     const bytes = new Uint8Array(binaryString.length);
+     for (let i = 0; i < binaryString.length; i++) {
+       bytes[i] = binaryString.charCodeAt(i);
+     }
+     const blob = new Blob([bytes], { type: 'application/pdf' });
+     const url = window.URL.createObjectURL(blob);
      const link = document.createElement("a");
      link.href = url;
-     // Setting filename received in response
      link.setAttribute("download", fileName);
      document.body.appendChild(link);
      link.click();
      document.body.removeChild(link);
+     window.URL.revokeObjectURL(url);
 
     } catch (error) {
       console.log("Error", error)
