@@ -8,41 +8,14 @@ import Spinner from '@/_components/Spinner';
 import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
 import Link from 'next/link';
 import PrintPricingLink from './PrintPricingLink';
+import { printHtmlDocument } from '@/_lib/client/printHtml';
 
 
 const handleFileDownload = async (pricingId: string, pricingName: string) => {
     const html = await downloadPricing({
       pricingId, pricingName, downloadHtml: true
     }) as string;
-
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;';
-    document.body.appendChild(iframe);
-
-    const doc = iframe.contentDocument || iframe.contentWindow?.document;
-    if (!doc) { document.body.removeChild(iframe); return; }
-
-    doc.open();
-    doc.write(`<!DOCTYPE html><html><head>
-      <meta charset="utf-8" />
-      <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { background: white; }
-        body { padding: 32px; font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif; }
-        @page { size: A4; margin: 10mm; }
-      </style>
-    </head><body>${html}</body></html>`);
-    doc.close();
-
-    const cleanup = () => {
-      try { document.body.removeChild(iframe); } catch { /* already removed */ }
-    };
-    iframe.contentWindow?.addEventListener('afterprint', cleanup);
-
-    setTimeout(() => {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-    }, 300);
+    printHtmlDocument(html);
 }
 
 export default function PricingDownloadLink({

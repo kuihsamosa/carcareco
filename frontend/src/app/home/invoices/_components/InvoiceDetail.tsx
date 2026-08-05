@@ -3,8 +3,7 @@ import moment from 'moment';
 import Link from 'next/link';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { CheckCircleIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/16/solid';
-import PricingDownloadLink from '../../work/_components/activity/PricingDownloadLink';
-import PrintButton from './PrintButton';
+import InvoiceDownloadButton from './InvoiceDownloadButton';
 import CopyButton from '@/_components/CopyButton';
 import InvoicePreviewFrame from './InvoicePreviewFrame';
 import { Badge } from '@/components/ui/badge';
@@ -89,10 +88,9 @@ export default async function InvoiceDetail({ id }: { id: string }) {
           <h1 className="text-xl font-semibold text-foreground tabular-nums">Invoice #{inv.invoiceNumber}</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">{moment(inv.issuedOn).format('LL')}</p>
         </div>
-        <div className="flex items-center gap-2">
-          <PrintButton />
-          <PricingDownloadLink name="Invoice" id={id} number={inv.invoiceNumber} hidePaperClip={false} />
+        <div className="flex items-center gap-3">
           {statusBadge}
+          <InvoiceDownloadButton id={id} />
         </div>
       </div>
 

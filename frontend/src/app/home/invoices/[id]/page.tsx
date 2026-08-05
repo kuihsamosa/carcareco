@@ -7,7 +7,7 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   return (
     <>
       <InvoiceDetail id={id} />
-      {print === '1' && <AutoPrint />}
+      {print === '1' && <AutoPrint id={id} />}
     </>
   );
 }
