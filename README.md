@@ -11,18 +11,24 @@
 - 📎 Offer and invoice generation with PDF export
 - 🧰 Inventory and spare part control
 - 📩 Email integration for quotes/invoices
-- 🤪 CI/CD ready (Github Actions, Docker-based)
+- 🤪 Deploys straight from `main` (Vercel + Railway, Docker-based)
 - 🌐 Clean modern UI (Next.js + Tailwind)
 
-## 🌍 Live Demo
+## 🌍 Deployment
 
-You can try the full-featured hosted version here:
+This fork runs as a single-tenant instance:
 
-️ [https://carcareco.app](https://carcareco.app)
+| Piece | Hosted on | URL |
+| --- | --- | --- |
+| Frontend (Next.js) | Vercel | [https://carcareco.vercel.app](https://carcareco.vercel.app) |
+| API (.NET) | Railway | `https://carcareco-production.up.railway.app` |
+| Database (Postgres) | Supabase | — |
 
-Click **"Try the demo"** on the landing page and enter a company name to spin up your own sandbox environment.
+Both the frontend and the API deploy automatically from `main` via their own GitHub
+integrations. There is no self-hosted deploy step.
 
-> Each demo company gets a private tenant database — feel free to explore!
+> The upstream project's multi-tenant demo at `carcareco.app` is a separate deployment run by
+> the original author and is unrelated to this instance.
 
 ## 🚀 Getting Started (Local Docker)
 
