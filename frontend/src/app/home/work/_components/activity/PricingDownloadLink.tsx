@@ -2,20 +2,16 @@
 'use client';
 
 import { PaperClipIcon } from '@heroicons/react/20/solid';
-import { downloadPricing } from '../../actions/downloadPricing';
 import { useState } from 'react';
 import Spinner from '@/_components/Spinner';
 import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
 import Link from 'next/link';
 import PrintPricingLink from './PrintPricingLink';
-import { printHtmlDocument } from '@/_lib/client/printHtml';
+import { savePricingDocument } from '@/_lib/client/savePricingDocument';
 
 
-const handleFileDownload = async (pricingId: string, pricingName: string) => {
-    const html = await downloadPricing({
-      pricingId, pricingName, downloadHtml: true
-    }) as string;
-    printHtmlDocument(html);
+const handleFileDownload = async (pricingId: string, pricingName: string, fileName: string) => {
+    await savePricingDocument({ pricingId, pricingName, fileName });
 }
 
 export default function PricingDownloadLink({
@@ -37,6 +33,7 @@ export default function PricingDownloadLink({
 }) {
 
     const [isDownloading,setIsDownloading] = useState(false);
+    const fileName = `${name.toLowerCase()}_${number}.pdf`;
 
     return (
         <div className="flex  ">
@@ -49,7 +46,7 @@ export default function PricingDownloadLink({
                    if (isDownloading) return;
                     setIsDownloading(true);
                     try {
-                      await handleFileDownload(id, name);
+                      await handleFileDownload(id, name, fileName);
                     } catch (error) {
                       console.log("Error", error);
                     } finally {

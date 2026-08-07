@@ -2,11 +2,10 @@
 
 import { useState } from 'react';
 import { ArrowDownTrayIcon } from '@heroicons/react/20/solid';
-import { downloadPricing } from '../../work/actions/downloadPricing';
-import { printHtmlDocument } from '@/_lib/client/printHtml';
+import { savePricingDocument } from '@/_lib/client/savePricingDocument';
 import Spinner from '@/_components/Spinner';
 
-export default function InvoiceDownloadButton({ id }: { id: string }) {
+export default function InvoiceDownloadButton({ id, number }: { id: string, number: string | number }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -20,12 +19,11 @@ export default function InvoiceDownloadButton({ id }: { id: string }) {
           setBusy(true);
           setFailed(false);
           try {
-            const html = await downloadPricing({
+            await savePricingDocument({
               pricingId: id,
               pricingName: 'invoice',
-              downloadHtml: true,
-            }) as string;
-            printHtmlDocument(html);
+              fileName: `invoice_${number}.pdf`,
+            });
           } catch (e) {
             console.log('Invoice download failed', e);
             setFailed(true);

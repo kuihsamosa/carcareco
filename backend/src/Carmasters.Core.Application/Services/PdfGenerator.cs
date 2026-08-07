@@ -15,6 +15,7 @@ using PuppeteerSharp;
 using PuppeteerSharp.Media;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -141,37 +142,80 @@ namespace Carmasters.Core.Application.Services
             return footerHtmlGenerator;
         }
 
-        public async Task<byte[]> Generate(Pricing pricing ) 
-        {  
-            var stream = default(MemoryStream);
-            var pdfLocalFile = new FileInfo(Path.Combine(configuration["PdfDirectory"], pricing.GetFileName()));
-            stream = await Print(pricing);
-            using (stream)
+        public async Task<byte[]> Generate(Pricing pricing )
+        {
+            using var stream = await Print(pricing);
+            var pdfBytes = stream.ToArray();
+            TryCacheToDisk(pricing, pdfBytes);
+            return pdfBytes;
+        }
+
+        /// <summary>
+        /// Keeping a copy on disk is a support convenience, not part of serving
+        /// the response. A missing or read-only PdfDirectory used to throw here
+        /// — after the PDF had rendered successfully — and surface as a 500.
+        /// </summary>
+        private void TryCacheToDisk(Pricing pricing, byte[] pdfBytes)
+        {
+            var directory = configuration["PdfDirectory"];
+            if (string.IsNullOrWhiteSpace(directory)) return;
+
+            try
             {
-                var pdfBytes = stream.ToArray();
-                if (pdfLocalFile.Exists) pdfLocalFile.Delete();
-                File.WriteAllBytes(pdfLocalFile.FullName, pdfBytes);
-                return pdfBytes;
+                Directory.CreateDirectory(directory);
+                File.WriteAllBytes(Path.Combine(directory, pricing.GetFileName()), pdfBytes);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Could not cache the generated PDF to {Directory}", directory);
             }
         }
 
-        private static string _executablePath; 
+        private static string _executablePath;
+        private static readonly SemaphoreSlim _prepareLock = new SemaphoreSlim(1, 1);
+
         private async Task PreparePuppeteerAsync( )
         {
-            if (!string.IsNullOrWhiteSpace(_executablePath)) return;//TODO is it threadsafe?
+            if (!string.IsNullOrWhiteSpace(_executablePath)) return;
 
+            await _prepareLock.WaitAsync();
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(_executablePath)) return;
 
-            var downloadPath = configuration["PuppeteerPath"];
-            var browserOptions = new BrowserFetcherOptions { 
-                Path = downloadPath , 
-            };
-            var browserFetcher = new BrowserFetcher(browserOptions);
+                // A browser baked into the container image is the supported path.
+                // BrowserFetcher below is only a local-dev convenience: on an
+                // ephemeral filesystem it re-downloads ~170MB on every cold start
+                // and still cannot launch without Chromium's shared libraries.
+                var preinstalled = configuration["PuppeteerExecutablePath"]
+                    ?? Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
 
-            var stableVersion = await browserFetcher.DownloadAsync(BrowserTag.Stable);
+                if (!string.IsNullOrWhiteSpace(preinstalled) && File.Exists(preinstalled))
+                {
+                    _executablePath = preinstalled;
+                    logger.LogInformation("Puppeteer using preinstalled browser: {Path}", _executablePath);
+                    return;
+                }
 
-            _executablePath = browserFetcher.GetExecutablePath(stableVersion.BuildId);
-            logger.LogDebug("Puppeteer downloaded browser : " + _executablePath);
+                if (!string.IsNullOrWhiteSpace(preinstalled))
+                {
+                    logger.LogWarning(
+                        "Configured browser {Path} is not on disk; falling back to downloading one.", preinstalled);
+                }
 
+                var downloadPath = configuration["PuppeteerPath"];
+                if (!string.IsNullOrWhiteSpace(downloadPath)) Directory.CreateDirectory(downloadPath);
+
+                var browserFetcher = new BrowserFetcher(new BrowserFetcherOptions { Path = downloadPath });
+                var stableVersion = await browserFetcher.DownloadAsync(BrowserTag.Stable);
+
+                _executablePath = browserFetcher.GetExecutablePath(stableVersion.BuildId);
+                logger.LogInformation("Puppeteer downloaded browser: {Path}", _executablePath);
+            }
+            finally
+            {
+                _prepareLock.Release();
+            }
         }
 
         private async Task<MemoryStream> Print(Pricing pricing )
@@ -184,27 +228,51 @@ namespace Carmasters.Core.Application.Services
             await using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true,
-                Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" },
+                // --disable-dev-shm-usage: containers default to a 64MB /dev/shm,
+                // which Chromium exhausts mid-render and then crashes on.
+                Args = new[]
+                {
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu"
+                },
                 ExecutablePath = _executablePath
             });
-             
-            var page = await browser.NewPageAsync(); 
+
+            await using var page = await browser.NewPageAsync();
 
             await page.SetViewportAsync(new ViewPortOptions() { DeviceScaleFactor = 1, Width = 1440, Height = 2880, IsMobile = false, HasTouch = false });
             await page.SetContentAsync(html, options: new NavigationOptions() { WaitUntil = new [] { WaitUntilNavigation.Load  } });
-            var tailWindCss = $"{serverUri.Scheme}://localhost:{serverUri.Port}/tailwind.css";
-            var printCss = $"{serverUri.Scheme}://localhost:{serverUri.Port}/print.css";
-            await page.AddStyleTagAsync(tailWindCss);
-            await page.AddStyleTagAsync(printCss);
-           
-             
+
+            await TryAddStyleAsync(page, "tailwind.css");
+            await TryAddStyleAsync(page, "print.css");
+
             var pdfContent = await page.PdfStreamAsync(new PdfOptions
             {
                 PrintBackground = false,
-                Format = PaperFormat.A4, 
-                DisplayHeaderFooter = false  
+                Format = PaperFormat.A4,
+                DisplayHeaderFooter = false
             });
             return (MemoryStream)pdfContent;
-        } 
+        }
+
+        /// <summary>
+        /// The invoice template carries its own inline styles; these shared
+        /// sheets are an enhancement. Losing the whole document because one of
+        /// them 404s is a bad trade.
+        /// </summary>
+        private async Task TryAddStyleAsync(IPage page, string fileName)
+        {
+            var url = $"{serverUri.Scheme}://localhost:{serverUri.Port}/{fileName}";
+            try
+            {
+                await page.AddStyleTagAsync(url);
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(ex, "Could not attach stylesheet {Url} to the PDF", url);
+            }
+        }
     }
 }

@@ -90,7 +90,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
         </div>
         <div className="flex items-center gap-3">
           {statusBadge}
-          <InvoiceDownloadButton id={id} />
+          <InvoiceDownloadButton id={id} number={inv.invoiceNumber} />
         </div>
       </div>
 
