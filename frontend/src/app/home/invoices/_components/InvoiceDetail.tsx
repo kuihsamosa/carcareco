@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import { CheckCircleIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/16/solid';
 import InvoiceDownloadButton from './InvoiceDownloadButton';
+import DeleteInvoiceButton from './DeleteInvoiceButton';
 import CopyButton from '@/_components/CopyButton';
 import InvoicePreviewFrame from './InvoicePreviewFrame';
 import { Badge } from '@/components/ui/badge';
@@ -91,6 +92,7 @@ export default async function InvoiceDetail({ id }: { id: string }) {
         <div className="flex items-center gap-3">
           {statusBadge}
           <InvoiceDownloadButton id={id} number={inv.invoiceNumber} />
+          <DeleteInvoiceButton workId={id} invoiceNumber={inv.invoiceNumber} redirectTo="/home/invoices" />
         </div>
       </div>
 

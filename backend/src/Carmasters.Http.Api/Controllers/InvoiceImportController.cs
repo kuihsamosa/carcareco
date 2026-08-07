@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Carmasters.Core.Application.Extensions;
 using Carmasters.Core.Application.RateLimiting;
-using ClosedXML.Excel;
+using Carmasters.Http.Api.Invoices;
 using Dapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -27,6 +27,88 @@ namespace Carmasters.Http.Api.Controllers
         public InvoiceImportController(NHibernate.ISession session)
         {
             this.session = session;
+        }
+
+        /// <summary>
+        /// Hard-deletes an invoice and the work order it hangs off, so the invoice
+        /// number is free again and a re-import will not report it as a duplicate.
+        ///
+        /// This deliberately does NOT go through NHibernate: Work maps its Invoice with
+        /// Cascade.SaveUpdate only, so deleting a Work leaves the invoice/pricing/pricingline
+        /// rows behind — the number would stay taken by a row nothing links to. The raw
+        /// deletes below run inside the ambient request transaction (UnitOfWorkAspect), so
+        /// the whole batch commits or rolls back together.
+        ///
+        /// Clients and vehicles are left alone on purpose: they are shared records that
+        /// other invoices and works may still point at.
+        /// </summary>
+        [HttpDelete]
+        public async Task<IActionResult> Delete([FromBody] Guid[] ids)
+        {
+            if (ids == null || ids.Length == 0)
+                return BadRequest(new { error = "No invoices selected." });
+
+            var conn = session.Connection;
+            var deleted = 0;
+
+            foreach (var workId in ids)
+            {
+                var pricingId = await conn.QueryFirstOrDefaultAsync<Guid?>(
+                    "SELECT invoiceid FROM domain.work WHERE id = @workId", new { workId });
+
+                // Saleables are joined-subclass rows (productinstalled / serviceperformed /
+                // productoffered / serviceoffered all key off domain.saleable). Grab the ids
+                // before the subclass rows go, otherwise the parent rows are unreachable.
+                var saleableIds = (await conn.QueryAsync<Guid>(
+                    @"SELECT id FROM domain.productinstalled WHERE repairjobid IN (SELECT id FROM domain.repairjob WHERE workid = @workId)
+                      UNION SELECT id FROM domain.serviceperformed WHERE repairjobid IN (SELECT id FROM domain.repairjob WHERE workid = @workId)
+                      UNION SELECT id FROM domain.productoffered  WHERE offerid     IN (SELECT id FROM domain.offer     WHERE workid = @workId)
+                      UNION SELECT id FROM domain.serviceoffered  WHERE offerid     IN (SELECT id FROM domain.offer     WHERE workid = @workId)",
+                    new { workId })).ToList();
+
+                var estimateIds = (await conn.QueryAsync<Guid>(
+                    "SELECT estimateid FROM domain.offer WHERE workid = @workId AND estimateid IS NOT NULL",
+                    new { workId })).ToList();
+
+                // productinstalled.serviceid -> serviceperformed and productoffered.serviceid
+                // -> serviceoffered, so the product rows have to go first.
+                await conn.ExecuteAsync(
+                    "DELETE FROM domain.productinstalled WHERE repairjobid IN (SELECT id FROM domain.repairjob WHERE workid = @workId)", new { workId });
+                await conn.ExecuteAsync(
+                    "DELETE FROM domain.serviceperformed WHERE repairjobid IN (SELECT id FROM domain.repairjob WHERE workid = @workId)", new { workId });
+                await conn.ExecuteAsync(
+                    "DELETE FROM domain.productoffered WHERE offerid IN (SELECT id FROM domain.offer WHERE workid = @workId)", new { workId });
+                await conn.ExecuteAsync(
+                    "DELETE FROM domain.serviceoffered WHERE offerid IN (SELECT id FROM domain.offer WHERE workid = @workId)", new { workId });
+
+                if (saleableIds.Count > 0)
+                    await conn.ExecuteAsync("DELETE FROM domain.saleable WHERE id = ANY(@saleableIds)", new { saleableIds });
+
+                await conn.ExecuteAsync("DELETE FROM domain.repairjob WHERE workid = @workId", new { workId });
+                await conn.ExecuteAsync("DELETE FROM domain.offer WHERE workid = @workId", new { workId });
+                await conn.ExecuteAsync("DELETE FROM domain.assignment WHERE workid = @workId", new { workId });
+
+                // work.invoiceid FKs the invoice, so drop the work before its pricing rows.
+                var workRows = await conn.ExecuteAsync("DELETE FROM domain.work WHERE id = @workId", new { workId });
+
+                if (estimateIds.Count > 0)
+                {
+                    await conn.ExecuteAsync("DELETE FROM domain.pricingline WHERE pricingid = ANY(@estimateIds)", new { estimateIds });
+                    await conn.ExecuteAsync("DELETE FROM domain.estimate WHERE id = ANY(@estimateIds)", new { estimateIds });
+                    await conn.ExecuteAsync("DELETE FROM domain.pricing WHERE id = ANY(@estimateIds)", new { estimateIds });
+                }
+
+                if (pricingId.HasValue)
+                {
+                    await conn.ExecuteAsync("DELETE FROM domain.pricingline WHERE pricingid = @pricingId", new { pricingId });
+                    await conn.ExecuteAsync("DELETE FROM domain.invoice WHERE id = @pricingId", new { pricingId });
+                    await conn.ExecuteAsync("DELETE FROM domain.pricing WHERE id = @pricingId", new { pricingId });
+                }
+
+                if (workRows > 0) deleted++;
+            }
+
+            return Ok(new { deleted });
         }
 
         [HttpPost("import")]
@@ -56,6 +138,23 @@ namespace Carmasters.Http.Api.Controllers
 
             foreach (var file in files)
             {
+                var shortName = Path.GetFileName(file.FileName);
+
+                // Excel leaves "~$1234.xlsx" lock files next to open workbooks. They are
+                // not workbooks at all, so skip them quietly instead of reporting a scary
+                // parse failure for what is really just folder noise.
+                if (shortName.StartsWith("~$", StringComparison.Ordinal))
+                {
+                    results.Add(new ImportedInvoiceResult
+                    {
+                        FileName = shortName,
+                        Status = "skipped",
+                        Reason = "Excel lock file, not an invoice"
+                    });
+                    skipped++;
+                    continue;
+                }
+
                 if (!file.FileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
                 {
                     results.Add(new ImportedInvoiceResult
@@ -74,7 +173,7 @@ namespace Carmasters.Http.Api.Controllers
                     using var stream = new MemoryStream();
                     await file.CopyToAsync(stream);
                     stream.Position = 0;
-                    parsed = ParseWorkbook(stream, file.FileName);
+                    parsed = InvoiceWorkbookParser.ParseWorkbook(stream, file.FileName);
                 }
                 catch (Exception ex)
                 {
@@ -166,190 +265,6 @@ namespace Carmasters.Http.Api.Controllers
                 summary = new { created, skipped, failed, total = results.Count },
                 results
             });
-        }
-
-        private List<ParsedInvoice> ParseWorkbook(MemoryStream stream, string fileName)
-        {
-            var invoices = new List<ParsedInvoice>();
-
-            using var workbook = new XLWorkbook(stream);
-            var sheet = workbook.Worksheets.First();
-            var rows = sheet.RowsUsed().ToList();
-            if (rows.Count == 0) return invoices;
-
-            var inv = new ParsedInvoice
-            {
-                SourceFile = fileName,
-                Warnings = new List<string>()
-            };
-
-            var allValues = new List<List<string>>();
-            foreach (var row in rows)
-            {
-                var cells = new List<string>();
-                foreach (var cell in row.CellsUsed())
-                {
-                    cells.Add(cell.GetFormattedString());
-                }
-                allValues.Add(cells);
-            }
-
-            foreach (var rowCells in allValues)
-            {
-                foreach (var cellValue in rowCells)
-                {
-                    var upper = cellValue.Trim().ToUpperInvariant();
-
-                    if (upper.Contains("MODEL") && cellValue.Contains(':'))
-                        inv.VehicleModel = ExtractFieldValue(cellValue);
-                    else if ((upper.Contains("N/ PLATE") || upper.Contains("PLATE")) && cellValue.Contains(':'))
-                        inv.LicensePlate = CleanPlate(ExtractFieldValue(cellValue));
-                    else if (upper.Contains("DATE") && cellValue.Contains(':'))
-                        inv.Date = ParseDate(ExtractFieldValue(cellValue));
-                    else if (upper.Contains("KM") && cellValue.Contains(':'))
-                    {
-                        var kmVal = ExtractFieldValue(cellValue);
-                        if (kmVal != null && int.TryParse(kmVal.Replace(",", "").Replace(" ", ""), out var km))
-                            inv.Kilometers = km;
-                    }
-                    else if ((upper.Contains("NAME & ADD") || upper.Contains("TO:")) && cellValue.Contains(':'))
-                        inv.Customer = ExtractFieldValue(cellValue);
-                    else if (upper.Contains("INVOICE") && cellValue.Contains(':'))
-                    {
-                        var numStr = ExtractFieldValue(cellValue);
-                        if (numStr != null && int.TryParse(numStr.Trim(), out var num))
-                            inv.InvoiceNumber = num;
-                    }
-                }
-            }
-
-            if (inv.InvoiceNumber == null)
-            {
-                var match = Regex.Match(fileName, @"\d+");
-                if (match.Success && int.TryParse(match.Value, out var fileNum))
-                    inv.InvoiceNumber = fileNum;
-            }
-
-            var itemsStarted = false;
-            foreach (var row in rows)
-            {
-                var rowStr = string.Join(" ", row.CellsUsed().Select(c => c.GetFormattedString())).ToUpperInvariant();
-
-                if (new[] { "SERVICE RENDERED", "DESCRIPTION", "UNIT RM", "AMOUNT" }.Any(k => rowStr.Contains(k)))
-                {
-                    itemsStarted = true;
-                    continue;
-                }
-
-                if (rowStr.Contains("TOTAL"))
-                {
-                    foreach (var cell in row.CellsUsed())
-                    {
-                        if (TryParseDecimal(cell.GetFormattedString(), out var total) && total > 0)
-                        {
-                            inv.TotalAmount = total;
-                            break;
-                        }
-                    }
-                    continue;
-                }
-
-                if (itemsStarted)
-                {
-                    var cells = row.CellsUsed().Select(c => c.GetFormattedString().Trim()).ToList();
-                    if (cells.Count < 2 || string.IsNullOrWhiteSpace(cells[0])) continue;
-
-                    var item = ParseItemRow(cells);
-                    if (item != null)
-                        inv.Items.Add(item);
-                }
-            }
-
-            invoices.Add(inv);
-            return invoices;
-        }
-
-        private static ParsedItem ParseItemRow(List<string> cells)
-        {
-            var item = new ParsedItem();
-
-            if (cells.Count > 0 && int.TryParse(cells[0], out _))
-            {
-                if (cells.Count > 1) item.Description = cells[1];
-            }
-            else
-            {
-                item.Description = cells[0];
-            }
-
-            var numerics = new List<decimal>();
-            var startIdx = string.IsNullOrWhiteSpace(item.Description) ? 1 : 2;
-            for (var i = startIdx; i < cells.Count; i++)
-            {
-                if (TryParseDecimal(cells[i], out var n) && n > 0)
-                    numerics.Add(n);
-            }
-
-            if (numerics.Count == 1)
-            {
-                item.Amount = numerics[0];
-            }
-            else if (numerics.Count >= 2)
-            {
-                item.UnitPrice = numerics[^2];
-                item.Amount = numerics[^1];
-                if (numerics.Count >= 3)
-                    item.Quantity = numerics[^3];
-            }
-
-            if (string.IsNullOrWhiteSpace(item.Description) && item.Amount == null)
-                return null;
-
-            return item;
-        }
-
-        private static string ExtractFieldValue(string cellValue)
-        {
-            if (string.IsNullOrWhiteSpace(cellValue)) return null;
-            foreach (var delim in new[] { ':', '=', '-' })
-            {
-                var idx = cellValue.IndexOf(delim);
-                if (idx >= 0)
-                {
-                    var val = cellValue[(idx + 1)..].Trim();
-                    return string.IsNullOrEmpty(val) ? null : val;
-                }
-            }
-            return null;
-        }
-
-        private static string CleanPlate(string s)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return null;
-            s = s.Trim().ToUpperInvariant();
-            if (s.Length > 15) return null;
-            var junk = new[] { "MODEL", "PLATE", "INVOICE", "LABOUR", "SERVICE", "NUMBER" };
-            if (junk.Any(j => s.Contains(j))) return null;
-            return s;
-        }
-
-        private static DateTime? ParseDate(string s)
-        {
-            if (string.IsNullOrWhiteSpace(s)) return null;
-            var formats = new[] { "d/M/yy", "d/M/yyyy", "d-M-yy", "d-M-yyyy", "M/d/yy", "M/d/yyyy" };
-            foreach (var fmt in formats)
-            {
-                if (DateTime.TryParseExact(s.Trim(), fmt, CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
-                    return dt;
-            }
-            return null;
-        }
-
-        private static bool TryParseDecimal(string s, out decimal result)
-        {
-            result = 0;
-            if (string.IsNullOrWhiteSpace(s)) return false;
-            return decimal.TryParse(s.Replace(",", "").Replace(" ", ""), NumberStyles.Any, CultureInfo.InvariantCulture, out result);
         }
 
         private async Task InsertInvoice(System.Data.IDbConnection conn, ParsedInvoice inv, Guid employeeId, int workNumber, int rowOffset)
@@ -480,28 +395,6 @@ namespace Carmasters.Http.Api.Controllers
                     "INSERT INTO domain.serviceperformed (id, repairjobid, mechanicid) VALUES (@id, @rjid, @mid)",
                     new { id = salId, rjid = rjId, mid = employeeId });
             }
-        }
-
-        private class ParsedInvoice
-        {
-            public string SourceFile { get; set; }
-            public int? InvoiceNumber { get; set; }
-            public DateTime? Date { get; set; }
-            public string Customer { get; set; }
-            public string VehicleModel { get; set; }
-            public string LicensePlate { get; set; }
-            public int? Kilometers { get; set; }
-            public decimal? TotalAmount { get; set; }
-            public List<ParsedItem> Items { get; set; } = new();
-            public List<string> Warnings { get; set; } = new();
-        }
-
-        private class ParsedItem
-        {
-            public string Description { get; set; }
-            public decimal? Quantity { get; set; }
-            public decimal? UnitPrice { get; set; }
-            public decimal? Amount { get; set; }
         }
 
         private class ImportedInvoiceResult

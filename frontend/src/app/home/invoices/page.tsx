@@ -5,6 +5,7 @@ import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SearchInput from "../_components/SearchInput";
 import SearchButton from "@/_components/SearchButton";
 import InvoiceImportDialog from "./_components/InvoiceImportDialog";
+import DeleteInvoiceButton from "./_components/DeleteInvoiceButton";
 import Link from "next/link";
 import moment from "moment";
 import { Badge } from "@/components/ui/badge";
@@ -126,6 +127,15 @@ export default async function Page(
       headerText: 'Status',
       dataFormatter: ({ issuance }: { issuance: IWorkIssuance }) => <PaidPill issuance={issuance} />,
     },
+    {
+      dataField: 'actions',
+      headerText: <span className="sr-only">Delete</span>,
+      headerClasses: () => 'relative py-3.5 px-3 w-px',
+      dataClasses: () => 'px-3 py-4 text-right whitespace-nowrap w-px',
+      dataFormatter: ({ issuance, id }: { issuance: IWorkIssuance; id: string }) => (
+        <DeleteInvoiceButton workId={id} invoiceNumber={issuance?.invoiceNumber} compact />
+      ),
+    },
   ];
 
   return (
@@ -142,9 +152,15 @@ export default async function Page(
           mobileCardFormatter={(item) => {
             const issuance = item.issuance as IWorkIssuance | undefined;
             return (
+              <div className="relative rounded-xl border border-border bg-card shadow-sm">
+                {/* Kept outside the Link: a button nested in an anchor is invalid
+                    markup and the tap would navigate instead of deleting. */}
+                <div className="absolute bottom-2 right-2 z-10">
+                  <DeleteInvoiceButton workId={item.id} invoiceNumber={issuance?.invoiceNumber} compact />
+                </div>
               <Link
                 href={`/home/invoices/${item.id}`}
-                className="block rounded-xl border border-border bg-card p-4 shadow-sm transition-colors active:bg-secondary"
+                className="block rounded-xl p-4 pr-12 transition-colors active:bg-secondary"
               >
                 <div className="mb-1 flex items-center justify-between">
                   <span className="text-sm font-semibold text-foreground tabular-nums">Invoice #{issuance?.invoiceNumber}</span>
@@ -161,6 +177,7 @@ export default async function Page(
                   </span>
                 )}
               </Link>
+              </div>
             );
           }}
         >

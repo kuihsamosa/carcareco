@@ -197,6 +197,13 @@ export default function InvoiceImportDialog() {
                             <td className="py-1.5 pl-3">
                               {statusBadge(r.status)}
                               {r.reason && <span className="ml-1.5 text-xs text-muted-foreground">{r.reason}</span>}
+                              {r.warnings && r.warnings.length > 0 && (
+                                <ul className="mt-0.5 space-y-0.5">
+                                  {r.warnings.map((w, wi) => (
+                                    <li key={wi} className="text-[11px] text-warning">{w}</li>
+                                  ))}
+                                </ul>
+                              )}
                             </td>
                           </tr>
                         ))}
